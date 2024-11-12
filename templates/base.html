@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PosturePal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="mainContainer"> <!-- Mila: Main container contains the navigation bar and block content -->
+        <div class="logo">
+            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/PosturePalLogo.png') }}"
+                    alt="PosturePal Logo"></a>
+        </div>
+        <div class="sidenav">
+            <a href="{{ url_for('home') }}">
+                <img class="navicons"
+                    src="{% if request.path == '/home' %}https://img.icons8.com/fluency-systems-filled/48/1A1A1A/home.png{% else %}https://img.icons8.com/fluency-systems-regular/50/home--v1.png{% endif %}"
+                    alt="home icon" />
+                Home
+            </a>
+            <a href="{{ url_for('statistics') }}">
+                <img class="navicons"
+                    src="{% if request.path == '/statistics' %}https://img.icons8.com/fluency-systems-filled/50/bar-chart.png{% else %}https://img.icons8.com/fluency-systems-regular/50/bar-chart.png{% endif %}"
+                    alt="statistics icon" />
+                Statistics
+            </a>
+            <a href="{{ url_for('information') }}">
+                <img class="navicons"
+                    src="{% if request.path == '/information' %}https://img.icons8.com/fluency-systems-filled/50/read.png{% else %}https://img.icons8.com/fluency-systems-regular/50/read.png{% endif %}"
+                    alt="information icon" />
+                Info
+            </a>
+            <a href="{{ url_for('settings') }}">
+                <img class="navicons"
+                    src="{% if request.path == '/settings' %}https://img.icons8.com/fluency-systems-filled/50/settings.png{% else %}https://img.icons8.com/fluency-systems-regular/50/settings--v1.png{% endif %}"
+                    alt="settings icon" />
+                Settings
+            </a>
+        </div>
+
+        <main>
+            <div class="PageBanner">
+                {% if request.path == '/home' %}
+                Home
+                {% elif request.path == '/statistics' %}
+                Statistics
+                {% elif request.path == '/information' %}
+                Info
+                {% elif request.path == '/settings' %}
+                Settings
+                {% else %}
+                Unknown Page
+                {% endif %}
+            </div>
+            <!-- Mila: When a page extends from base.html, its own content will go in block content below -->
+            <div class="blockContent">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

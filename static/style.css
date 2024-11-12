@@ -1,6 +1,79 @@
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: lightblue;
     margin: 0;
     padding: 0;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* ensure main takes up remaining width apart from the sidebar */
+}
+
+.blockContent {
+    padding: 20px;
+    width: 100%;
+}
+
+/* ============================== Base Page (that other pages extend layouts from) ========================================*/
+
+.mainContainer {
+    display: flex;
+    width: 100%;
+}
+
+.logo {
+    position: fixed;
+    z-index: 1;
+    top: 40px;
+    left: 32px;
+}
+
+.logo img {
+    height: 40px;
+}
+
+.sidenav {
+    height: 100vh;
+    position: sticky;
+    left: 0;
+    top: 0;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+    padding-right: 10vw;
+    font-size: 20px;
+}
+
+.sidenav a {
+    text-decoration: none;
+    color: black;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.navicons {
+    height: 35px;
+    width: 35px;
+    margin-right: 5px;
+}
+
+.PageBanner {
+    padding: 20px;
+    width: 100%;
+    background-color: #2B617D;
+    font-weight: 900;
+    color: white;
+    font-size: 30px;
 }
