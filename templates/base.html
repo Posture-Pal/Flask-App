@@ -46,7 +46,7 @@
         </div>
 
         <main>
-            <div class="PageBanner">
+            <div class="PageBanner"> <!-- Mila: Dynamically show page banner text depending on the route -->
                 {% if request.path == '/home' %}
                 Home
                 {% elif request.path == '/statistics' %}

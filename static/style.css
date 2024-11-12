@@ -7,13 +7,13 @@ body {
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+    box-sizing: border-box; /* mIla: Ensure no overflow */
 }
 
 main {
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* ensure main takes up remaining width apart from the sidebar */
+    flex-grow: 1; /* Mila: Ensure main takes up remaining width apart from the sidebar */
 }
 
 .blockContent {
@@ -21,7 +21,7 @@ main {
     width: 100%;
 }
 
-/* ============================== Base Page (that other pages extend layouts from) ========================================*/
+/* ======================== Base Page (that other pages extend layouts from) ==================================*/
 
 .mainContainer {
     display: flex;
@@ -73,7 +73,40 @@ main {
     padding: 20px;
     width: 100%;
     background-color: #2B617D;
-    font-weight: 900;
+    font-weight: 600; /* Mila: Semi-bold*/
     color: white;
     font-size: 30px;
+}
+
+/* ======================== Home Page ==================================*/
+
+.greeting {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.usageContainer {
+
+}
+
+.usageContainerFlex {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.usageCard {
+    padding: 10px;
+}
+
+.percentPosture {
+    font-size: 30px;
+    color: #46C261;
+}
+
+.usageSmallText{
+    font-size: 12px;
+}
+
+.usageBoldText {
+    font-weight: bold;
 }
