@@ -3,8 +3,7 @@
 {% block title %}PosturePal - Home{% endblock %}
 
 {% block content %}
-<div class="greeting"><p>Hello, User!</p></div> <!--TODO Replace User with actual name (from login) -->
-<!-- Dashboard graph will go here-->
+<div class="greeting"><p>Hello, {{ user }}!</p></div> <!-- Shows "Hello" followed by the user's name after they log in -->
 
 <div class="postureGoalContainer">
     <div class="percentPosture">85%</div> <!-- TODO Replace 85% with actual posture score -->
@@ -30,4 +29,6 @@
         </div>
     </div>
 </div>
+<a href="{{ url_for('logout') }}">Logout</a>
+
 {% endblock %}
