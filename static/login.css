@@ -1,0 +1,79 @@
+/* Reset default styles */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; }
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+/* ======================== Login Container ======================== */
+
+.loginContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;/* Space between elements */}
+
+
+.posturePalLogo {
+    width: 250px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+
+.loginButton {
+    width: 200px;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: #2B617D;
+    color: white;
+    height: 61px;
+    font-size: 28px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow effect */
+}
+
+
+.dividerLine {
+    width: 120%; 
+    height: 2px;
+    background-color: #e0e0e0;}
+
+.socialIcons {
+    display: flex;
+    justify-content: space-around;
+    width: 120%;
+}
+
+
+.socialIcon {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Creates a raised button look */
+}
+
+/* ======================== Flash Message for Logout ======================== */
+
+.flashMessages {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f8d7da; 
+    color: #721c24;
+    text-align: center;}
+
+.flashMessages li {
+    list-style-type: none; /* Removes bullet points from list items */}

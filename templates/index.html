@@ -1,21 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PosturePal</title>
     <link rel="stylesheet" href="{{  url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{  url_for('static', filename='login.css') }}">
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
-    <div class="container">
-        <h1>Test Flask App</h1>
-        <p>Test</p>
-        <!-- Mila: Login with Google will go on this page index.html, does not need to extend from base.html -->
-        <a href="{{ url_for('home') }}">Home (temporary as login button will be here)</a>
+    
+    <div class="loginContainer">
+        <!-- Display flash message for logout notification) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flashMessages">
+            <ul>
+                {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- PosturePal Logo -->
+        <img src="{{ url_for('static', filename='images/login.png') }}" alt="PosturePal Logo" class="posturePalLogo">
+
+        <button class="loginButton">Login With</button>
+
+        <div class="dividerLine"></div>
+
+        <!-- Login icons for Facebook, Google, and GitHub -->
+        <div class="socialIcons">
+            <a href="{{ url_for('facebook.login') }}">
+                <img src="{{ url_for('static', filename='images/facebook_icon.png') }}" alt="Facebook Icon"
+                    class="socialIcon">
+            </a>
+
+
+            <a href="{{ url_for('google.login') }}">
+                <img src="{{ url_for('static', filename='images/google_icon.png') }}" alt="Google Icon"
+                    class="socialIcon">
+            </a>
+
+
+            <a href="{{ url_for('github.login') }}">
+                <img src="{{ url_for('static', filename='images/github_icon.png') }}" alt="GitHub Icon"
+                    class="socialIcon">
+            </a>
+        </div>
     </div>
 </body>
+
 </html>
