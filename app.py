@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, url_for, session, flash
+from flask import Flask, render_template, redirect, url_for, session, flash, jsonify
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
 from flask_dance.contrib.github import make_github_blueprint, github
@@ -44,6 +44,7 @@ github_bp = make_github_blueprint(
     redirect_to="github_login",  # TODO: Change the redirect link when moving to cloud
 )
 app.register_blueprint(github_bp, url_prefix="/login")
+
 
 
 @app.route("/")
@@ -134,6 +135,10 @@ def home():
 @app.route("/statistics")
 def statistics():
     return render_template("statistics.html")
+
+@app.route("/test")
+def test():
+    return render_template("test.html")
 
 
 @app.route("/information")
