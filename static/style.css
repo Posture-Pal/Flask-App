@@ -110,3 +110,24 @@ main {
 .usageBoldText {
     font-weight: bold;
 }
+
+/* =========================== Info Page ==============================*/
+
+.informationContainer{
+    width: 100%;
+}
+
+.infoCardsContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+.infoCards {
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.infoCards img {
+    height: 200px;
+    border-radius: 25px;
+}
