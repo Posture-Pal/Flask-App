@@ -138,7 +138,7 @@ input:checked + .toggle-slider:before {
 
 button {
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 20px !important;
     border: none;
     color: #fff;
     background-color: #2B617D;
@@ -147,12 +147,12 @@ button {
 
 /* Styles for logout button */
 #logoutBtn {
-    padding: 6px;
+    padding: 12px;
     width: auto;
     border-radius: 20px;
     background-color: #d9534f;
     color: #ffffff;
-    font-size: 15px;
+    font-size: 17px;
     text-decoration: none;
 }
 
