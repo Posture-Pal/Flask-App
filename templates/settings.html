@@ -3,6 +3,7 @@
 {% block title %}PosturePal - Settings{% endblock %}
 
 {% block content %}
+<div class="marginContainer">
 <div class="settingsContainer">
     <!-- Device Section: Controls for device features like power, vibration, and sound -->
     <h2>Device</h2>
@@ -66,5 +67,6 @@
     <!-- TODO: Add export data logic for user information -->
     <button id="exportDataBtn">Export Data</button>
     <a href="{{ url_for('logout') }}" id="logoutBtn" class="logout">Logout</a>
+</div>
 </div>
 {% endblock %}

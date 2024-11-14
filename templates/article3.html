@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}PosturePal - Article{% endblock %}
+
+{% block content %}
+<div class="articleBanner">
+        <img src="{{ url_for('static', filename='images/ThumbnailBenefits.png') }}" alt="Banner">
+</div>
+<div class="marginContainer">
+<h1>Health Benefits Of Posture</h1>
+<p>Article Container</p>
+<a href="{{ url_for('information') }}" class="btn btn-primary">Back to Info</a>
+</div>
+{% endblock %}

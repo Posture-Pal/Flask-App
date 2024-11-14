@@ -145,6 +145,21 @@ def information():
 def settings():
     return render_template("settings.html")
 
+@app.route("/article1")
+def article1():
+    return render_template("article1.html")
 
+@app.route("/article2")
+def article2():
+    return render_template("article2.html")
+
+@app.route("/article3")
+def article3():
+    return render_template("article3.html")
+
+@app.route("/article4")
+def article4():
+    return render_template("article4.html")
+    
 if __name__ == "__main__":
     app.run(debug=True)

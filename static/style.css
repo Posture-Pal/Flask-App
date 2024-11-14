@@ -17,8 +17,12 @@ main {
 }
 
 .blockContent {
-    padding: 20px;
+    /* padding: 20px; */
     width: 100%;
+}
+
+.marginContainer {
+    padding: 20px;
 }
 
 /* ======================== Base Page (that other pages extend layouts from) ==================================*/
@@ -120,14 +124,34 @@ main {
 .infoCardsContainer{
     display: flex;
     flex-direction: column;
+    margin-left: 35px;
+}
+
+.infoCardsContainer a {
+    text-decoration: none;
+    color: black;
 }
 
 .infoCards {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 400;
+    margin-bottom: 40px;
 }
 
 .infoCards img {
     height: 200px;
     border-radius: 25px;
+}
+
+/* =========================== Article Pages ==============================*/
+
+.articleBanner {
+
+}
+
+.articleBanner img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
 }

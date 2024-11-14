@@ -3,6 +3,7 @@
 {% block title %}PosturePal - Home{% endblock %}
 
 {% block content %}
+<div class="marginContainer">
 <div class="greeting"><p>Hello, {{ user }}!</p></div> <!-- Shows "Hello" followed by the user's name after they log in -->
 
 <div class="postureGoalContainer">
@@ -30,5 +31,5 @@
     </div>
 </div>
 <a href="{{ url_for('logout') }}">Logout</a>
-
+</div>
 {% endblock %}
