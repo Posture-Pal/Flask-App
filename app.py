@@ -25,7 +25,7 @@ google_bp = make_google_blueprint(
         "openid",
         "https://www.googleapis.com/auth/userinfo.profile",
         "https://www.googleapis.com/auth/userinfo.email",
-    ],
+    ], 
 )
 app.register_blueprint(google_bp, url_prefix="/login")
 
