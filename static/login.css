@@ -14,14 +14,41 @@ body {
     background-color: #f0f0f0;
 }
 
+#splashScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #C0DCF2;
+    transition: transform 1s ease, opacity 1s ease;
+}
+
+#splashScreen.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
 /* ======================== Login Container ======================== */
 
-.loginContainer {
+#loginContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;/* Space between elements */}
+    gap: 20px;
+    opacity: 1;
+    transition: opacity 1s ease;
+    z-index: 500; /* make sure it's below the splashScreen */
+}
 
+
+#loginContainer.visible {
+    opacity: 1;
+}
 
 .posturePalLogo {
     width: 250px;
@@ -41,7 +68,7 @@ body {
     font-size: 28px;
     font-weight: 500;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow effect */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -63,7 +90,7 @@ body {
     cursor: pointer;
     border-radius: 10px;
     background-color: #ffffff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Creates a raised button look */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* ======================== Flash Message for Logout ======================== */
@@ -76,4 +103,5 @@ body {
     text-align: center;}
 
 .flashMessages li {
-    list-style-type: none; /* Removes bullet points from list items */}
+    list-style-type: none;
+}

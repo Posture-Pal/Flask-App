@@ -7,7 +7,7 @@ body {
 *,
 *::before,
 *::after {
-    box-sizing: border-box; /* mIla: Ensure no overflow */
+    box-sizing: border-box; /* Mila: Ensure no overflow */
 }
 
 main {

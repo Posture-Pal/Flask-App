@@ -16,8 +16,11 @@
 </head>
 
 <body>
-    
-    <div class="loginContainer">
+    <div id="splashScreen">
+        <img src="{{ url_for('static', filename='images/SplashScreen.png') }}" alt="Splash Screen Image">
+    </div>
+
+    <div id="loginContainer">
         <!-- Display flash message for logout notification) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -58,6 +61,7 @@
             </a>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='splash.js') }}"></script>
 </body>
 
 </html>
