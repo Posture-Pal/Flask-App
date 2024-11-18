@@ -1,15 +1,25 @@
 import os
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, redirect, url_for, session, flash, jsonify
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
 from flask_dance.contrib.github import make_github_blueprint, github
 from dotenv import load_dotenv
 
+import my_db
+
 # Load environment variables from the .env file
 load_dotenv()
 
+db = my_db.db
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:Elga_12345@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
 
 # Enable insecure transport (HTTP) for local development
 # TODO: Remove or set to it to 0 in production for HTTPS only
@@ -129,6 +139,7 @@ def logout():
 def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
+    my_db.add_user_and_login(user, email)
     return render_template("home.html", user=user, email=email)
 
 
