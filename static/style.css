@@ -155,3 +155,47 @@ main {
     max-height: 200px;
     object-fit: cover;
 }
+
+/* ===================== Responsiveness ====================== */
+
+.bottomnav {
+    display: none;
+    height: 50px;
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+    text-decoration: none;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 20px;
+}
+
+.bottomnav a {
+    text-decoration: none;
+    color: black;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+@media screen and (max-width: 1200px) {
+    .logo img {
+        height: 40px;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .sidenav {
+        display: none;
+    }
+
+    .bottomnav {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .logo {
+        display: none;
+    }
+}

@@ -77,8 +77,34 @@
                 {% block content %}
                 {% endblock %}
             </div>
+            <div class="bottomnav">
+                <a href="{{ url_for('home') }}">
+                    <img class="navicons"
+                        src="{% if request.path == '/home' %}https://img.icons8.com/fluency-systems-filled/48/1A1A1A/home.png{% else %}https://img.icons8.com/fluency-systems-regular/50/home--v1.png{% endif %}"
+                        alt="home icon" />
+                </a>
+                <a href="{{ url_for('statistics') }}">
+                    <img class="navicons"
+                        src="{% if request.path == '/statistics' %}https://img.icons8.com/fluency-systems-filled/50/bar-chart.png{% else %}https://img.icons8.com/fluency-systems-regular/50/bar-chart.png{% endif %}"
+                        alt="statistics icon" />
+                </a>
+                <a href="{{ url_for('information') }}">
+                    <img class="navicons" src="{% if request.path == '/information' or request.path == '/article1' or request.path == '/article2' or request.path == '/article3' or request.path == '/article4' %}
+                        https://img.icons8.com/fluency-systems-filled/50/read.png
+                    {% else %}
+                        https://img.icons8.com/fluency-systems-regular/50/read.png
+                    {% endif %}" alt="information icon" />
+                </a>
+                <a href="{{ url_for('settings') }}">
+                    <img class="navicons"
+                        src="{% if request.path == '/settings' %}https://img.icons8.com/fluency-systems-filled/50/settings.png{% else %}https://img.icons8.com/fluency-systems-regular/50/settings--v1.png{% endif %}"
+                        alt="settings icon" />
+                </a>
+            </div>
+        </div>
         </main>
-    </div>
+
+        
     <script src="{{ url_for('static', filename='settings.js') }}"></script>
     <!-- Includes JavaScript for settings page functionality -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
