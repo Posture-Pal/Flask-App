@@ -6,29 +6,53 @@ const pubnub = new PubNub({
 
 const channelName = "Posture-Pal";
 
+// Global variables for threshold values
+let thresholdYaw, thresholdPitch, thresholdRoll, thresholdTemperature, thresholdHumidity;
+
+// Function to fetch threshold values from the backend and store them in global variables
+function fetchThresholdValues() {
+    fetch("/threshold_values")
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("Error retrieving threshold values:", data.error);
+                return;
+            }
+
+            // Store the threshold values in global variables
+            thresholdYaw = data.threshold_yaw;
+            thresholdPitch = data.threshold_pitch;
+            thresholdRoll = data.threshold_roll;
+            thresholdTemperature = data.threshold_temperature;
+            thresholdHumidity = data.threshold_humidity;
+
+            console.log("Threshold values loaded:", {
+                thresholdYaw,
+                thresholdPitch,
+                thresholdRoll,
+                thresholdTemperature,
+                thresholdHumidity
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching threshold values:", error);
+        });
+}
+
+// Call this function initially to fetch threshold values
+fetchThresholdValues();
+
+let receivedData = {}; 
+
 pubnub.subscribe({
     channels: [channelName],
 });
 
-let receivedData = {};
-
-// Retrieve threshold values from the DOM
-const thresholdYaw = parseFloat(document.getElementById("threshold_yaw").innerText.split(":")[1].trim());
-const thresholdPitch = parseFloat(document.getElementById("threshold_pitch").innerText.split(":")[1].trim());
-const thresholdRoll = parseFloat(document.getElementById("threshold_roll").innerText.split(":")[1].trim());
-const thresholdTemperature = parseFloat(document.getElementById("threshold_temperature").innerText.split(":")[1].trim());
-const thresholdHumidity = parseFloat(document.getElementById("threshold_humidity").innerText.split(":")[1].trim());
-
 pubnub.addListener({
-    message: function (event) {
-        const data = event.message;
-
+    message: function(event) {
+        const data = JSON.parse(event.message); 
         console.log("Received data:", data);
         receivedData = data;
-
-        if (data.pitch) document.getElementById('currentPitch').innerText = `${data.pitch}°`;
-        if (data.yaw) document.getElementById('currentYaw').innerText = `${data.yaw}°`;
-        if (data.roll) document.getElementById('currentRoll').innerText = `${data.roll}°`;
 
         if (data.temperature) {
             document.getElementById("temperature").innerText = `Temperature: ${data.temperature}°C`;
@@ -46,102 +70,89 @@ pubnub.addListener({
             document.getElementById("yaw").innerText = `Yaw: ${data.yaw}°`;
         }
 
-        // comparison logic to add into a dict
-        let outOfThresholdData = {};
-
-        // compare received data with thresholds and log it
-        if (data.yaw && (data.yaw < thresholdYaw - 5 || data.yaw > thresholdYaw + 5)) {
-            console.log(`Yaw (${data.yaw}) is out of range (${thresholdYaw})`);
-            outOfThresholdData.yaw = data.yaw;
+        // Compare with received data using the checkThresholds function
+        if (checkThresholds(data)) {
+            sendDataToBackend(data);
         }
-        if (data.pitch && (data.pitch < thresholdPitch - 5 || data.pitch > thresholdPitch + 5)) {
-            console.log(`Pitch (${data.pitch}) is out of range (${thresholdPitch})`);
-            outOfThresholdData.pitch = data.pitch;
-        }
-        if (data.roll && (data.roll < thresholdRoll - 5 || data.roll > thresholdRoll + 5)) {
-            console.log(`Roll (${data.roll}) is out of range (${thresholdRoll})`);
-            outOfThresholdData.roll = data.roll;
-        }
-        if (data.temperature && (data.temperature < thresholdTemperature - 2 || data.temperature > thresholdTemperature + 2)) {
-            console.log(`Temperature (${data.temperature}) is out of range (${thresholdTemperature})`);
-            outOfThresholdData.temperature = data.temperature;
-        }
-        if (data.humidity && (data.humidity < thresholdHumidity - 5 || data.humidity > thresholdHumidity + 5)) {
-            console.log(`Humidity (${data.humidity}) is out of range (${thresholdHumidity})`);
-            outOfThresholdData.humidity = data.humidity;
-        }
-
-        if (Object.keys(outOfThresholdData).length > 0) {
-            fetch("/store_sensor_data", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(outOfThresholdData),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Response from backend:", data);
-                })
-                .catch(error => {
-                    console.error("Error sending out-of-threshold data:", error);
-                });
-        }
-
-
     },
-    status: function (statusEvent) {
+    status: function(statusEvent) {
         if (statusEvent.category === "PNConnectedCategory") {
             console.log("Connected to PubNub and subscribed to channel:", channelName);
         }
     }
 });
 
-function calibratePosture() {
-    if (Object.keys(receivedData).length > 0) {
-        fetch('/test', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(receivedData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message || 'Posture calibrated successfully!');
-            closeModal();
-        })
-        .catch(error => console.error('Error calibrating posture:', error));
-    } else {
-        alert('No sensor data received. Please ensure the device is active.');
+// Function to check if the values are out of the defined threshold range
+function checkThresholds(data) {
+    let outOfThresholdData = {};
+
+    if (data.yaw && (data.yaw < thresholdYaw - 5 || data.yaw > thresholdYaw + 5)) {
+        console.log(`Yaw (${data.yaw}) is out of range (${thresholdYaw})`);
+        outOfThresholdData.yaw = data.yaw;
     }
+    if (data.pitch && (data.pitch < thresholdPitch - 5 || data.pitch > thresholdPitch + 5)) {
+        console.log(`Pitch (${data.pitch}) is out of range (${thresholdPitch})`);
+        outOfThresholdData.pitch = data.pitch;
+    }
+    if (data.roll && (data.roll < thresholdRoll - 5 || data.roll > thresholdRoll + 5)) {
+        console.log(`Roll (${data.roll}) is out of range (${thresholdRoll})`);
+        outOfThresholdData.roll = data.roll;
+    }
+    if (data.temperature && (data.temperature < thresholdTemperature - 2 || data.temperature > thresholdTemperature + 2)) {
+        console.log(`Temperature (${data.temperature}) is out of range (${thresholdTemperature})`);
+        outOfThresholdData.temperature = data.temperature;
+    }
+    if (data.humidity && (data.humidity < thresholdHumidity - 5 || data.humidity > thresholdHumidity + 5)) {
+        console.log(`Humidity (${data.humidity}) is out of range (${thresholdHumidity})`);
+        outOfThresholdData.humidity = data.humidity;
+    }
+
+    // If there are any values out of range, return true
+    return Object.keys(outOfThresholdData).length > 0;
 }
 
-function closeModal() {
-    document.getElementById('calibrationModal').style.display = 'none';
+// Function to send out-of-threshold data to the backend
+function sendDataToBackend(data) {
+    fetch("/store_sensor_data", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),  // Sending the full data or outOfThresholdData
+    })
+    .then(response => response.json())
+    .then(responseData => {
+        console.log("Response from backend:", responseData);
+    })
+    .catch(error => {
+        console.error("Error sending out-of-threshold data:", error);
+    });
 }
 
-document.getElementById("saveDataButton").addEventListener("click", function () {
+// Event listener for the "Save Data" button
+document.getElementById("saveDataButton").addEventListener("click", function() {
     if (Object.keys(receivedData).length > 0) {
         fetch("/test", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(receivedData),
+            body: JSON.stringify(receivedData), 
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    console.log("Data saved:", data.message);
-                    document.getElementById("statusMessage").innerText = "Device calibrated and data saved!";
-                } else if (data.error) {
-                    console.error("Error saving data:", data.error);
-                    document.getElementById("statusMessage").innerText = "Error saving data.";
-                }
-            })
-            .catch(error => {
-                console.error("Error sending data to backend:", error);
-                document.getElementById("statusMessage").innerText = "Error sending data to backend.";
-            });
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                console.log("Data saved:", data.message);
+                document.getElementById("statusMessage").innerText = "Device calibrated and data saved!";
+            } else if (data.error) {
+                console.error("Error saving data:", data.error);
+                document.getElementById("statusMessage").innerText = "Error saving data.";
+            }
+        })
+        .catch(error => {
+            console.error("Error sending data to backend:", error);
+            document.getElementById("statusMessage").innerText = "Error sending data to backend.";
+        });
     } else {
         console.log("No data available to save.");
         document.getElementById("statusMessage").innerText = "No data available to save.";
