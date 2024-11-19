@@ -8,3 +8,4 @@ __pycache__/
 
 # Ignore virtual environments
 venv/
+__pycache__/app.cpython-312.pyc
