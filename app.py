@@ -135,9 +135,17 @@ def logout():
 
 @app.route("/home", methods=["GET", "POST"])
 def home():
+    user = session.get("user", "Guest")
+    email = session.get("email", "No email provided")
+    client_id = session.get("google_client_id", "No client_id provided")
+    
     user_data = my_db.get_user_by_email(email)
-    user_id = user_data["id"] if user_data else None
-    threshold_exists = my_db.threshold_exists(user_id) if user_id else False
+    if user_data:
+        user_id = user_data["id"]
+        threshold_exists = my_db.threshold_exists(user_id)
+    else:
+        user_id = None
+        threshold_exists = False
 
     if request.method == "POST":
         sensor_data = request.json 
@@ -160,9 +168,8 @@ def home():
             print(f"Error saving sensor data: {e}")
             return jsonify({"error": str(e)}), 500
 
-    user = session.get("user", "Guest")
-    email = session.get("email", "No email provided")
-    client_id = session.get("google_client_id", "No client_id provided")
+    if not user_data:
+        return redirect("/login")
 
     my_db.add_user_and_login(user, client_id, email)
 
