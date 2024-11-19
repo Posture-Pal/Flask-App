@@ -11,6 +11,11 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:mila1234@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+
 # Enable insecure transport (HTTP) for local development
 # TODO: Remove or set to it to 0 in production for HTTPS only
 if os.getenv("OAUTHLIB_INSECURE_TRANSPORT") == "1":
