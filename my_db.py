@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -159,6 +160,8 @@ def save_sensor_data(sensor_data, user_id):
             humidity=sensor_data.get('humidity'),
             timestamp=datetime.utcnow(), 
         )
+        
+        print(f"Saving sensor data: {new_sensor_data}")
         db.session.add(new_sensor_data)
         db.session.commit()
         return "Sensor data saved successfully."

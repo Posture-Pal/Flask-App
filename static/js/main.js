@@ -15,18 +15,20 @@ pubnub.subscribe({
 let receivedData = {}; 
 
     // Retrieve threshold values
-const thresholdYaw = parseFloat(document.getElementById("threshold_yaw").innerText.split(":")[1].trim());
-const thresholdPitch = parseFloat(document.getElementById("threshold_pitch").innerText.split(":")[1].trim());
-const thresholdRoll = parseFloat(document.getElementById("threshold_roll").innerText.split(":")[1].trim());
-const thresholdTemperature = parseFloat(document.getElementById("threshold_temperature").innerText.split(":")[1].trim());
-const thresholdHumidity = parseFloat(document.getElementById("threshold_humidity").innerText.split(":")[1].trim());
+const thresholdYaw = 12.3
+const thresholdPitch = 34.2
+const thresholdRoll = -1.98
+const thresholdTemperature = 23
+const thresholdHumidity = 66
 
 pubnub.addListener({
     message: function(event) {
-        const data = event.message;  
+        // console.log("Received event:", event); 
+        const data = JSON.parse(event.message); 
 
         console.log("Received data:", data);
         receivedData = data;
+        // console.log(data.yaw);
     
             // Compare with received data
 
