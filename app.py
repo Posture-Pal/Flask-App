@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 # Load environment variables from the .env file
 load_dotenv()
 
+db = my_db.db
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
