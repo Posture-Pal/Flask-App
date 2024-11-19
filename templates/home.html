@@ -6,6 +6,21 @@
 <div class="marginContainer">
 <div class="greeting"><p>Hello, {{ user }}!</p></div> <!-- Shows "Hello" followed by the user's name after they log in -->
 
+<!-- temporary display threshold values -->
+<p>Show calibration modal: {{ show_calibration_modal }}</p>
+<div>
+    <div id="threshold_yaw" style="display:none;">0</div>
+    <div id="threshold_pitch" style="display:none;">0</div>
+    <div id="threshold_roll" style="display:none;">0</div>
+    <div id="threshold_temperature" style="display:none;">25</div>
+    <div id="threshold_humidity" style="display:none;">50</div>
+</div>
+<div class="currentValuesContainer">
+    <div>Current Pitch: <span id="currentPitch">0</span></div>
+    <div>Current Yaw: <span id="currentYaw">0</span></div>
+    <div>Current Roll: <span id="currentRoll">0</span></div>
+</div>
+
 <div class="postureGoalContainer">
     <div class="percentPosture">85%</div> <!-- TODO Replace 85% with actual posture score -->
     <div>You are meeting your posture goal!</div> <!-- TODO Replace with conditional message to display if they are meeting their posture goal -->
@@ -31,5 +46,50 @@
     </div>
 </div>
 <a href="{{ url_for('logout') }}">Logout</a>
+
+{% if show_calibration_modal %}
+<div id="calibrationModal" class="modal" style="display:block;"> <!-- Initially show the modal if needed -->
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h2>Calibrate Your Posture</h2>
+        <p>Please stand up straight and click the button below to save your good posture.</p>
+        <button id="confirmPosture" onclick="calibratePosture()">Confirm Posture</button>
+    </div>
 </div>
+<script>
+    pubnub.addListener({
+        message: function(event) {
+            const data = event.message;
+            if (data.pitch) document.getElementById('currentPitch').innerText = `${data.pitch}°`;
+            if (data.yaw) document.getElementById('currentYaw').innerText = `${data.yaw}°`;
+            if (data.roll) document.getElementById('currentRoll').innerText = `${data.roll}°`;
+            receivedData = data; // keep track of latest data
+        },
+    });
+
+    function calibratePosture() {
+        if (Object.keys(receivedData).length > 0) {
+            fetch('/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(receivedData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Posture calibrated successfully!');
+                closeModal();
+            })
+            .catch(error => console.error('Error calibrating posture:', error));
+        } else {
+            alert('No sensor data received. Please ensure the device is active.');
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('calibrationModal').style.display = 'none';
+    }
+</script>
+</div>
+{% endif %}
+
 {% endblock %}

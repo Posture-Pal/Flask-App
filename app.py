@@ -141,9 +141,17 @@ def home():
     email = session.get("email", "No email provided")
     client_id = session.get("google_client_id", "No client_id provided")
     my_db.add_user_and_login(user, client_id, email)
-    return render_template("home.html", user=user, user_id= client_id, email=email)
-
-
+    
+    user_data = my_db.get_user_by_email(email)
+    if user_data:
+        user_id = user_data["id"]
+        threshold = my_db.get_threshold_by_user_id(user_id)
+        
+        if not threshold or 'pitch' not in threshold or 'yaw' not in threshold or 'roll' not in threshold:
+            show_calibration_modal = True
+        
+    return render_template("home.html", user=user, user_id=client_id, email=email, show_calibration_modal=show_calibration_modal)
+    
 @app.route("/statistics", methods=["GET"])
 def statistics():
     try:
@@ -203,9 +211,9 @@ def test():
             print(user_email)
             if not user_email:
                 return jsonify({"error": "User not authenticated"}), 401
-  
+
             user = my_db.get_user_by_email(user_email)
-          
+
             if not user:
                 return jsonify({"error": "User not found"}), 404
             
