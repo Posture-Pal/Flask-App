@@ -53,43 +53,10 @@
         <span class="close-button" onclick="closeModal()">&times;</span>
         <h2>Calibrate Your Posture</h2>
         <p>Please stand up straight and click the button below to save your good posture.</p>
-        <button id="confirmPosture" onclick="calibratePosture()">Confirm Posture</button>
+        <button id="saveDataButton" onclick="calibratePosture()">Confirm Posture</button>
     </div>
 </div>
-<script>
-    pubnub.addListener({
-        message: function(event) {
-            const data = event.message;
-            if (data.pitch) document.getElementById('currentPitch').innerText = `${data.pitch}°`;
-            if (data.yaw) document.getElementById('currentYaw').innerText = `${data.yaw}°`;
-            if (data.roll) document.getElementById('currentRoll').innerText = `${data.roll}°`;
-            receivedData = data; // keep track of latest data
-        },
-    });
-
-    function calibratePosture() {
-        if (Object.keys(receivedData).length > 0) {
-            fetch('/test', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(receivedData),
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message || 'Posture calibrated successfully!');
-                closeModal();
-            })
-            .catch(error => console.error('Error calibrating posture:', error));
-        } else {
-            alert('No sensor data received. Please ensure the device is active.');
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('calibrationModal').style.display = 'none';
-    }
-</script>
-</div>
 {% endif %}
-
+<script src="static/js/main.js"></script>
+</div>
 {% endblock %}
