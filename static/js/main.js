@@ -14,12 +14,22 @@ pubnub.subscribe({
 
 let receivedData = {}; 
 
+    // Retrieve threshold values
+const thresholdYaw = parseFloat(document.getElementById("threshold_yaw").innerText.split(":")[1].trim());
+const thresholdPitch = parseFloat(document.getElementById("threshold_pitch").innerText.split(":")[1].trim());
+const thresholdRoll = parseFloat(document.getElementById("threshold_roll").innerText.split(":")[1].trim());
+const thresholdTemperature = parseFloat(document.getElementById("threshold_temperature").innerText.split(":")[1].trim());
+const thresholdHumidity = parseFloat(document.getElementById("threshold_humidity").innerText.split(":")[1].trim());
+
 pubnub.addListener({
     message: function(event) {
         const data = event.message;  
 
         console.log("Received data:", data);
         receivedData = data;
+    
+            // Compare with received data
+
 
     if (data.temperature) {
         document.getElementById("temperature").innerText = `Temperature: ${data.temperature}°C`;
@@ -36,7 +46,50 @@ pubnub.addListener({
     if (data.yaw) {
         document.getElementById("yaw").innerText = `Yaw: ${data.yaw}°`;
     }
+        
+        // comparison logic to add into a dict
+    let outOfThresholdData = {};
 
+        // compare received data with thresholds and log it
+        if (data.yaw && (data.yaw < thresholdYaw - 5 || data.yaw > thresholdYaw + 5)) {
+            console.log(`Yaw (${data.yaw}) is out of range (${thresholdYaw})`);
+            outOfThresholdData.yaw = data.yaw;
+        }
+        if (data.pitch && (data.pitch < thresholdPitch - 5 || data.pitch > thresholdPitch + 5)) {
+            console.log(`Pitch (${data.pitch}) is out of range (${thresholdPitch})`);
+            outOfThresholdData.pitch = data.pitch;
+        }
+        if (data.roll && (data.roll < thresholdRoll - 5 || data.roll > thresholdRoll + 5)) {
+            console.log(`Roll (${data.roll}) is out of range (${thresholdRoll})`);
+            outOfThresholdData.roll = data.roll;
+        }
+        if (data.temperature && (data.temperature < thresholdTemperature - 2 || data.temperature > thresholdTemperature + 2)) {
+            console.log(`Temperature (${data.temperature}) is out of range (${thresholdTemperature})`);
+            outOfThresholdData.temperature = data.temperature;
+        }
+        if (data.humidity && (data.humidity < thresholdHumidity - 5 || data.humidity > thresholdHumidity + 5)) {
+            console.log(`Humidity (${data.humidity}) is out of range (${thresholdHumidity})`);
+            outOfThresholdData.humidity = data.humidity;
+        }
+
+        if (Object.keys(outOfThresholdData).length > 0) {
+            fetch("/store_sensor_data", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(outOfThresholdData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Response from backend:", data);
+                })
+                .catch(error => {
+                    console.error("Error sending out-of-threshold data:", error);
+                });
+        }
+
+        
     },
     status: function(statusEvent) {
         if (statusEvent.category === "PNConnectedCategory") {

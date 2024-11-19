@@ -15,7 +15,7 @@ db = my_db.db
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:yourPassword@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:Guglu%402002@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -144,9 +144,28 @@ def home():
     return render_template("home.html", user=user, user_id= client_id, email=email)
 
 
-@app.route("/statistics")
+@app.route("/statistics", methods=["GET"])
 def statistics():
-    return render_template("statistics.html")
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+
+        sensor_data_list = my_db.get_sensor_data_by_user_id(user_id)
+
+        if isinstance(sensor_data_list, dict) and "error" in sensor_data_list:
+            return jsonify(sensor_data_list), 404
+
+        return render_template("statistics.html", sensor_data=sensor_data_list)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/information")
@@ -184,6 +203,53 @@ def test():
             return jsonify({"error": str(e)}), 500
 
     return render_template("test.html")
+
+@app.route("/threshold_values", methods=["GET"])
+def threshold_values():
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+
+        threshold_data = my_db.get_threshold_by_user_id(user_id)
+
+        if "error" in threshold_data:
+            return jsonify(threshold_data), 404
+
+        return render_template("threshold_values.html", threshold_data=threshold_data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/store_sensor_data", methods=["POST"])
+def store_sensor_data():
+    if request.method == "POST":
+        sensor_data = request.json
+        try:
+            user_email = session.get("email")
+            if not user_email:
+                return jsonify({"error": "User not authenticated"}), 401
+
+            user = my_db.get_user_by_email(user_email)
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+            
+            user_id = user["id"]
+
+            my_db.save_sensor_data(sensor_data, user_id)
+
+            return jsonify({"message": "Sensor data saved successfully"}), 201
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}PosturePal - Settings{% endblock %}
+
+{% block content %}
+    <p>Test Statistics Page p tag in block content</p>
+     <ul>
+            <li id="threshold_yaw">Yaw Threshold: {{ threshold_data.threshold_yaw }}</li>
+            <li id="threshold_pitch">Pitch Threshold: {{ threshold_data.threshold_pitch }}</li>
+            <li id="threshold_roll">Roll Threshold: {{ threshold_data.threshold_roll }}</li>
+            <li id="threshold_temperature">Temperature Threshold: {{ threshold_data.threshold_temperature }}</li>
+            <li id="threshold_humidity">Humidity Threshold: {{ threshold_data.threshold_humidity }}</li>
+        </ul>
+{% endblock %}

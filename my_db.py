@@ -122,3 +122,75 @@ def save_threshold(sensor_data, user_id):
     except Exception as e:
         print(f"Error saving or updating sensor thresholds: {e}")
         return "Error saving or updating sensor thresholds."
+
+
+def get_threshold_by_user_id(user_id):
+    try:
+        # Fetch the threshold entry for the given user ID
+        threshold = Threshold.query.filter_by(user_id=user_id).first()
+
+        if threshold:
+            # Return threshold values as a JSON object
+            return {
+                "user_id": threshold.user_id,
+                "threshold_yaw": threshold.threshold_yaw,
+                "threshold_pitch": threshold.threshold_pitch,
+                "threshold_roll": threshold.threshold_roll,
+                "threshold_temperature": threshold.threshold_temperature,
+                "threshold_humidity": threshold.threshold_humidity
+            }
+        else:
+            # No threshold found for the user ID
+            return {"error": "No threshold values found for the given user ID."}
+
+    except Exception as e:
+        print(f"Error retrieving threshold values: {e}")
+        return {"error": "An error occurred while retrieving threshold values."}
+
+
+def save_sensor_data(sensor_data, user_id):
+    try:
+        new_sensor_data = SensorData(
+            user_id=user_id,
+            yaw=sensor_data.get('yaw'),
+            pitch=sensor_data.get('pitch'),
+            roll=sensor_data.get('roll'),
+            temperature=sensor_data.get('temperature'),
+            humidity=sensor_data.get('humidity'),
+            timestamp=datetime.utcnow(), 
+        )
+        db.session.add(new_sensor_data)
+        db.session.commit()
+        return "Sensor data saved successfully."
+
+    except Exception as e:
+        print(f"Error saving sensor data: {e}")
+        return "Error saving sensor data."
+
+
+def get_sensor_data_by_user_id(user_id):
+    try:
+        # fetch all sensor data entries for a given user 
+        sensor_data_entries = SensorData.query.filter_by(user_id=user_id).all()
+
+        if sensor_data_entries:
+            # convert sensor data entries to a list of dictionaries
+            sensor_data_list = [
+                {
+                    "id": entry.id,
+                    "yaw": entry.yaw,
+                    "pitch": entry.pitch,
+                    "roll": entry.roll,
+                    "temperature": entry.temperature,
+                    "humidity": entry.humidity,
+                    "timestamp": entry.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                }
+                for entry in sensor_data_entries
+            ]
+            return sensor_data_list
+        else:
+            return {"error": "No sensor data found for the given user ID."}
+
+    except Exception as e:
+        print(f"Error retrieving sensor data: {e}")
+        return {"error": "An error occurred while retrieving sensor data."}
