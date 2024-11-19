@@ -11,14 +11,18 @@ class User(db.Model):
     login = db.Column(db.Integer)
     read_access = db.Column(db.Integer)
     write_access = db.Column(db.Integer)
+    email = db.Column(db.String(30))
+
     
-    def __init__(self, name, user_id, token, login, read_access, write_access):
+    def __init__(self, name, user_id, token, login, read_access, write_access, email):
         self.name = name
         self.user_id = user_id
         self.token = token
         self.login = login
         self.read_access = read_access
         self.write_access = write_access
+        self.email = email
+
 
 
 class SensorData(db.Model):
@@ -50,14 +54,71 @@ def get_user_row_if_exists(user_id):
     else:
         print("That user does not exist")
         return False
+    
+
+def get_user_row_if_exists_using_id(id):
+    get_user_row = User.query.filter_by(id=id).first()
+    if get_user_row is not None:
+        return get_user_row
+    else:
+        print("That user does not exist")
+        return False
 
 
-def add_user_and_login(name, user_id):
+def add_user_and_login(name, user_id, email):
     row = get_user_row_if_exists(user_id)
     if row is not False:
         row.login = 1
         db.session.commit()
     else:
-        new_user = User(name, user_id, None, 1, 0, 0)
+        new_user = User(name, user_id, None, 1, 0, 0, email)
         db.session.add(new_user)
         db.session.commit()
+
+def get_user_by_email(email):
+    try:
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            return {"id": user.id, "name": user.name, "email": user.email}
+        else:
+            return None
+    except Exception as e:
+        print(f"Error retrieving user by email: {e}")
+        return None
+
+
+def save_threshold(sensor_data, user_id):
+    try:
+        # check if the user already exists
+        user_row = get_user_row_if_exists_using_id(user_id)
+        existing_threshold = Threshold.query.filter_by(user_id=user_id).first()
+        
+        if user_row and existing_threshold:
+           #update the existing threshold values
+            existing_threshold.threshold_yaw = sensor_data.get('yaw')
+            existing_threshold.threshold_pitch = sensor_data.get('pitch')
+            existing_threshold.threshold_roll = sensor_data.get('roll')
+            existing_threshold.threshold_temperature = sensor_data.get('temperature')
+            existing_threshold.threshold_humidity = sensor_data.get('humidity')
+
+            db.session.commit()  
+            return "Sensor thresholds updated successfully."
+        else:
+        
+            new_threshold = Threshold(
+                user_id=user_id,
+                threshold_yaw=sensor_data.get('yaw'),
+                threshold_pitch=sensor_data.get('pitch'),
+                threshold_roll=sensor_data.get('roll'),
+                threshold_temperature=sensor_data.get('temperature'),
+                threshold_humidity=sensor_data.get('humidity')
+            )
+
+            db.session.add(new_threshold)
+            db.session.commit()
+            return "Sensor thresholds saved successfully."
+
+    except Exception as e:
+        print(f"Error saving or updating sensor thresholds: {e}")
+        return "Error saving or updating sensor thresholds."

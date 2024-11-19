@@ -1,6 +1,6 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
 from flask_dance.contrib.github import make_github_blueprint, github
@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 
 import my_db
 
-# Load environment variables from the .env file
 load_dotenv()
 
 db = my_db.db
@@ -16,7 +15,7 @@ db = my_db.db
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:Elga_12345@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:yourPassword@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -83,6 +82,7 @@ def google_login():
     print("User Info:", user_info)
     session["user"] = user_info.get("name", "Unknown User")
     session["email"] = user_info.get("email", "No email provided")
+    session["google_client_id"] = user_info.get("id")
 
     return redirect(url_for("home"))
 
@@ -139,17 +139,14 @@ def logout():
 def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
-    my_db.add_user_and_login(user, email)
-    return render_template("home.html", user=user, email=email)
+    client_id = session.get("google_client_id", "No client_id provided")
+    my_db.add_user_and_login(user, client_id, email)
+    return render_template("home.html", user=user, user_id= client_id, email=email)
 
 
 @app.route("/statistics")
 def statistics():
     return render_template("statistics.html")
-
-@app.route("/test")
-def test():
-    return render_template("test.html")
 
 
 @app.route("/information")
@@ -161,6 +158,32 @@ def information():
 def settings():
     return render_template("settings.html")
 
+@app.route("/test", methods=["GET", "POST"])
+def test():
+    if request.method == "POST":
+        sensor_data = request.json  
+        try:
+            user_email = session.get("email")
+            print(session.get("google_client_id"))
+            print(user_email)
+            if not user_email:
+                return jsonify({"error": "User not authenticated"}), 401
+  
+            user = my_db.get_user_by_email(user_email)
+          
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+            
+            user_id = user["id"]
+            
+            message = my_db.save_threshold(sensor_data, user_id)
+            
+            return jsonify({"message": message}), 201
+        
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    return render_template("test.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
