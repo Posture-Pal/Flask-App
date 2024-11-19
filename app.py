@@ -135,6 +135,10 @@ def logout():
 
 @app.route("/home", methods=["GET", "POST"])
 def home():
+    user_data = my_db.get_user_by_email(email)
+    user_id = user_data["id"] if user_data else None
+    threshold_exists = my_db.threshold_exists(user_id) if user_id else False
+
     if request.method == "POST":
         sensor_data = request.json 
         try:
@@ -161,10 +165,6 @@ def home():
     client_id = session.get("google_client_id", "No client_id provided")
 
     my_db.add_user_and_login(user, client_id, email)
-
-    user_data = my_db.get_user_by_email(email)
-    user_id = user_data["id"] if user_data else None
-    threshold_exists = my_db.threshold_exists(user_id) if user_id else False
 
     return render_template(
         "home.html",
