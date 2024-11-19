@@ -222,7 +222,8 @@ def threshold_values():
         if "error" in threshold_data:
             return jsonify(threshold_data), 404
 
-        return render_template("threshold_values.html", threshold_data=threshold_data)
+        # Return the threshold data as JSON instead of rendering a template
+        return jsonify(threshold_data)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
