@@ -15,7 +15,7 @@ db = my_db.db
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:Guglu%402002@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -222,7 +222,8 @@ def threshold_values():
         if "error" in threshold_data:
             return jsonify(threshold_data), 404
 
-        return render_template("threshold_values.html", threshold_data=threshold_data)
+        # Return the threshold data as JSON instead of rendering a template
+        return jsonify(threshold_data)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -232,6 +233,7 @@ def threshold_values():
 def store_sensor_data():
     if request.method == "POST":
         sensor_data = request.json
+        # print(f"Received sensor data: {sensor_data}")
         try:
             user_email = session.get("email")
             if not user_email:
