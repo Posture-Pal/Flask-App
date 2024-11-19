@@ -133,16 +133,46 @@ def logout():
     flash("You have been logged out successfully.", "info")
     return redirect(url_for("index"))
 
-
-@app.route("/home")
-# Display the home page with user info
+@app.route("/home", methods=["GET", "POST"])
 def home():
+    if request.method == "POST":
+        sensor_data = request.json 
+        try:
+            user_email = session.get("email")
+            if not user_email:
+                return jsonify({"error": "User not authenticated"}), 401
+
+            user = my_db.get_user_by_email(user_email)
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+
+            user_id = user["id"]
+            
+            message = my_db.save_threshold(sensor_data, user_id)
+
+            return jsonify({"message": message}), 201
+
+        except Exception as e:
+            print(f"Error saving sensor data: {e}")
+            return jsonify({"error": str(e)}), 500
+
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
     client_id = session.get("google_client_id", "No client_id provided")
-    my_db.add_user_and_login(user, client_id, email)
-    return render_template("home.html", user=user, user_id= client_id, email=email)
 
+    my_db.add_user_and_login(user, client_id, email)
+
+    user_data = my_db.get_user_by_email(email)
+    user_id = user_data["id"] if user_data else None
+    threshold_exists = my_db.threshold_exists(user_id) if user_id else False
+
+    return render_template(
+        "home.html",
+        user=user,
+        user_id=client_id,
+        email=email,
+        show_calibration_modal=not threshold_exists
+    )
 
 @app.route("/statistics", methods=["GET"])
 def statistics():

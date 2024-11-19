@@ -132,7 +132,7 @@ function sendDataToBackend(data) {
 // Event listener for the "Save Data" button
 document.getElementById("saveDataButton").addEventListener("click", function() {
     if (Object.keys(receivedData).length > 0) {
-        fetch("/test", {
+        fetch("/home", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -158,3 +158,7 @@ document.getElementById("saveDataButton").addEventListener("click", function() {
         document.getElementById("statusMessage").innerText = "No data available to save.";
     }
 });
+
+function closeModal() {
+    document.getElementById("calibrationModal").style.display = "none";
+}

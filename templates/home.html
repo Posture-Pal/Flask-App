@@ -29,6 +29,19 @@
         </div>
     </div>
 </div>
+
+{% if show_calibration_modal %}
+<div id="calibrationModal" class="modal" style="display:block;">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h2>Calibrate Your Posture</h2>
+        <p>Please stand up straight and click the button below to save your good posture</p>
+        <button id="saveDataButton">Confirm Posture</button>
+        <p id="statusMessage"></p>
+    </div>
+</div>
+{% endif %}
+
 <a href="{{ url_for('logout') }}">Logout</a>
 
 {% endblock %}
