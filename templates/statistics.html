@@ -1,9 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}PosturePal - Settings{% endblock %}
+{% block title %}PosturePal - Statistics{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <div class="marginContainer">
     <p>Test Statistics Page p tag in block content</p>
 </div>
 {% endblock %}
+=======
+    <h2>Sensor Data Statistics</h2>
+    
+    {% if sensor_data %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Yaw</th>
+                    <th>Pitch</th>
+                    <th>Roll</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in sensor_data %}
+                    <tr>
+                        <td>{{ entry.id }}</td>
+                        <td>{{ entry.yaw }}</td>
+                        <td>{{ entry.pitch }}</td>
+                        <td>{{ entry.roll }}</td>
+                        <td>{{ entry.temperature }}</td>
+                        <td>{{ entry.humidity }}</td>
+                        <td>{{ entry.timestamp }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No sensor data available.</p>
+    {% endif %}
+{% endblock %}
+>>>>>>> Database

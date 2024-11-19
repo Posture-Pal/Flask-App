@@ -1,11 +1,13 @@
 import os
-from flask import Flask, render_template, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
 from flask_dance.contrib.github import make_github_blueprint, github
 from dotenv import load_dotenv
 
-# Load environment variables from the .env file
+import my_db
+
 load_dotenv()
 
 db = my_db.db
@@ -53,6 +55,7 @@ github_bp = make_github_blueprint(
 app.register_blueprint(github_bp, url_prefix="/login")
 
 
+
 @app.route("/")
 # Redirect to home if the user is already logged in
 def index():
@@ -79,6 +82,7 @@ def google_login():
     print("User Info:", user_info)
     session["user"] = user_info.get("name", "Unknown User")
     session["email"] = user_info.get("email", "No email provided")
+    session["google_client_id"] = user_info.get("id")
 
     return redirect(url_for("home"))
 
@@ -135,12 +139,33 @@ def logout():
 def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
-    return render_template("home.html", user=user, email=email)
+    client_id = session.get("google_client_id", "No client_id provided")
+    my_db.add_user_and_login(user, client_id, email)
+    return render_template("home.html", user=user, user_id= client_id, email=email)
 
 
-@app.route("/statistics")
+@app.route("/statistics", methods=["GET"])
 def statistics():
-    return render_template("statistics.html")
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+
+        sensor_data_list = my_db.get_sensor_data_by_user_id(user_id)
+
+        if isinstance(sensor_data_list, dict) and "error" in sensor_data_list:
+            return jsonify(sensor_data_list), 404
+
+        return render_template("statistics.html", sensor_data=sensor_data_list)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/information")
@@ -167,6 +192,80 @@ def article3():
 @app.route("/article4")
 def article4():
     return render_template("article4.html")
-    
+
+@app.route("/test", methods=["GET", "POST"])
+def test():
+    if request.method == "POST":
+        sensor_data = request.json  
+        try:
+            user_email = session.get("email")
+            print(session.get("google_client_id"))
+            print(user_email)
+            if not user_email:
+                return jsonify({"error": "User not authenticated"}), 401
+  
+            user = my_db.get_user_by_email(user_email)
+          
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+            
+            user_id = user["id"]
+            
+            message = my_db.save_threshold(sensor_data, user_id)
+            
+            return jsonify({"message": message}), 201
+        
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    return render_template("test.html")
+
+@app.route("/threshold_values", methods=["GET"])
+def threshold_values():
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+
+        threshold_data = my_db.get_threshold_by_user_id(user_id)
+
+        if "error" in threshold_data:
+            return jsonify(threshold_data), 404
+
+        return render_template("threshold_values.html", threshold_data=threshold_data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/store_sensor_data", methods=["POST"])
+def store_sensor_data():
+    if request.method == "POST":
+        sensor_data = request.json
+        try:
+            user_email = session.get("email")
+            if not user_email:
+                return jsonify({"error": "User not authenticated"}), 401
+
+            user = my_db.get_user_by_email(user_email)
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+            
+            user_id = user["id"]
+
+            my_db.save_sensor_data(sensor_data, user_id)
+
+            return jsonify({"message": "Sensor data saved successfully"}), 201
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)
