@@ -6,6 +6,28 @@
 <div class="greeting"><p>Hello, {{ user }}!</p></div> <!-- Shows "Hello" followed by the user's name after they log in -->
 
 <div class="postureGoalContainer">
+    {% if sensor_data %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Yaw</th>
+                    <th>Pitch</th>
+                    <th>Roll</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in sensor_data %}
+                    <tr>
+                        <td>{{ entry.yaw }}</td>
+                        <td>{{ entry.pitch }}</td>
+                        <td>{{ entry.roll }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No sensor data available.</p>
+    {% endif %}
     <div class="percentPosture">85%</div> <!-- TODO Replace 85% with actual posture score -->
     <div>You are meeting your posture goal!</div> <!-- TODO Replace with conditional message to display if they are meeting their posture goal -->
 </div>

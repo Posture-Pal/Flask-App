@@ -5,6 +5,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
 from flask_dance.contrib.github import make_github_blueprint, github
 from dotenv import load_dotenv
+from datetime import datetime
 
 import my_db
 
@@ -168,8 +169,24 @@ def home():
             print(f"Error saving sensor data: {e}")
             return jsonify({"error": str(e)}), 500
 
-    if not user_data:
-        return redirect("/login")
+    # if not user_data:
+    #     return redirect("/login")
+
+
+    try:
+        sensor_data_list = my_db.get_sensor_data_by_user_id(user_id)
+
+        if isinstance(sensor_data_list, dict) and "error" in sensor_data_list:
+            sensor_data_list = []
+
+        today = datetime.now().date()
+        sensor_data_list = [
+            entry for entry in sensor_data_list
+            if datetime.fromisoformat(entry["timestamp"]).date() == today
+        ]
+
+    except Exception as e:
+        sensor_data_list = []
 
     my_db.add_user_and_login(user, client_id, email)
 
@@ -178,6 +195,7 @@ def home():
         user=user,
         user_id=client_id,
         email=email,
+        sensor_data=sensor_data_list,
         show_calibration_modal=not threshold_exists
     )
 
