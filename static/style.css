@@ -110,6 +110,16 @@ main {
 .usageBoldText {
     font-weight: bold;
 }
+
+/* == Canvas == */
+
+.chartCanvas {
+    width: 800px;
+    height: 500px;
+    display: block;
+    margin: 0 auto;
+}
+
 /* ======================== Modal ==================================*/
 
 .modal {

@@ -7,24 +7,62 @@
 
 <div class="postureGoalContainer">
     {% if sensor_data %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Yaw</th>
-                    <th>Pitch</th>
-                    <th>Roll</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in sensor_data %}
-                    <tr>
-                        <td>{{ entry.yaw }}</td>
-                        <td>{{ entry.pitch }}</td>
-                        <td>{{ entry.roll }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <canvas id="postureChart" class="chartCanvas"></canvas>
+        <script>
+            // Prepare posture data
+            const sensorData = {{ sensor_data | tojson }};
+            const timestamps = sensorData.map(entry => new Date(entry.timestamp).toLocaleTimeString());
+            const postureLabels = sensorData.map(entry => entry.pitch < -50 ? "Good Posture" : "Bad Posture");
+            const postureValues = sensorData.map(entry => entry.pitch);
+
+            // Line chart configuration
+            const ctx = document.getElementById('postureChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [{
+                        label: 'Pitch Angle (°)',
+                        data: postureValues,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        pointBackgroundColor: postureLabels.map(label => label === "Good Posture" ? 'green' : 'red'),
+                        pointBorderColor: postureLabels.map(label => label === "Good Posture" ? 'green' : 'red'),
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time',
+                            },
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Pitch Angle (°)',
+                            },
+                            suggestedMin: -100,
+                            suggestedMax: 0
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const posture = postureLabels[index];
+                                    return `${context.raw}° (${posture})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
     {% else %}
         <p>No sensor data available.</p>
     {% endif %}
