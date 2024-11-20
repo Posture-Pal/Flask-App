@@ -45,3 +45,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+let alertTriggered = false;
+
+function updateTemperatureDisplay(temperature) {
+    const deviceTempElement = document.getElementById("deviceTemp");
+    deviceTempElement.textContent = `${temperature}°C`;
+
+    if (temperature > 30 && !alertTriggered) {
+        alertTriggered = true;
+        showPushNotification(`High Temperature Alert: ${temperature}°C`);
+    } else if (temperature <= 30) {
+        alertTriggered = false;
+    }
+}
+
+function showPushNotification(message) {
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+            new Notification("Temperature Alert", { body: message });
+        } else if (Notification.permission === "default") {
+            Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                    new Notification("Temperature Alert", { body: message });
+                }
+            });
+        }
+    } else {
+        alert("This browser does not support notifications.");
+    }
+}
+
+function fetchLatestTemperature() {
+    //console.log("Fetching latest temperature");
+    fetch("/api/latest_temperature")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.temperature !== undefined) {
+                const temperature = data.temperature;
+                updateTemperatureDisplay(temperature);
+            } else {
+                console.error("Temperature data not found:", data);
+            }
+        })
+        .catch((error) => console.error("Error fetching temperature:", error));
+}
+
+// Check the temperature every minute (60,000)
+setInterval(fetchLatestTemperature, 60000);
+
+
+// Initial fetch when the page loads
+fetchLatestTemperature();

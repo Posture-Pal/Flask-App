@@ -32,8 +32,7 @@
                 <span class="slider"></span>
             </label>
         </div>
-        <!-- TODO: Fetch real-time device temperature from backend -->
-        <p>Device Temperature: <span id="deviceTemp">27°C</span></p>
+        <p>Device Temperature: <span id="deviceTemp">{{ device_temp }}°C</span></p>
         <!-- TODO: Add functionality for calibrate button -->
         <button id="calibrateBtn">Calibrate Device</button>
     </div>
@@ -62,10 +61,9 @@
 
     <!-- Account Section -->
     <h2>Account</h2>
-    <!-- TODO: Implement functionality for setting user goals -->
-    <button id="setGoalBtn">Set Goal</button>
-    <!-- TODO: Add export data logic for user information -->
-    <button id="exportDataBtn">Export Data</button>
+    <br>
+    <!-- <button id="setGoalBtn">Set Goal</button> -->
+    <!-- <button id="exportDataBtn">Export Data</button> -->
     <a href="{{ url_for('logout') }}" id="logoutBtn" class="logout">Logout</a>
 </div>
 </div>

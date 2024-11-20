@@ -15,7 +15,7 @@ db = my_db.db
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:mila1234@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -172,10 +172,59 @@ def statistics():
 def information():
     return render_template("information.html")
 
+@app.route("/api/latest_temperature", methods=["GET"])
+def latest_temperature():
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+        sensor_data_list = my_db.get_sensor_data_by_user_id(user_id)
+
+        if isinstance(sensor_data_list, list) and sensor_data_list:
+            # Sort sensor data by timestamp (assuming timestamp is a datetime object)
+            latest_entry = max(sensor_data_list, key=lambda x: x["timestamp"])  # Get the most recent entry
+            latest_temperature = latest_entry.get("temperature", "N/A")
+        else:
+            return jsonify({"error": "No sensor data found for the user."}), 404
+
+        return jsonify({"temperature": latest_temperature}), 200
+
+    except Exception as e:
+        print(f"Error in latest_temperature endpoint: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/settings")
 def settings():
-    return render_template("settings.html")
+    
+    try:
+        user_email = session.get("email")
+        
+        if not user_email:
+            return redirect(url_for("login"))
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return "User not found.", 404
+
+        user_id = user["id"]
+        sensor_data = my_db.get_sensor_data_by_user_id(user_id)
+
+        if isinstance(sensor_data, list) and sensor_data:
+            latest_temperature = sensor_data[-1].get("temperature", "N/A") 
+        else:
+            latest_temperature = "No data available"
+
+        return render_template("settings.html", device_temp=latest_temperature)
+
+    except Exception as e:
+        print(f"Error in settings route: {e}")
+        return "An error occurred.", 500
 
 @app.route("/article1")
 def article1():
