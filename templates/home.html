@@ -15,14 +15,13 @@
             const postureLabels = sensorData.map(entry => entry.pitch < -50 ? "Good Posture" : "Bad Posture");
             const postureValues = sensorData.map(entry => entry.pitch);
 
-            // Line chart configuration
             const ctx = document.getElementById('postureChart').getContext('2d');
             const chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: timestamps,
                     datasets: [{
-                        label: 'Pitch Angle (°)',
+                        label: 'Posture Graph',
                         data: postureValues,
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
                         borderColor: 'rgba(54, 162, 235, 1)',
@@ -42,11 +41,12 @@
                         },
                         y: {
                             title: {
-                                display: true,
+                                display: false,
                                 text: 'Pitch Angle (°)',
                             },
                             suggestedMin: -100,
-                            suggestedMax: 0
+                            suggestedMax: 0,
+                            reverse: true // Flip the Y axis to show bad posture at the bottom instead of top
                         }
                     },
                     plugins: {
