@@ -48,21 +48,32 @@
 
     <div>
         <!-- Button to trigger calibration -->
-    <button id="calibrate-btn">Calibrate Posture</button>
+        <button id="calibrate-btn">Calibrate Posture</button>
 
-    <!-- Table to display threshold values -->
-    <table id="threshold-table" border="1" style="margin-top: 20px; display: none;">
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody id="threshold-values">
-            <!-- Data will be populated dynamically -->
-        </tbody>
-    </table>
-
+        <!-- Table to display threshold values -->
+        <table id="threshold-table" border="1" style="margin-top: 20px; display: none;">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody id="threshold-values">
+                <!-- Data will be populated dynamically -->
+            </tbody>
+        </table>
     </div>
+
+    <div>
+        <label>
+            <input type="checkbox" id="sound-toggle" />
+            Sound Mode
+        </label>
+        <label>
+            <input type="checkbox" id="vibration-toggle" />
+            Vibration Mode
+        </label>
+    </div>
+
 </div>
 {% endblock %}

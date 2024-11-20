@@ -170,9 +170,42 @@ function startListeningForUpdates() {
     });
 }
 
+//send a "sound_mode: true/false, vibration_mode: true/false" message to PubNub
+function sendModesStatus() {
+    const soundToggle = document.getElementById("sound-toggle").checked;
+    const vibrationToggle = document.getElementById("vibration-toggle").checked;
+
+    const message = {
+        sound_mode: soundToggle,
+        vibration_mode: vibrationToggle,
+    };
+
+    pubnub.publish(
+        {
+            channel: CHANNEL_NAME,
+            message: message,
+        },
+        (status, response) => {
+            if (status.error) {
+                console.error("Error publishing mode status:", status);
+            } else {
+                console.log("Mode status message sent:", response);
+            }
+        }
+    );
+}
+
+function initToggleListeners() {
+    const soundToggle = document.getElementById("sound-toggle");
+    const vibrationToggle = document.getElementById("vibration-toggle");
+
+    soundToggle.addEventListener("change", sendModesStatus);
+    vibrationToggle.addEventListener("change", sendModesStatus);
+}
 
 function initApp() {
     startListeningForUpdates();
+
     const powerButton = document.getElementById("power-btn");
     powerButton.addEventListener("click", () => {
         sendPowerOnMessage();
@@ -187,7 +220,8 @@ function initApp() {
     calibrateButton.addEventListener("click", () => {
         sendCalibrationMessage();
     });
-}
 
+    initToggleListeners();
+}
 
 document.addEventListener("DOMContentLoaded", initApp);
