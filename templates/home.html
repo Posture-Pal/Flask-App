@@ -45,5 +45,24 @@
         <p id="pitch-value">Pitch: --</p>
         <p id="gravity-vector">Gravity Vector: --</p>
     </div>
+
+    <div>
+        <!-- Button to trigger calibration -->
+    <button id="calibrate-btn">Calibrate Posture</button>
+
+    <!-- Table to display threshold values -->
+    <table id="threshold-table" border="1" style="margin-top: 20px; display: none;">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody id="threshold-values">
+            <!-- Data will be populated dynamically -->
+        </tbody>
+    </table>
+
+    </div>
 </div>
 {% endblock %}

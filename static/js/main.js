@@ -6,6 +6,37 @@ const pubnub = new PubNub({
 
 const CHANNEL_NAME = "Posture-Pal";
 
+
+
+function startListeningForUpdates() {
+    console.log("Subscribing to channel:", CHANNEL_NAME);
+
+    pubnub.subscribe({ channels: [CHANNEL_NAME] });
+
+    pubnub.addListener({
+        message: (event) => {
+            console.log("Received message:", event.message);
+
+            // check if the message contains calibration thresholds
+            if (event.message.thresholds) {
+                updateThresholdTable(event.message.thresholds);
+            } else {
+                // regular slouch data
+                updateDataInHTML(event.message);
+            }
+        },
+        status: (statusEvent) => {
+            if (statusEvent.category === "PNConnectedCategory") {
+                console.log("Successfully connected to PubNub channel.");
+            } else {
+                console.warn("PubNub connection status:", statusEvent);
+            }
+        },
+    });
+}
+
+
+//send a "power: true" message to PubNub
 function sendPowerOnMessage() {
     const message = { power: true };
 
@@ -24,6 +55,23 @@ function sendPowerOnMessage() {
     );
 }
 
+//send a "power: false" message to PubNub
+function sendPowerOffMessage() {
+    const message = { power: false };
+
+    pubnub.publish({
+        channel: CHANNEL_NAME,
+        message: message,
+    }, (status, response) => {
+        if (status.error) {
+            console.error("Error publishing message:", status);
+        } else {
+            console.log("Power OFF message sent:", response);
+        }
+    });
+}
+
+// display the slouch values with received data
 function updateDataInHTML(data) {
     if (!data) {
         console.error("No data received to update.");
@@ -49,6 +97,51 @@ function updateDataInHTML(data) {
     }`;
 }
 
+//send a "calibration_setup: true" message to PubNub
+function sendCalibrationMessage() {
+    const message = { calibration_setup: true };
+
+    pubnub.publish({
+        channel: CHANNEL_NAME,
+        message: message,
+    }, (status, response) => {
+        if (status.error) {
+            console.error("Error publishing calibration message:", status);
+        } else {
+            console.log("Calibration message sent:", response);
+        }
+    });
+}
+
+function updateThresholdTable(data) {
+    const table = document.getElementById("threshold-table");
+    const tableBody = document.getElementById("threshold-values");
+
+    tableBody.innerHTML = "";
+
+    Object.entries(data.thresholds).forEach(([key, value]) => {
+        const row = document.createElement("tr");
+
+        const parameterCell = document.createElement("td");
+        parameterCell.textContent = key;
+
+        const valueCell = document.createElement("td");
+
+        if (Array.isArray(value)) {
+            valueCell.textContent = value.map(v => v.toFixed(2)).join(", ");
+        } else {
+            valueCell.textContent = typeof value === "number" ? value.toFixed(2) : value;
+        }
+
+        row.appendChild(parameterCell);
+        row.appendChild(valueCell);
+        tableBody.appendChild(row);
+    });
+
+    table.style.display = "table";
+}
+
+
 function startListeningForUpdates() {
     console.log("Subscribing to channel:", CHANNEL_NAME);
 
@@ -57,7 +150,15 @@ function startListeningForUpdates() {
     pubnub.addListener({
         message: (event) => {
             console.log("Received message:", event.message);
-            updateDataInHTML(event.message);
+
+            // check the type of message and call the appropriate function
+            if (event.message.thresholds) {
+                // handle calibration data
+                updateThresholdTable(event.message);
+            } else {
+                // handle regular sensor data
+                updateDataInHTML(event.message);
+            }
         },
         status: (statusEvent) => {
             if (statusEvent.category === "PNConnectedCategory") {
@@ -69,26 +170,10 @@ function startListeningForUpdates() {
     });
 }
 
-function sendPowerOffMessage() {
-    const message = { power: false };
-
-    pubnub.publish({
-        channel: CHANNEL_NAME,
-        message: message,
-    }, (status, response) => {
-        if (status.error) {
-            console.error("Error publishing message:", status);
-        } else {
-            console.log("Power OFF message sent:", response);
-        }
-    });
-}
 
 function initApp() {
     startListeningForUpdates();
-
     const powerButton = document.getElementById("power-btn");
-
     powerButton.addEventListener("click", () => {
         sendPowerOnMessage();
     });
@@ -97,6 +182,12 @@ function initApp() {
     powerOffButton.addEventListener("click", () => {
         sendPowerOffMessage();
     });
+
+    const calibrateButton = document.getElementById("calibrate-btn");
+    calibrateButton.addEventListener("click", () => {
+        sendCalibrationMessage();
+    });
 }
+
 
 document.addEventListener("DOMContentLoaded", initApp);
