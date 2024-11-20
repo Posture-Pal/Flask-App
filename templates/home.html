@@ -31,5 +31,19 @@
     </div>
 </div>
 <a href="{{ url_for('logout') }}">Logout</a>
+    <div>
+        <button id="power-btn" >Turn On Sensor</button>
+        <button id="power-off-btn">Turn Off Sensor</button>
+    </div>
+    <div id="data-container" style="margin-top: 20px;">
+        <h3>Received Data:</h3>
+        <p id="slouch-status">Slouch: --</p>
+        <p id="temperature-status">Temperature Status: --</p>
+        <p id="temperature-value">Temperature: -- °C</p>
+        <p id="humidity-status">Humidity Status: --</p>
+        <p id="humidity-value">Humidity: --%</p>
+        <p id="pitch-value">Pitch: --</p>
+        <p id="gravity-vector">Gravity Vector: --</p>
+    </div>
 </div>
 {% endblock %}
