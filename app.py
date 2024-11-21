@@ -154,6 +154,31 @@ def save_threshold_data():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
+@app.route("/get_statistics_data", methods=["GET"])
+def get_statistics_data():
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+
+        power_sessions = my_db.get_power_sessions_by_user_id(user_id)
+
+        sensor_data = my_db.get_sensor_data_by_user_id(user_id)
+
+        return jsonify({
+            "power_sessions": power_sessions,
+            "sensor_data": sensor_data
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/statistics", methods=["GET"])
 def statistics():

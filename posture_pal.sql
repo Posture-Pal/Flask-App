@@ -43,3 +43,11 @@ CREATE TABLE threshold (
     gravity_z FLOAT DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE power_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,  
+    user_id INT NOT NULL,             
+    power_on BOOLEAN NOT NULL,           
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  
+    FOREIGN KEY (user_id) REFERENCES users(id)  
+);
