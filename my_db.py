@@ -200,3 +200,11 @@ def get_sensor_data_by_user_id(user_id):
     except Exception as e:
         print(f"Error retrieving sensor data: {e}")
         return {"error": "An error occurred while retrieving sensor data."}
+
+def has_threshold_for_user(user_id):
+    try:
+        count = Threshold.query.filter_by(user_id=user_id).count()
+        return count > 0 
+    except Exception as e:
+        print(f"Error checking threshold existence: {e}")
+        return False

@@ -148,7 +148,7 @@ function updateThresholdTable(data) {
         tableBody.appendChild(row);
     });
 
-    table.style.display = "table";
+    table.style.display = "none";
     axios
         .post("/save_threshold_data", data.thresholds)
         .then((response) => {
@@ -243,3 +243,28 @@ function initApp() {
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
+
+document.addEventListener('DOMContentLoaded', function () {
+    const calibrateBtn = document.getElementById('calibrate-btn');
+    const thresholdTable = document.getElementById('threshold-table');
+
+    fetch('/check-threshold')
+        .then(response => response.json())
+        .then(data => {
+            if (data.show_calibrate) {
+                calibrateBtn.style.display = 'block';
+                thresholdTable.style.display = 'block';
+            } else {
+                calibrateBtn.style.display = 'none';
+                thresholdTable.style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Error fetching threshold status:', error));
+});
+
+document.getElementById("calibrate-btn").addEventListener("click", () => {
+    const modal = document.getElementById("calibrateModal");
+    const overlay = document.getElementById("modal-overlay")
+    modal.style.display = modal.style.display === "none" ? "block" : "none";
+    overlay.style.display = overlay.style.display === "none" ? "block" : "none";
+});

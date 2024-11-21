@@ -4,35 +4,41 @@
 
 {% block content %}
 <div class="marginContainer">
-<div class="greeting"><p>Hello, {{ user }}!</p></div> <!-- Shows "Hello" followed by the user's name after they log in -->
+    <div class="greeting">
+        <p>Hello, {{ user }}!</p>
+    </div> <!-- Shows "Hello" followed by the user's name after they log in -->
 
-<div class="postureGoalContainer">
-    <div class="percentPosture">85%</div> <!-- TODO Replace 85% with actual posture score -->
-    <div>You are meeting your posture goal!</div> <!-- TODO Replace with conditional message to display if they are meeting their posture goal -->
-</div>
+    <div class="postureGoalContainer">
+        <div class="percentPosture">85%</div> <!-- TODO Replace 85% with actual posture score -->
+        <div>You are meeting your posture goal!</div>
+        <!-- TODO Replace with conditional message to display if they are meeting their posture goal -->
+    </div>
 
-<div class="usageContainer">
-    <div class="usageContainerFlex">
-        <div class="usageCard">
-            <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/clock--v1.png" alt="clock icon" />
-            <div class="usageSmallText">Usage Today</div>
-            <div class="usageBoldText">11 Hours</div> <!-- TODO Replace with actual usage -->
-        </div>
-        <div class="usageCard">
-            <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/push-notifications.png" alt="notifications icon" />
-            <div class="usageSmallText">Reminders</div>
-            <div class="usageBoldText">7</div> <!-- TODO Replace with actual usage -->
-        </div>
-        <div class="usageCard">
-            <img class="navicons" src="https://img.icons8.com/windows/32/2b617d/inclination.png" alt="angle icon" />
-            <div class="usageSmallText">Average Angle</div>
-            <div class="usageBoldText">15°</div> <!-- TODO Replace with actual usage -->
+    <div class="usageContainer">
+        <div class="usageContainerFlex">
+            <div class="usageCard">
+                <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/clock--v1.png"
+                    alt="clock icon" />
+                <div class="usageSmallText">Usage Today</div>
+                <div class="usageBoldText">11 Hours</div> <!-- TODO Replace with actual usage -->
+            </div>
+            <div class="usageCard">
+                <img class="navicons"
+                    src="https://img.icons8.com/fluency-systems-regular/50/2b617d/push-notifications.png"
+                    alt="notifications icon" />
+                <div class="usageSmallText">Reminders</div>
+                <div class="usageBoldText">7</div> <!-- TODO Replace with actual usage -->
+            </div>
+            <div class="usageCard">
+                <img class="navicons" src="https://img.icons8.com/windows/32/2b617d/inclination.png" alt="angle icon" />
+                <div class="usageSmallText">Average Angle</div>
+                <div class="usageBoldText">15°</div> <!-- TODO Replace with actual usage -->
+            </div>
         </div>
     </div>
-</div>
-<a href="{{ url_for('logout') }}">Logout</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
     <div>
-        <button id="power-btn" >Turn On Sensor</button>
+        <button id="power-btn">Turn On Sensor</button>
         <button id="power-off-btn">Turn Off Sensor</button>
     </div>
     <div id="data-container" style="margin-top: 20px;">
@@ -46,7 +52,11 @@
         <p id="gravity-vector">Gravity Vector: --</p>
     </div>
 
-    <div>
+    {% if show_calibrate_button %}
+    <div id="modal-overlay"></div>
+    <div id="calibrateModal">
+        <h3>Calibrate Your Device</h3>
+        <p>Make sure to sit or stand up straight to capture your good posture. If you deviate from this posture you will receive an alert. Don't worry, you can always re-calibrate in settings.</p>
         <button id="calibrate-btn">Calibrate Posture</button>
 
         <table id="threshold-table" border="1" style="margin-top: 20px; display: none;">
@@ -60,6 +70,7 @@
             </tbody>
         </table>
     </div>
+    {% endif %}
 
     <div>
         <label>

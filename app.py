@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 import my_db
 
+from my_db import get_threshold_by_user_id
+
 load_dotenv()
 
 db = my_db.db
@@ -80,10 +82,23 @@ def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
     google_client_id = session.get("google_client_id", "No client_id provided")
-    
+
     my_db.add_user_and_login(user, google_client_id, email)
-    
-    return render_template("home.html", user=user, google_client_id=google_client_id, email=email)
+
+    show_calibrate_button = True
+
+    user_data = my_db.get_user_by_email(email)
+    if user_data:
+        user_id = user_data.get("id")
+        show_calibrate_button = not my_db.has_threshold_for_user(user_id)
+
+    return render_template(
+        "home.html",
+        user=user,
+        google_client_id=google_client_id,
+        email=email,
+        show_calibrate_button=show_calibrate_button,
+    )
 
 @app.route("/save_sensor_data", methods=["POST"])
 def save_sensor_data():
