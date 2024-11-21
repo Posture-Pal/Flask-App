@@ -72,5 +72,43 @@
         </label>
     </div>
 
+    <div>   
+        <button id="view-statistics-btn">Show Statistics</button>
+    <h1>User Statistics</h1>
+
+    <h2>Power Sessions</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Power On</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="power-sessions-table"></tbody>
+    </table>
+
+    <h2>Sensor Data</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Temperature</th>
+                    <th>Temperature Status</th>
+                    <th>Humidity</th>
+                    <th>Humidity Status</th>
+                    <th>Pitch</th>
+                    <th>Gravity X</th>
+                    <th>Gravity Y</th>
+                    <th>Gravity Z</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="sensor-data-table"></tbody>
+        </table>
+    </div>
+
+    <canvas id="lineGraph" width="600" height="400"></canvas>
+
+
+
 </div>
 {% endblock %}
