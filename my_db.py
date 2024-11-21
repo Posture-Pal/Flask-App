@@ -98,6 +98,20 @@ class Threshold(db.Model):
             self.gravity_z = gravity[2]
         db.session.commit()
 
+
+class PowerSessions(db.Model):
+    __tablename__ = "power_sessions"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    power_on = db.Column(db.Boolean, nullable=False)  # True = Power On, False = Power Off
+    timestamp = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+
+
+    def __init__(self, user_id, power_on, timestamp=None):
+        self.user_id = user_id
+        self.power_on = power_on
+        self.timestamp = timestamp if timestamp else db.func.current_timestamp()
+
 def get_user_row_if_exists(google_client_id):
     return User.query.filter_by(google_client_id=google_client_id).first()
 
@@ -172,34 +186,40 @@ def save_sensor_data(sensor_data, user_id):
         raise Exception(f"Error saving sensor data: {e}")
 
 
+def get_power_sessions_by_user_id(user_id):
+    try:
+        power_sessions = PowerSessions.query.filter_by(user_id=user_id).order_by(PowerSessions.timestamp).all()
+        return [
+            {
+                "power_on": session.power_on,
+                "timestamp": session.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            } for session in power_sessions
+        ]
+    except Exception as e:
+        print(f"Error retrieving power sessions: {e}")
+        return []
+
 
 
 def get_sensor_data_by_user_id(user_id):
     try:
-        # fetch all sensor data entries for a given user 
-        sensor_data_entries = SensorData.query.filter_by(user_id=user_id).all()
-
-        if sensor_data_entries:
-            # convert sensor data entries to a list of dictionaries
-            sensor_data_list = [
-                {
-                    "id": entry.id,
-                    "yaw": entry.yaw,
-                    "pitch": entry.pitch,
-                    "roll": entry.roll,
-                    "temperature": entry.temperature,
-                    "humidity": entry.humidity,
-                    "timestamp": entry.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-                }
-                for entry in sensor_data_entries
-            ]
-            return sensor_data_list
-        else:
-            return {"error": "No sensor data found for the given user ID."}
-
+        sensor_data = SensorData.query.filter_by(user_id=user_id).order_by(SensorData.timestamp).all()
+        return [
+            {
+                "temperature": data.temperature,
+                "temperature_status": data.temperature_status,
+                "humidity": data.humidity,
+                "humidity_status": data.humidity_status,
+                "pitch": data.pitch,
+                "gravity_x": data.gravity_x,
+                "gravity_y": data.gravity_y,
+                "gravity_z": data.gravity_z,
+                "timestamp": data.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            } for data in sensor_data
+        ]
     except Exception as e:
         print(f"Error retrieving sensor data: {e}")
-        return {"error": "An error occurred while retrieving sensor data."}
+        return []
 
 def has_threshold_for_user(user_id):
     try:
