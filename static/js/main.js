@@ -94,7 +94,17 @@ function updateDataInHTML(data) {
         Array.isArray(data.gravity_vector)
             ? data.gravity_vector.map((g) => (typeof g === "number" ? g.toFixed(2) : "N/A")).join(", ")
             : "N/A"
-    }`;
+        }`;
+    
+    
+    axios
+        .post("/save_sensor_data", data)
+        .then((response) => {
+            console.log(response.data.message || "Data saved successfully.");
+        })
+        .catch((error) => {
+            console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
+        });
 }
 
 //send a "calibration_setup: true" message to PubNub
