@@ -5,6 +5,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
 from flask_dance.contrib.github import make_github_blueprint, github
 from dotenv import load_dotenv
+import pymysql
 
 import my_db
 
@@ -15,8 +16,31 @@ db = my_db.db
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
+# logic to check for defualt or no password
+def check_database_credentials(uri):
+    try:
+        # parse URI
+        user = uri.split('//')[1].split(':')[0]
+        password = uri.split(':')[2].split('@')[0]
+        
+        # check for default or empty password
+        if not password or password in ["root", "admin", "password", "1234", ""]:
+            print("⚠️ Warning: The database is using a default or no password. Please secure your database!")
+        
+        # Attempt a database connection to ensure credentials work
+        connection = pymysql.connect(
+            host=uri.split('@')[1].split('/')[0],
+            user=user,
+            password=password,
+        )
+        connection.close()
+    except Exception as e:
+        print("⚠️ Error while checking database credentials:", e)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])
 
 db.init_app(app)
 
