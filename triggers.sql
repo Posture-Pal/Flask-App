@@ -431,3 +431,82 @@ WHERE id = 3;
 
 -- View Log Table
 SELECT * FROM threshold_data_log;
+
+
+----------------------------- POWER_SESSIONS ------------------------------
+-- Create power_sessions table
+CREATE TABLE power_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    power_on BOOLEAN NOT NULL, -- True = Power On, False = Power Off
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_power_sessions_users FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Create power_sessions_log table
+CREATE TABLE power_sessions_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(50),
+    action_type VARCHAR(10), -- 'INSERT', 'UPDATE', 'DELETE'
+    table_name VARCHAR(50) DEFAULT 'power_sessions',
+    timestamp DATETIME,
+    affected_data TEXT
+);
+
+DELIMITER $$
+
+-- Create trigger for power_sessions log
+CREATE TRIGGER log_power_sessions_changes
+AFTER INSERT OR UPDATE OR DELETE ON power_sessions
+FOR EACH ROW
+BEGIN
+    DECLARE action VARCHAR(10);
+
+    -- Determine the action type
+    IF (NEW IS NOT NULL AND OLD IS NULL) THEN
+        SET action = 'INSERT';
+    ELSEIF (NEW IS NOT NULL AND OLD IS NOT NULL) THEN
+        SET action = 'UPDATE';
+    ELSEIF (NEW IS NULL AND OLD IS NOT NULL) THEN
+        SET action = 'DELETE';
+    END IF;
+
+    -- Insert log entry
+    INSERT INTO power_sessions_log (
+        user_name,
+        action_type,
+        timestamp,
+        affected_data
+    )
+    VALUES (
+        USER(), -- Captures the current user
+        action, -- The action performed
+        NOW(), -- Timestamp of the operation
+        CONCAT(
+            'user_id: ', COALESCE(NEW.user_id, OLD.user_id), ', ',
+            'power_on: ', COALESCE(NEW.power_on, OLD.power_on), ', ',
+            'timestamp: ', COALESCE(NEW.timestamp, OLD.timestamp)
+        )
+    );
+END$$
+
+DELIMITER ;
+
+-- Sample Data Insertion
+INSERT INTO power_sessions (user_id, power_on, timestamp) VALUES
+(3, TRUE, '2024-11-21 09:30:00'), 
+(3, FALSE, '2024-11-21 12:30:00'),
+(3, TRUE, '2024-11-21 14:30:00'), 
+(3, FALSE, '2024-11-21 20:30:00');
+
+INSERT INTO power_sessions (user_id, power_on)
+VALUES (1, TRUE);
+
+-- Update Sample
+UPDATE power_sessions SET power_on = FALSE WHERE id = 1;
+
+-- Delete Sample
+DELETE FROM power_sessions WHERE id = 1;
+
+-- View Logs
+SELECT * FROM power_sessions_log;
