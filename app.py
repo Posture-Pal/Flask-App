@@ -110,6 +110,50 @@ def save_sensor_data():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
+@app.route("/save_threshold_data", methods=["POST"])
+def save_threshold_data():
+    if request.method == "POST":
+        threshold_data = request.json
+        try:
+            user_email = session.get("email")
+            if not user_email:
+                return jsonify({"error": "User not authenticated"}), 401
+            
+            user = my_db.get_user_by_email(user_email)
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+            
+            user_id = user["id"]
+            print(threshold_data)
+            
+            existing_threshold = my_db.Threshold.query.filter_by(user_id=user_id).first()
+            
+            if existing_threshold:
+                existing_threshold.update_thresholds(
+                    temp_overheat=threshold_data.get("temp_overheat"),
+                    temp_cold=threshold_data.get("temp_cold"),
+                    humid_high=threshold_data.get("humid_high"),
+                    humid_low=threshold_data.get("humid_low"),
+                    pitch=threshold_data.get("pitch"),
+                    gravity=threshold_data.get("gravity")
+                )
+                return jsonify({"message": "Thresholds updated successfully."}), 200
+            else:
+                new_threshold = my_db.Threshold(
+                    user_id=user_id,
+                    temp_overheat=threshold_data.get("temp_overheat", 37.5),
+                    temp_cold=threshold_data.get("temp_cold", 15.0),
+                    humid_high=threshold_data.get("humid_high", 80.0),
+                    humid_low=threshold_data.get("humid_low", 20.0),
+                    pitch=threshold_data.get("pitch", 0.0),
+                    gravity=threshold_data.get("gravity", [0.0, 0.0, 1.0])
+                )
+                db.session.add(new_threshold)
+                db.session.commit()
+                return jsonify({"message": "Thresholds saved successfully."}), 201
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
 
 @app.route("/statistics", methods=["GET"])
 def statistics():
@@ -208,56 +252,6 @@ def article3():
 @app.route("/article4")
 def article4():
     return render_template("article4.html")
-
-@app.route("/test", methods=["GET", "POST"])
-def test():
-    if request.method == "POST":
-        sensor_data = request.json  
-        try:
-            user_email = session.get("email")
-            print(session.get("google_client_id"))
-            print(user_email)
-            if not user_email:
-                return jsonify({"error": "User not authenticated"}), 401
-  
-            user = my_db.get_user_by_email(user_email)
-          
-            if not user:
-                return jsonify({"error": "User not found"}), 404
-            
-            user_id = user["id"]
-            
-            message = my_db.save_threshold(sensor_data, user_id)
-            
-            return jsonify({"message": message}), 201
-        
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-
-    return render_template("test.html")
-
-@app.route("/threshold_values", methods=["GET"])
-def threshold_values():
-    try:
-        user_email = session.get("email")
-        if not user_email:
-            return jsonify({"error": "User not authenticated"}), 401
-
-        user = my_db.get_user_by_email(user_email)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
-
-        user_id = user["id"]
-
-        threshold_data = my_db.get_threshold_by_user_id(user_id)
-
-        if "error" in threshold_data:
-            return jsonify(threshold_data), 404
-
-        return render_template("threshold_values.html", threshold_data=threshold_data)
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

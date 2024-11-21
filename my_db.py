@@ -50,30 +50,56 @@ class SensorData(db.Model):
         self.gravity_y = gravity_y
         self.gravity_z = gravity_z
 
-
 class Threshold(db.Model):
     __tablename__ = "threshold"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    threshold_yaw = db.Column(db.Float)
-    threshold_pitch = db.Column(db.Float)
-    threshold_roll = db.Column(db.Float)
-    threshold_temperature = db.Column(db.Float)
-    threshold_humidity = db.Column(db.Float)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    temp_overheat = db.Column(db.Float, default=37.5)
+    temp_cold = db.Column(db.Float, default=15.0)      
+    humid_high = db.Column(db.Float, default=80.0)    
+    humid_low = db.Column(db.Float, default=20.0)      
+    pitch = db.Column(db.Float, default=0.0)          
+    gravity_x = db.Column(db.Float, default=0.0)       
+    gravity_y = db.Column(db.Float, default=0.0)       
+    gravity_z = db.Column(db.Float, default=1.0)       
     
+    def __init__(self, user_id, temp_overheat=None, temp_cold=None, humid_high=None, humid_low=None, pitch=None, gravity=None):
+        self.user_id = user_id
+        if temp_overheat is not None:
+            self.temp_overheat = temp_overheat
+        if temp_cold is not None:
+            self.temp_cold = temp_cold
+        if humid_high is not None:
+            self.humid_high = humid_high
+        if humid_low is not None:
+            self.humid_low = humid_low
+        if pitch is not None:
+            self.pitch = pitch
+        if gravity is not None:
+            self.gravity_x = gravity[0]
+            self.gravity_y = gravity[1]
+            self.gravity_z = gravity[2]
     
+    def update_thresholds(self, temp_overheat=None, temp_cold=None, humid_high=None, humid_low=None, pitch=None, gravity=None):
+        if temp_overheat is not None:
+            self.temp_overheat = temp_overheat
+        if temp_cold is not None:
+            self.temp_cold = temp_cold
+        if humid_high is not None:
+            self.humid_high = humid_high
+        if humid_low is not None:
+            self.humid_low = humid_low
+        if pitch is not None:
+            self.pitch = pitch
+        if gravity is not None:
+            self.gravity_x = gravity[0]
+            self.gravity_y = gravity[1]
+            self.gravity_z = gravity[2]
+        db.session.commit()
+
 def get_user_row_if_exists(google_client_id):
     return User.query.filter_by(google_client_id=google_client_id).first()
-    
-
-def get_user_row_if_exists_using_id(id):
-    get_user_row = User.query.filter_by(id=id).first()
-    if get_user_row is not None:
-        return get_user_row
-    else:
-        print("That user does not exist")
-        return False
-
 
 def add_user_and_login(name, google_client_id, email):
     user = get_user_row_if_exists(google_client_id)
@@ -98,50 +124,11 @@ def get_user_by_email(email):
         print(f"Error retrieving user by email: {e}")
         return None
 
-
-def save_threshold(sensor_data, user_id):
-    try:
-        # check if the user already exists
-        user_row = get_user_row_if_exists_using_id(user_id)
-        existing_threshold = Threshold.query.filter_by(user_id=user_id).first()
-        
-        if user_row and existing_threshold:
-           #update the existing threshold values
-            existing_threshold.threshold_yaw = sensor_data.get('yaw')
-            existing_threshold.threshold_pitch = sensor_data.get('pitch')
-            existing_threshold.threshold_roll = sensor_data.get('roll')
-            existing_threshold.threshold_temperature = sensor_data.get('temperature')
-            existing_threshold.threshold_humidity = sensor_data.get('humidity')
-
-            db.session.commit()  
-            return "Sensor thresholds updated successfully."
-        else:
-        
-            new_threshold = Threshold(
-                user_id=user_id,
-                threshold_yaw=sensor_data.get('yaw'),
-                threshold_pitch=sensor_data.get('pitch'),
-                threshold_roll=sensor_data.get('roll'),
-                threshold_temperature=sensor_data.get('temperature'),
-                threshold_humidity=sensor_data.get('humidity')
-            )
-
-            db.session.add(new_threshold)
-            db.session.commit()
-            return "Sensor thresholds saved successfully."
-
-    except Exception as e:
-        print(f"Error saving or updating sensor thresholds: {e}")
-        return "Error saving or updating sensor thresholds."
-
-
 def get_threshold_by_user_id(user_id):
     try:
-        # Fetch the threshold entry for the given user ID
         threshold = Threshold.query.filter_by(user_id=user_id).first()
 
         if threshold:
-            # Return threshold values as a JSON object
             return {
                 "user_id": threshold.user_id,
                 "threshold_yaw": threshold.threshold_yaw,
@@ -151,7 +138,6 @@ def get_threshold_by_user_id(user_id):
                 "threshold_humidity": threshold.threshold_humidity
             }
         else:
-            # No threshold found for the user ID
             return {"error": "No threshold values found for the given user ID."}
 
     except Exception as e:

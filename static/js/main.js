@@ -149,6 +149,14 @@ function updateThresholdTable(data) {
     });
 
     table.style.display = "table";
+    axios
+        .post("/save_threshold_data", data.thresholds)
+        .then((response) => {
+            console.log(response.data.message || "Data saved successfully.");
+        })
+        .catch((error) => {
+            console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
+        });
 }
 
 
