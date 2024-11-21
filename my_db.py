@@ -205,3 +205,60 @@ def threshold_exists(user_id):
     except Exception as e:
         print(f"Error checking threshold existence: {e}")
         return False
+    
+def calculate_posture_stats(user_id):
+    try:
+        today = datetime.now().date()
+
+        # Fetch all sensor records for the user for today
+        sensor_data = get_sensor_data_by_user_id(user_id)
+
+        if not sensor_data or "error" in sensor_data:
+            return {"good_posture_percentage": 0, "total_hours": 0, "good_posture_hours": 0}
+
+        # Filter for today's data
+        today_data = [
+            entry for entry in sensor_data
+            if datetime.fromisoformat(entry["timestamp"]).date() == today
+        ]
+
+        if len(today_data) < 2:
+            return {"good_posture_percentage": 0, "total_hours": 0, "good_posture_hours": 0}
+
+        # Sort records by timestamp
+        today_data.sort(key=lambda x: x["timestamp"])
+
+        # Calculate total hours between first and last record
+        first_record = today_data[0]
+        last_record = today_data[-1]
+
+        total_seconds = (datetime.fromisoformat(last_record["timestamp"]) -
+                         datetime.fromisoformat(first_record["timestamp"])).total_seconds()
+        total_hours = total_seconds / 3600
+
+        # Calculate good posture hours
+        good_posture_hours = 0
+        for i in range(len(today_data) - 1):
+            current = today_data[i]
+            next = today_data[i + 1]
+
+            # Time interval between current and next records
+            interval_seconds = (datetime.fromisoformat(next["timestamp"]) -
+                                datetime.fromisoformat(current["timestamp"])).total_seconds()
+            interval_hours = interval_seconds / 3600
+
+            # Check if current posture is good
+            if current["pitch"] <= -50:  # Good posture threshold
+                good_posture_hours += interval_hours
+
+        # Calculate percentage
+        good_posture_percentage = (good_posture_hours / total_hours * 100) if total_hours > 0 else 0
+
+        return {
+            "good_posture_percentage": round(good_posture_percentage, 2),
+            "total_hours": round(total_hours, 2),
+            "good_posture_hours": round(good_posture_hours, 2),
+        }
+    except Exception as e:
+        print(f"Error calculating posture stats: {e}")
+        return {"error": str(e)}

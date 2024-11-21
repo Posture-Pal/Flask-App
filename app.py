@@ -139,17 +139,19 @@ def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
     client_id = session.get("google_client_id", "No client_id provided")
-    
+
     user_data = my_db.get_user_by_email(email)
     if user_data:
         user_id = user_data["id"]
         threshold_exists = my_db.threshold_exists(user_id)
+        posture_stats = my_db.calculate_posture_stats(user_id)
     else:
         user_id = None
         threshold_exists = False
+        posture_stats = {"good_posture_percentage": None, "total_hours": None, "good_posture_hours": None}
 
     if request.method == "POST":
-        sensor_data = request.json 
+        sensor_data = request.json
         try:
             user_email = session.get("email")
             if not user_email:
@@ -160,7 +162,7 @@ def home():
                 return jsonify({"error": "User not found"}), 404
 
             user_id = user["id"]
-            
+
             message = my_db.save_threshold(sensor_data, user_id)
 
             return jsonify({"message": message}), 201
@@ -168,10 +170,6 @@ def home():
         except Exception as e:
             print(f"Error saving sensor data: {e}")
             return jsonify({"error": str(e)}), 500
-
-    # if not user_data:
-    #     return redirect("/login")
-
 
     try:
         sensor_data_list = my_db.get_sensor_data_by_user_id(user_id)
@@ -196,6 +194,9 @@ def home():
         user_id=client_id,
         email=email,
         sensor_data=sensor_data_list,
+        good_posture_percentage=posture_stats["good_posture_percentage"],
+        total_hours=posture_stats["total_hours"],
+        good_posture_hours=posture_stats["good_posture_hours"],
         show_calibration_modal=not threshold_exists
     )
 
