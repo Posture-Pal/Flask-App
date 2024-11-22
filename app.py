@@ -27,7 +27,7 @@ def check_database_credentials(uri):
         password = uri.split(':')[2].split('@')[0]
         
         # check for default or empty password
-        if not password or password in ["root", "admin", "password", "1234", ""]:
+        if not password or password in ["root", "admin", "password", "", ""]:
             print("⚠️ Warning: The database is using a default or no password. Please secure your database!")
         
         # Attempt a database connection to ensure credentials work
@@ -41,7 +41,7 @@ def check_database_credentials(uri):
         print("⚠️ Error while checking database credentials:", e)
 
 # app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:Guglu%402002@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])

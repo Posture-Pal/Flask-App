@@ -25,14 +25,13 @@
     </div>
 
     <div class="controls">
-                <div class="control">
+        <div class="control">
             <span>Power</span>
             <label class="switch">
                 <input type="checkbox" id="powerToggle" checked>
                 <span class="slider"></span>
             </label>
         </div>
-        <!-- TODO: Connect vibration toggle to device settings -->
         <div class="control">
             <span>Vibration</span>
             <label class="switch">
@@ -40,7 +39,6 @@
                 <span class="slider"></span>
             </label>
         </div>
-        <!-- TODO: Implement sound toggle functionality -->
         <div class="control">
             <span>Sound</span>
             <label class="switch">
@@ -50,6 +48,7 @@
         </div>
     </div>
 
+    <br>
     <div class="usageContainer">
         <div class="usageContainerFlex">
             <div class="usageCard">
@@ -66,39 +65,42 @@
                 <div class="usageBoldText">{{ todays_reminders }}</div>
             </div>
             <div class="usageCard">
-                <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/thermometer.png" alt="angle icon" />
+                <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/thermometer.png"
+                    alt="angle icon" />
                 <div class="temperatureSmallText">Temperature of Device</div>
-                <div class="temperatureBoldText">15°</div> <!-- TODO Replace with actual temperature -->
+                <div class="temperatureBoldText">15°</div>
             </div>
         </div>
     </div>
     <!-- <a href="{{ url_for('logout') }}">Logout</a> -->
-
+    <br><br>
     <div>
         <div class="calendar-container">
-        <label for="datePicker">Select a date:</label>
-        <input type="date" id="datePicker">
-    </div>
+            <label for="datePicker">Select a date:</label>
+            <input type="date" id="datePicker">
+        </div>
 
         <div class="chart-container">
-    <canvas id="postureChartHome"></canvas>
-    </div>
+            <canvas id="postureChartHome"></canvas>
+        </div>
 
-    <div id="errorMessageHome" style="color: red; display: none;">
-        Unable to load posture data for today.
-    </div>
+        <div id="errorMessageHome" style="color: red; display: none;">
+            Unable to load posture data for today.
+        </div>
     </div>
 
     {% if show_calibrate_button %}
-        {% include '_calibration_modal.html' %}
+    {% include '_calibration_modal.html' %}
     {% endif %}
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-        const modalOverlay = document.getElementById("modal-overlay");
-        const calibrateModal = document.getElementById("calibrateModal");
-        const closeModalBtn = document.getElementById("close-modal-btn");
-        const showCalibrate = {{ 'true' if show_calibrate_button else 'false' }};
+            const modalOverlay = document.getElementById("modal-overlay");
+            const calibrateModal = document.getElementById("calibrateModal");
+            const closeModalBtn = document.getElementById("close-modal-btn");
+            const showCalibrate = {{ 'true' if show_calibrate_button else 'false' }}
+        }
+        };
 
         // Ensure elements are found and showCalibrate is true
         if (showCalibrate && modalOverlay && calibrateModal) {
