@@ -3,36 +3,21 @@
 {% block title %}PosturePal - Statistics{% endblock %}
 
 {% block content %}
+<h2>Posture Statistics</h2>
 
-    
-    {% if sensor_data %}
-        <!-- <table border="1">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Yaw</th>
-                    <th>Pitch</th>
-                    <th>Roll</th>
-                    <th>Temperature</th>
-                    <th>Humidity</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in sensor_data %}
-                    <tr>
-                        <td>{{ entry.id }}</td>
-                        <td>{{ entry.yaw }}</td>
-                        <td>{{ entry.pitch }}</td>
-                        <td>{{ entry.roll }}</td>
-                        <td>{{ entry.temperature }}</td>
-                        <td>{{ entry.humidity }}</td>
-                        <td>{{ entry.timestamp }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table> -->
-    {% else %}
-        <p>No sensor data available.</p>
-    {% endif %}
+<!-- Calendar for date selection -->
+<div class="calendar-container">
+    <label for="datePicker">Select a date:</label>
+    <input type="date" id="datePicker">
+</div>
+
+<!-- Chart container -->
+<div class="chart-container">
+    <canvas id="postureChart"></canvas>
+</div>
+
+<!-- Error message -->
+<div id="errorMessage" style="color: red; display: none;">
+    No data available for the selected date.
+</div>
 {% endblock %}
