@@ -33,8 +33,9 @@
             </label>
         </div>
         <p>Device Temperature: <span id="deviceTemp">{{ device_temp }}°C</span></p>
-        <!-- TODO: Add functionality for calibrate button -->
+
         <button id="calibrateBtn">Calibrate Device</button>
+        {% include '_calibration_modal.html' %}
     </div>
 
     <hr>

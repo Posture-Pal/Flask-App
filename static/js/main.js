@@ -82,23 +82,19 @@ function updateDataInHTML(data) {
 
     document.getElementById("slouch-status").textContent = `Slouch: ${data.slouch !== undefined ? data.slouch : "N/A"}`;
     document.getElementById("temperature-status").textContent = `Temperature Status: ${data.temperature_status || "N/A"}`;
-    document.getElementById("temperature-value").textContent = `Temperature: ${
-        typeof data.temperature === "number" ? data.temperature.toFixed(1) : "N/A"
-    } °C`;
+    document.getElementById("temperature-value").textContent = `Temperature: ${typeof data.temperature === "number" ? data.temperature.toFixed(1) : "N/A"
+        } °C`;
     document.getElementById("humidity-status").textContent = `Humidity Status: ${data.humidity_status || "N/A"}`;
-    document.getElementById("humidity-value").textContent = `Humidity: ${
-        typeof data.humidity === "number" ? data.humidity.toFixed(1) : "N/A"
-    }%`;
-    document.getElementById("pitch-value").textContent = `Pitch: ${
-        typeof data.pitch === "number" ? data.pitch.toFixed(4) : "N/A"
-    }`;
-    document.getElementById("gravity-vector").textContent = `Gravity Vector: ${
-        Array.isArray(data.gravity_vector)
+    document.getElementById("humidity-value").textContent = `Humidity: ${typeof data.humidity === "number" ? data.humidity.toFixed(1) : "N/A"
+        }%`;
+    document.getElementById("pitch-value").textContent = `Pitch: ${typeof data.pitch === "number" ? data.pitch.toFixed(4) : "N/A"
+        }`;
+    document.getElementById("gravity-vector").textContent = `Gravity Vector: ${Array.isArray(data.gravity_vector)
             ? data.gravity_vector.map((g) => (typeof g === "number" ? g.toFixed(2) : "N/A")).join(", ")
             : "N/A"
         }`;
-    
-    
+
+
     axios
         .post("/save_sensor_data", data)
         .then((response) => {
@@ -224,17 +220,17 @@ function initToggleListeners() {
 }
 
 function initApp() {
-    // startListeningForUpdates();
+    startListeningForUpdates();
 
-    // const powerButton = document.getElementById("power-btn");
-    // powerButton.addEventListener("click", () => {
-    //     sendPowerOnMessage();
-    // });
+    const powerButton = document.getElementById("power-btn");
+    powerButton.addEventListener("click", () => {
+        sendPowerOnMessage();
+    });
 
-    // const powerOffButton = document.getElementById("power-off-btn");
-    // powerOffButton.addEventListener("click", () => {
-    //     sendPowerOffMessage();
-    // });
+    const powerOffButton = document.getElementById("power-off-btn");
+    powerOffButton.addEventListener("click", () => {
+        sendPowerOffMessage();
+    });
 
     // const calibrateButton = document.getElementById("calibrate-btn");
     // calibrateButton.addEventListener("click", () => {
@@ -251,7 +247,7 @@ function initApp() {
 
 function populatePowerSessionsTable(powerSessions) {
     const powerSessionsTable = document.getElementById("power-sessions-table");
-    powerSessionsTable.innerHTML = ""; 
+    powerSessionsTable.innerHTML = "";
 
     powerSessions.forEach((session) => {
         const row = document.createElement("tr");
@@ -271,7 +267,7 @@ function populatePowerSessionsTable(powerSessions) {
 
 function populateSensorDataTable(sensorData) {
     const sensorDataTable = document.getElementById("sensor-data-table");
-    sensorDataTable.innerHTML = ""; 
+    sensorDataTable.innerHTML = "";
     console.log(sensorData);
 
 
@@ -417,8 +413,8 @@ function createLineGraph(sensorData, powerSessions) {
                 x: {
                     type: "time",
                     time: {
-                        unit: "minute", 
-                        tooltipFormat: "ll HH:mm", 
+                        unit: "minute",
+                        tooltipFormat: "ll HH:mm",
                     },
                     title: {
                         display: true,
@@ -429,7 +425,7 @@ function createLineGraph(sensorData, powerSessions) {
                     beginAtZero: false,
                     ticks: {
                         stepSize: 1,
-                        min: -1, 
+                        min: -1,
                         max: 2,
                     },
                     title: {
@@ -452,31 +448,52 @@ function createLineGraph(sensorData, powerSessions) {
     });
 }
 
-
-
 document.addEventListener("DOMContentLoaded", initApp);
 
 document.addEventListener('DOMContentLoaded', function () {
-    const calibrateBtn = document.getElementById('calibrate-btn');
-    const thresholdTable = document.getElementById('threshold-table');
+    const modal = document.querySelector('#calibrateModal');
+    const overlay = document.querySelector('#modal-overlay');
 
-    fetch('/check-threshold')
-        .then(response => response.json())
-        .then(data => {
-            if (data.show_calibrate) {
-                calibrateBtn.style.display = 'block';
-                thresholdTable.style.display = 'block';
-            } else {
-                calibrateBtn.style.display = 'none';
-                thresholdTable.style.display = 'none';
-            }
-        })
-        .catch(error => console.error('Error fetching threshold status:', error));
-});
+    const thresholdTable = document.querySelector('#threshold-table');
+    const calibrateBtnHome = document.querySelector('#calibrate-btn');
 
-document.getElementById("calibrate-btn").addEventListener("click", () => {
-    const modal = document.getElementById("calibrateModal");
-    const overlay = document.getElementById("modal-overlay")
-    modal.style.display = modal.style.display === "none" ? "block" : "none";
-    overlay.style.display = overlay.style.display === "none" ? "block" : "none";
+    if (thresholdTable && calibrateBtnHome) {
+        fetch('/check-threshold')
+            .then(response => response.json())
+            .then(data => {
+                if (data.show_calibrate) {
+                    modal.style.display = 'block';
+                    overlay.style.display = 'block';
+
+                    calibrateBtnHome.style.display = 'block';
+                    thresholdTable.style.display = 'block';
+                } else {
+                    modal.style.display = 'none';
+                    overlay.style.display = 'none';
+                    calibrateBtnHome.style.display = 'none';
+                    thresholdTable.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error fetching threshold status:', error));
+    }
+
+    const openModalBtns = [
+        document.querySelector('#calibrate-btn'),
+        document.querySelector('#calibrateBtn')
+    ].filter(btn => btn !== null);
+
+    openModalBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const isModalVisible = modal.style.display === 'block';
+            modal.style.display = isModalVisible ? 'none' : 'block';
+            overlay.style.display = isModalVisible ? 'none' : 'block';
+
+            sendCalibrationMessage();
+        });
+    });
+
+    overlay.addEventListener('click', () => {
+        modal.style.display = 'none';
+        overlay.style.display = 'none';
+    });
 });
