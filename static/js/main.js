@@ -246,7 +246,17 @@ function initApp() {
     //     fetchAndDisplayStatistics();
     // });
 
-    console.log("hello")
+
+    if (document.body.classList.contains("statistics-page")) {
+        setupStatisticsPage();
+
+    }
+
+    if (document.body.classList.contains("home-page")) {
+                console.log("Inside the body page")
+        setupHomePage();
+    }
+
     fetchLastSlouchTemperature();
 
     // initToggleListeners();
@@ -512,7 +522,6 @@ function showPushNotification(message) {
 
 function checkTemperatureStatus(status) {
     if (status === "high") {
-        console.log("highhhhhh")
         showPushNotification("Warning: Temperature is high!");
     } else if (status === "low") {
         showPushNotification("Warning: Temperature is low!");
@@ -568,3 +577,274 @@ document.getElementById("calibrate-btn").addEventListener("click", () => {
     modal.style.display = modal.style.display === "none" ? "block" : "none";
     overlay.style.display = overlay.style.display === "none" ? "block" : "none";
 });
+
+async function fetchPostureData(date) {
+    try {
+        const response = await fetch(`/get_posture_data?date=${date}`);
+        const data = await response.json();
+        
+
+        if (!data.success) {
+            throw new Error(data.message || "An error occurred while fetching data.");
+        }
+
+        console.log(data, "Inside fetchPostureData")
+        return data;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+    }
+}
+
+function showErrorMessage(container, message) {
+    container.textContent = message;
+    container.style.display = "block";
+}
+
+function hideErrorMessage(container) {
+    container.style.display = "none";
+}
+
+function renderChart(ctx, data) {
+    const { timestamps, greenBars, greyBars, redSpikes } = data;
+    // console.log(data, "Inside renderChart")
+    console.log("happy")
+
+    return new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: timestamps,
+            datasets: [
+                {
+                    label: "Good Posture",
+                    data: greenBars,
+                    borderColor: "green",
+                    backgroundColor: "green",
+                    borderWidth: 2,
+                    fill: false,
+                    stepped: true,
+                },
+                {
+                    label: "Power Off",
+                    data: greyBars,
+                    borderColor: "gray",
+                    backgroundColor: "gray",
+                    borderWidth: 2,
+                    fill: false,
+                    stepped: true,
+                },
+                {
+                    label: "Bad Posture",
+                    data: redSpikes,
+                    borderColor: "red",
+                    backgroundColor: "red",
+                    borderWidth: 2,
+                    fill: false,
+                    stepped: true,
+                    pointStyle: "circle",
+                    pointRadius: (context) => (context.raw === 1 ? 6 : 0),
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: "Time" },
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 10,
+                    },
+                },
+                y: {
+                    title: { display: true, text: "Posture Status" },
+                    min: -1.5,
+                    max: 1.5,
+                    ticks: {
+                        callback: (value) => {
+                            if (value === 0) return "Good Posture";
+                            if (value === 1) return "Bad Posture";
+                            if (value === -1) return "Power Off";
+                            return "";
+                        },
+                    },
+                },
+            },
+        },
+    });
+}
+
+
+function setupStatisticsPage() {
+    const datePicker = document.getElementById("datePicker");
+    const errorMessage = document.getElementById("errorMessage");
+    const ctx = document.getElementById("postureChart").getContext("2d");
+    let postureChart;
+
+    datePicker.addEventListener("change", async () => {
+        const selectedDate = datePicker.value;
+        console.log(selectedDate)
+        if (!selectedDate) {
+            showErrorMessage(errorMessage, "Please select a date.");
+            return;
+        }
+
+        try {
+            const data = await fetchPostureData(selectedDate);
+            hideErrorMessage(errorMessage);
+
+            const chartData = processChartData(data.powerData, data.slouchData);
+            if (postureChart) postureChart.destroy();
+            postureChart = renderChart(ctx, chartData);
+        } catch (error) {
+            showErrorMessage(errorMessage, error.message);
+        }
+    });
+}
+
+
+// TODO - This function doesn't work as expected, user need to select the date and then only they will see the data
+
+function setupHomePage() {
+    // const ctx = document.getElementById("postureChartHome").getContext("2d");
+    // const errorMessage = document.getElementById("errorMessageHome");
+    // let postureChart;
+
+    // // Fetch and render data for today
+    // const today = new Date().toISOString().split("T")[0];
+
+    // (async () => {
+    //     try {
+    //         const data = await fetchPostureData(today);
+    //         hideErrorMessage(errorMessage);
+
+    //         const chartData = processChartData(data.powerData, data.slouchData);
+    //         if (postureChart) postureChart.destroy();
+    //         postureChart = renderChart(ctx, chartData);
+    //     } catch (error) {
+    //         showErrorMessage(errorMessage, error.message);
+    //     }
+    // })();
+
+    const ctx = document.getElementById("postureChartHome").getContext("2d");
+    const errorMessage = document.getElementById("errorMessageHome");
+    let postureChart;
+
+    const today = new Date().toISOString().split("T")[0];
+    console.log(today)
+
+
+    // (async () => {
+    //     try {
+    //         const data = await fetchPostureData(today);
+    //         hideErrorMessage(errorMessage);
+    //         console.log(data)
+
+    //         const chartData = processChartData(data.powerData, data.slouchData);
+    //         if (postureChart) postureChart.destroy();
+    //         postureChart = renderChart(ctx, chartData);
+    //     } catch (error) {
+    //         showErrorMessage(errorMessage, error.message);
+    //     }
+    // })();
+
+    const datePicker = document.getElementById("datePicker");
+
+
+    datePicker.value = today;
+    datePicker.addEventListener("change", async () => {
+        const selectedDate = datePicker.value;
+        if (!selectedDate) {
+            showErrorMessage(errorMessage, "Please select a date.");
+            return;
+        }
+
+        try {
+            const data = await fetchPostureData(selectedDate);
+            hideErrorMessage(errorMessage);
+
+            const chartData = processChartData(data.powerData, data.slouchData);
+            console.log(chartData, "Inside setup home page")
+
+            console.log("About to call renderChart", chartData);
+            if (postureChart) postureChart.destroy();
+            postureChart = renderChart(ctx, chartData);
+        } catch (error) {
+            showErrorMessage(errorMessage, error.message);
+        }
+    });
+}
+
+
+function processChartData(powerData, slouchData) {
+    const timestamps = [];
+    const greenBars = [];
+    const greyBars = [];
+    const redSpikes = [];
+
+    powerData.forEach((session, index) => {
+        const sessionTime = session.timestamp;
+
+        if (!session.power_on) {
+            if (!timestamps.includes(sessionTime)) {
+                timestamps.push(sessionTime);
+                greyBars.push(-1);
+                greenBars.push(null);
+                redSpikes.push(null);
+            }
+
+            if (
+                index + 1 < powerData.length &&
+                !timestamps.includes(powerData[index + 1].timestamp)
+            ) {
+                timestamps.push(powerData[index + 1].timestamp);
+                greyBars.push(-1);
+                greenBars.push(null);
+                redSpikes.push(null);
+            }
+        } else {
+            if (!timestamps.includes(sessionTime)) {
+                timestamps.push(sessionTime);
+                greenBars.push(0);
+                greyBars.push(null);
+                redSpikes.push(null);
+            }
+
+            slouchData.forEach((slouch) => {
+                if (
+                    slouch.timestamp >= sessionTime &&
+                    (index + 1 < powerData.length
+                        ? slouch.timestamp < powerData[index + 1].timestamp
+                        : true)
+                ) {
+                    if (!timestamps.includes(slouch.timestamp)) {
+                        timestamps.push(slouch.timestamp);
+                        greenBars.push(0);
+                        greyBars.push(null);
+                        redSpikes.push(null);
+
+                        timestamps.push(slouch.timestamp);
+                        greenBars.push(null);
+                        greyBars.push(null);
+                        redSpikes.push(1);
+                    }
+                }
+            });
+
+            if (
+                index + 1 < powerData.length &&
+                !timestamps.includes(powerData[index + 1].timestamp)
+            ) {
+                timestamps.push(powerData[index + 1].timestamp);
+                greenBars.push(0);
+                greyBars.push(null);
+                redSpikes.push(null);
+            }
+        }
+    });
+
+    return { timestamps, greenBars, greyBars, redSpikes };
+}

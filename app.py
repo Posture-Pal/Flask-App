@@ -301,8 +301,6 @@ def last_slouch_temperature():
         user = my_db.get_user_by_email(user_email)
         if not user:
             return jsonify({"error": "User not found"}), 404
-        
-        print(user)
 
         user_id = user["id"]
 

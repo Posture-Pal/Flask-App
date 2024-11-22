@@ -2,6 +2,8 @@
 
 {% block title %}PosturePal - Home{% endblock %}
 
+{% block body_class %}home-page{% endblock %}
+
 {% block content %}
 <div class="marginContainer">
     <div class="greeting">
@@ -55,6 +57,21 @@
         <p id="humidity-value">Humidity: --%</p>
         <p id="pitch-value">Pitch: --</p>
         <p id="gravity-vector">Gravity Vector: --</p>
+    </div>
+
+    <div>
+        <div class="calendar-container">
+        <label for="datePicker">Select a date:</label>
+        <input type="date" id="datePicker">
+    </div>
+
+        <div class="chart-container">
+    <canvas id="postureChartHome"></canvas>
+    </div>
+
+    <div id="errorMessageHome" style="color: red; display: none;">
+        Unable to load posture data for today.
+    </div>
     </div>
 
     {% if show_calibrate_button %}
