@@ -241,215 +241,303 @@ function initApp() {
     //     sendCalibrationMessage();
     // });
 
-    const statisticButton = document.getElementById("view-statistics-btn");
-    statisticButton.addEventListener("click", () => {
-        fetchAndDisplayStatistics();
-    });
+    // const statisticButton = document.getElementById("view-statistics-btn");
+    // statisticButton.addEventListener("click", () => {
+    //     fetchAndDisplayStatistics();
+    // });
 
-    initToggleListeners();
+    console.log("hello")
+    fetchLastSlouchTemperature();
+
+    // initToggleListeners();
 }
 
-function populatePowerSessionsTable(powerSessions) {
-    const powerSessionsTable = document.getElementById("power-sessions-table");
-    powerSessionsTable.innerHTML = ""; 
+// function populatePowerSessionsTable(powerSessions) {
+//     const powerSessionsTable = document.getElementById("power-sessions-table");
+//     powerSessionsTable.innerHTML = ""; 
 
-    powerSessions.forEach((session) => {
-        const row = document.createElement("tr");
+//     powerSessions.forEach((session) => {
+//         const row = document.createElement("tr");
 
-        const powerOnCell = document.createElement("td");
-        powerOnCell.textContent = session.power_on ? "Yes" : "No";
+//         const powerOnCell = document.createElement("td");
+//         powerOnCell.textContent = session.power_on ? "Yes" : "No";
 
-        const timestampCell = document.createElement("td");
-        timestampCell.textContent = new Date(session.timestamp).toLocaleString();
+//         const timestampCell = document.createElement("td");
+//         timestampCell.textContent = new Date(session.timestamp).toLocaleString();
 
-        row.appendChild(powerOnCell);
-        row.appendChild(timestampCell);
+//         row.appendChild(powerOnCell);
+//         row.appendChild(timestampCell);
 
-        powerSessionsTable.appendChild(row);
-    });
-}
+//         powerSessionsTable.appendChild(row);
+//     });
+// }
 
-function populateSensorDataTable(sensorData) {
-    const sensorDataTable = document.getElementById("sensor-data-table");
-    sensorDataTable.innerHTML = ""; 
-    console.log(sensorData);
-
-
-    sensorData.forEach((data) => {
-        const row = document.createElement("tr");
-
-        const temperatureCell = document.createElement("td");
-        temperatureCell.textContent = data.temperature.toFixed(1) + " °C";
-
-        const temperatureStatusCell = document.createElement("td");
-        temperatureStatusCell.textContent = data.temperature_status;
-
-        const humidityCell = document.createElement("td");
-        humidityCell.textContent = data.humidity.toFixed(1) + " %";
-
-        const humidityStatusCell = document.createElement("td");
-        humidityStatusCell.textContent = data.humidity_status;
-
-        const pitchCell = document.createElement("td");
-        pitchCell.textContent = data.pitch.toFixed(2);
-
-        const gravityXCell = document.createElement("td");
-        gravityXCell.textContent = data.gravity_x.toFixed(2);
-
-        const gravityYCell = document.createElement("td");
-        gravityYCell.textContent = data.gravity_y.toFixed(2);
-
-        const gravityZCell = document.createElement("td");
-        gravityZCell.textContent = data.gravity_z.toFixed(2);
+// function populateSensorDataTable(sensorData) {
+//     const sensorDataTable = document.getElementById("sensor-data-table");
+//     sensorDataTable.innerHTML = ""; 
+//     console.log(sensorData);
 
 
-        const timestampCell = document.createElement("td");
-        timestampCell.textContent = new Date(data.timestamp).toLocaleString();
+//     sensorData.forEach((data) => {
+//         const row = document.createElement("tr");
 
-        row.appendChild(temperatureCell);
-        row.appendChild(temperatureStatusCell);
-        row.appendChild(humidityCell);
-        row.appendChild(humidityStatusCell);
-        row.appendChild(pitchCell);
-        row.appendChild(gravityXCell);
-        row.appendChild(gravityYCell);
-        row.appendChild(gravityZCell);
-        row.appendChild(timestampCell);
+//         const temperatureCell = document.createElement("td");
+//         temperatureCell.textContent = data.temperature.toFixed(1) + " °C";
 
-        sensorDataTable.appendChild(row);
-    });
-}
+//         const temperatureStatusCell = document.createElement("td");
+//         temperatureStatusCell.textContent = data.temperature_status;
 
-function fetchAndDisplayStatistics() {
-    axios
-        .get("/get_statistics_data")
-        .then((response) => {
-            const { power_sessions, sensor_data } = response.data;
+//         const humidityCell = document.createElement("td");
+//         humidityCell.textContent = data.humidity.toFixed(1) + " %";
 
-            populatePowerSessionsTable(power_sessions);
-            populateSensorDataTable(sensor_data);
-            createLineGraph(sensor_data, power_sessions);
+//         const humidityStatusCell = document.createElement("td");
+//         humidityStatusCell.textContent = data.humidity_status;
 
-            console.log("Statistics data displayed successfully.");
-        })
-        .catch((error) => {
-            console.error("Error fetching statistics data:", error.response?.data?.error || error.message);
-        });
-}
+//         const pitchCell = document.createElement("td");
+//         pitchCell.textContent = data.pitch.toFixed(2);
 
-function prepareGraphData(sensorData, powerSessions) {
-    const timestamps = [];
-    const postureStates = [];
-    const powerStates = [];
+//         const gravityXCell = document.createElement("td");
+//         gravityXCell.textContent = data.gravity_x.toFixed(2);
 
-    let sensorIndex = 0;
-    let powerIndex = 0;
+//         const gravityYCell = document.createElement("td");
+//         gravityYCell.textContent = data.gravity_y.toFixed(2);
 
-    while (sensorIndex < sensorData.length && powerIndex < powerSessions.length) {
-        const sensorTimestamp = new Date(sensorData[sensorIndex].timestamp);
-        const powerTimestamp = new Date(powerSessions[powerIndex].timestamp);
+//         const gravityZCell = document.createElement("td");
+//         gravityZCell.textContent = data.gravity_z.toFixed(2);
 
-        if (powerTimestamp < sensorTimestamp) {
-            powerIndex++;
-        } else if (sensorTimestamp < powerTimestamp) {
-            sensorIndex++;
-        } else {
-            timestamps.push(sensorTimestamp);
-            postureStates.push(sensorData[sensorIndex].posture_status === 'good' ? 1 : 0);
-            powerStates.push(powerSessions[powerIndex].power_status === 'on' ? 1 : 0);
 
-            sensorIndex++;
-            powerIndex++;
-        }
+//         const timestampCell = document.createElement("td");
+//         timestampCell.textContent = new Date(data.timestamp).toLocaleString();
+
+//         row.appendChild(temperatureCell);
+//         row.appendChild(temperatureStatusCell);
+//         row.appendChild(humidityCell);
+//         row.appendChild(humidityStatusCell);
+//         row.appendChild(pitchCell);
+//         row.appendChild(gravityXCell);
+//         row.appendChild(gravityYCell);
+//         row.appendChild(gravityZCell);
+//         row.appendChild(timestampCell);
+
+//         sensorDataTable.appendChild(row);
+//     });
+// }
+
+// function fetchAndDisplayStatistics() {
+//     axios
+//         .get("/get_statistics_data")
+//         .then((response) => {
+//             const { power_sessions, sensor_data } = response.data;
+
+//             populatePowerSessionsTable(power_sessions);
+//             populateSensorDataTable(sensor_data);
+//             createLineGraph(sensor_data, power_sessions);
+
+//             console.log("Statistics data displayed successfully.");
+//         })
+//         .catch((error) => {
+//             console.error("Error fetching statistics data:", error.response?.data?.error || error.message);
+//         });
+// }
+
+// function prepareGraphData(sensorData, powerSessions) {
+//     const timestamps = [];
+//     const postureStates = [];
+//     const powerStates = [];
+
+//     let sensorIndex = 0;
+//     let powerIndex = 0;
+
+//     while (sensorIndex < sensorData.length && powerIndex < powerSessions.length) {
+//         const sensorTimestamp = new Date(sensorData[sensorIndex].timestamp);
+//         const powerTimestamp = new Date(powerSessions[powerIndex].timestamp);
+
+//         if (powerTimestamp < sensorTimestamp) {
+//             powerIndex++;
+//         } else if (sensorTimestamp < powerTimestamp) {
+//             sensorIndex++;
+//         } else {
+//             timestamps.push(sensorTimestamp);
+//             postureStates.push(sensorData[sensorIndex].posture_status === 'good' ? 1 : 0);
+//             powerStates.push(powerSessions[powerIndex].power_status === 'on' ? 1 : 0);
+
+//             sensorIndex++;
+//             powerIndex++;
+//         }
+//     }
+
+//     return {
+//         timestamps,
+//         postureStates,
+//         powerStates,
+//     };
+// }
+
+
+// function createLineGraph(sensorData, powerSessions) {
+//     const graphData = prepareGraphData(sensorData, powerSessions);
+
+//     const ctx = document.getElementById("lineGraph").getContext("2d");
+
+//     const chart = new Chart(ctx, {
+//         type: "line",
+//         data: {
+//             labels: graphData.timestamps,
+//             datasets: [
+//                 {
+//                     label: "Posture",
+//                     data: graphData.postureStates,
+//                     borderColor: "green",
+//                     backgroundColor: "rgba(0, 255, 0, 0.2)",
+//                     fill: true,
+//                     lineTension: 0.1,
+//                     borderWidth: 2,
+//                     pointRadius: 0,
+//                 },
+//                 {
+//                     label: "Slouch",
+//                     data: graphData.postureStates.map((state) => (state === 0 ? 1 : null)), // Slouch
+//                     borderColor: "red",
+//                     backgroundColor: "rgba(255, 0, 0, 0.2)",
+//                     fill: true,
+//                     lineTension: 0.1,
+//                     borderWidth: 2,
+//                     pointRadius: 0,
+//                 },
+//                 {
+//                     label: "Power Status",
+//                     data: graphData.powerStates,
+//                     borderColor: "gray",
+//                     backgroundColor: "rgba(128, 128, 128, 0.2)",
+//                     fill: false,
+//                     borderWidth: 2,
+//                     pointRadius: 0,
+//                 },
+//             ],
+//         },
+//         options: {
+//             scales: {
+//                 x: {
+//                     type: "time",
+//                     time: {
+//                         unit: "minute", 
+//                         tooltipFormat: "ll HH:mm", 
+//                     },
+//                     title: {
+//                         display: true,
+//                         text: "Time",
+//                     },
+//                 },
+//                 y: {
+//                     beginAtZero: false,
+//                     ticks: {
+//                         stepSize: 1,
+//                         min: -1, 
+//                         max: 2,
+//                     },
+//                     title: {
+//                         display: true,
+//                         text: "States",
+//                     },
+//                 },
+//             },
+//             responsive: true,
+//             plugins: {
+//                 legend: {
+//                     position: "top",
+//                 },
+//                 tooltip: {
+//                     mode: "index",
+//                     intersect: false,
+//                 },
+//             },
+//         },
+//     });
+// }
+function populateTemperature(data) {
+    const temperatureDiv = document.querySelector(".temperatureBoldText");
+    if (temperatureDiv) {
+        temperatureDiv.textContent = `${data.temperature}°`;
+
+        checkTemperatureStatus(data.temperature_status);
     }
+}
 
-    return {
-        timestamps,
-        postureStates,
-        powerStates,
-    };
+// function showPushNotification(message) {
+//     if ("Notification" in window) {
+//         if (Notification.permission === "granted") {
+//             new Notification("Temperature Alert", { body: message });
+//         } else if (Notification.permission === "default") {
+//             Notification.requestPermission().then((permission) => {
+//                 if (permission === "granted") {
+//                     new Notification("Temperature Alert", { body: message });
+//                 } else {
+//                     console.log("Notification permission denied.");
+//                 }
+//             });
+//         } else {
+//             console.log("Notifications are blocked. Please enable them in browser settings.");
+//         }
+//     } else {
+//         alert("This browser does not support notifications.");
+//     }
+// }
+
+function showPushNotification(message) {
+    console.log("Attempting to show notification:", message); // Debug log
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+            console.log("Notification permission granted."); // Debug log
+            new Notification("Temperature Alert", { body: message });
+        } else if (Notification.permission === "default") {
+            console.log("Requesting notification permission."); // Debug log
+            Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                    console.log("Permission granted after request."); // Debug log
+                    new Notification("Temperature Alert", { body: message });
+                    console.log(message)
+                    console.log("hello inside notification")
+                } else {
+                    console.log("Notification permission denied."); // Debug log
+                }
+            });
+        } else {
+            console.log("Notifications are blocked."); // Debug log
+        }
+    } else {
+        console.log("Notifications are not supported by the browser."); // Debug log
+    }
 }
 
 
-function createLineGraph(sensorData, powerSessions) {
-    const graphData = prepareGraphData(sensorData, powerSessions);
+function checkTemperatureStatus(status) {
+    if (status === "high") {
+        console.log("highhhhhh")
+        showPushNotification("Warning: Temperature is high!");
+    } else if (status === "low") {
+        showPushNotification("Warning: Temperature is low!");
+    }
+}
+function populateTemperatureDiv(temperature) {
+    const temperatureDiv = document.querySelector(".temperatureBoldText");
+    if (temperatureDiv) {
+        temperatureDiv.textContent = `${temperature.toFixed(1)}°`;
+    }
+}
 
-    const ctx = document.getElementById("lineGraph").getContext("2d");
-
-    const chart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: graphData.timestamps,
-            datasets: [
-                {
-                    label: "Posture",
-                    data: graphData.postureStates,
-                    borderColor: "green",
-                    backgroundColor: "rgba(0, 255, 0, 0.2)",
-                    fill: true,
-                    lineTension: 0.1,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                },
-                {
-                    label: "Slouch",
-                    data: graphData.postureStates.map((state) => (state === 0 ? 1 : null)), // Slouch
-                    borderColor: "red",
-                    backgroundColor: "rgba(255, 0, 0, 0.2)",
-                    fill: true,
-                    lineTension: 0.1,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                },
-                {
-                    label: "Power Status",
-                    data: graphData.powerStates,
-                    borderColor: "gray",
-                    backgroundColor: "rgba(128, 128, 128, 0.2)",
-                    fill: false,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                },
-            ],
-        },
-        options: {
-            scales: {
-                x: {
-                    type: "time",
-                    time: {
-                        unit: "minute", 
-                        tooltipFormat: "ll HH:mm", 
-                    },
-                    title: {
-                        display: true,
-                        text: "Time",
-                    },
-                },
-                y: {
-                    beginAtZero: false,
-                    ticks: {
-                        stepSize: 1,
-                        min: -1, 
-                        max: 2,
-                    },
-                    title: {
-                        display: true,
-                        text: "States",
-                    },
-                },
-            },
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: "top",
-                },
-                tooltip: {
-                    mode: "index",
-                    intersect: false,
-                },
-            },
-        },
-    });
+async function fetchLastSlouchTemperature() {
+    try {
+        const response = await axios.get("/last-slouch-temperature");
+        if (response.status === 200) {
+            const { temperature, temperature_status } = response.data;
+            populateTemperatureDiv(temperature);
+            checkTemperatureStatus(temperature_status);
+        } else {
+            console.error("Error fetching temperature:", response.data.error);
+        }
+    } catch (error) {
+        console.error("Error fetching temperature:", error);
+    }
 }
 
 
