@@ -276,3 +276,19 @@ def calculate_daily_usage(user_id):
     except Exception as e:
         print(f"Error calculating daily usage: {e}")
         return 0
+    
+def get_last_slouch_entry(user_id):
+    try:
+        slouch_entry = SensorData.query.filter_by(user_id=user_id).order_by(SensorData.timestamp.desc()).first()
+        if not slouch_entry:
+            return None
+
+        # Return temperature and status
+        return {
+            "temperature": slouch_entry.temperature,
+            "temperature_status": slouch_entry.temperature_status,
+            "timestamp": slouch_entry.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+    except Exception as e:
+        print(f"Error retrieving last slouch entry: {e}")
+        return None

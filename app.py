@@ -266,7 +266,7 @@ def get_posture_data():
 
     except Exception as e:
         print(f"Error fetching posture data: {e}")
-        return jsonify({"success": False, "message": "An error occurred in get_posture_data route. Check server logs for details."}), 500
+        return jsonify({"success": False, "message": "An error occurred. Check server logs for details."}), 500
 
 @app.route("/statistics", methods=["GET"])
 def statistics():
@@ -296,8 +296,37 @@ def statistics():
 def information():
     return render_template("information.html")
 
-@app.route("/api/latest_temperature", methods=["GET"])
-def latest_temperature():
+@app.route("/last-slouch-temperature", methods=["GET"])
+def last_slouch_temperature():
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+
+        last_slouch_entry = my_db.get_last_slouch_entry(user_id)
+
+        if not last_slouch_entry:
+            return jsonify({"error": "No slouch data available"}), 404
+        
+        print(last_slouch_entry)
+
+        return jsonify({
+            "temperature": last_slouch_entry["temperature"],
+            "temperature_status": last_slouch_entry["temperature_status"],
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# @app.route("/api/latest_temperature", methods=["GET"])
+# def latest_temperature():
     try:
         user_email = session.get("email")
         if not user_email:
@@ -339,10 +368,10 @@ def settings():
         user_id = user["id"]
         sensor_data = my_db.get_sensor_data_by_user_id(user_id)
 
-        if isinstance(sensor_data, list) and sensor_data:
-            latest_temperature = sensor_data[-1].get("temperature", "N/A") 
-        else:
-            latest_temperature = "No data available"
+        # if isinstance(sensor_data, list) and sensor_data:
+        #     latest_temperature = sensor_data[-1].get("temperature", "N/A") 
+        # else:
+        latest_temperature = "No data available"
 
         return render_template("settings.html", device_temp=latest_temperature)
 

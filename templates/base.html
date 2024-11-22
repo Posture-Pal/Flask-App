@@ -32,7 +32,7 @@
 
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <div class="mainContainer"> <!-- Mila: Main container contains the navigation bar and block content -->
         <div class="logo">
             <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/PosturePalLogo.png') }}"
