@@ -1,4 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from sqlalchemy import and_
 
 db = SQLAlchemy()
 
@@ -228,6 +230,52 @@ def has_threshold_for_user(user_id):
     except Exception as e:
         print(f"Error checking threshold existence: {e}")
         return False
+
+def count_todays_reminders():
+    try:
+        start_of_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        # Query to count rows between start and end of today
+        count = SensorData.query.filter(
+            SensorData.timestamp >= start_of_day,
+            SensorData.timestamp <= end_of_day
+        ).count()
+        
+        return count
+    except Exception as e:
+        print(f"Error in count_todays_reminders: {e}")
+        return 0
+
+def calculate_daily_usage(user_id):
+    try:
+        from datetime import datetime, timedelta
+        
+        start_of_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
+
+        power_sessions = PowerSessions.query.filter(
+            PowerSessions.user_id == user_id,
+            PowerSessions.timestamp >= start_of_day,
+            PowerSessions.timestamp <= end_of_day
+        ).order_by(PowerSessions.timestamp).all()
+
+        total_usage = timedelta()
+        session_start = None
+
+        for session in power_sessions:
+            print(f"Session: {session.power_on}, Timestamp: {session.timestamp}")  # Debug
+            if session.power_on:
+                session_start = session.timestamp
+            elif session_start:  # Power off
+                total_usage += session.timestamp - session_start
+                session_start = None
+
+        print(f"Total usage time in seconds: {total_usage.total_seconds()}")  # Debug
+        return total_usage.total_seconds() / 3600  # Convert to hours
+    except Exception as e:
+        print(f"Error calculating daily usage: {e}")
+        return 0
     
 def get_last_slouch_entry(user_id):
     try:

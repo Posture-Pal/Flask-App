@@ -82,23 +82,19 @@ function updateDataInHTML(data) {
 
     document.getElementById("slouch-status").textContent = `Slouch: ${data.slouch !== undefined ? data.slouch : "N/A"}`;
     document.getElementById("temperature-status").textContent = `Temperature Status: ${data.temperature_status || "N/A"}`;
-    document.getElementById("temperature-value").textContent = `Temperature: ${
-        typeof data.temperature === "number" ? data.temperature.toFixed(1) : "N/A"
-    } °C`;
+    document.getElementById("temperature-value").textContent = `Temperature: ${typeof data.temperature === "number" ? data.temperature.toFixed(1) : "N/A"
+        } °C`;
     document.getElementById("humidity-status").textContent = `Humidity Status: ${data.humidity_status || "N/A"}`;
-    document.getElementById("humidity-value").textContent = `Humidity: ${
-        typeof data.humidity === "number" ? data.humidity.toFixed(1) : "N/A"
-    }%`;
-    document.getElementById("pitch-value").textContent = `Pitch: ${
-        typeof data.pitch === "number" ? data.pitch.toFixed(4) : "N/A"
-    }`;
-    document.getElementById("gravity-vector").textContent = `Gravity Vector: ${
-        Array.isArray(data.gravity_vector)
+    document.getElementById("humidity-value").textContent = `Humidity: ${typeof data.humidity === "number" ? data.humidity.toFixed(1) : "N/A"
+        }%`;
+    document.getElementById("pitch-value").textContent = `Pitch: ${typeof data.pitch === "number" ? data.pitch.toFixed(4) : "N/A"
+        }`;
+    document.getElementById("gravity-vector").textContent = `Gravity Vector: ${Array.isArray(data.gravity_vector)
             ? data.gravity_vector.map((g) => (typeof g === "number" ? g.toFixed(2) : "N/A")).join(", ")
             : "N/A"
         }`;
-    
-    
+
+
     axios
         .post("/save_sensor_data", data)
         .then((response) => {
@@ -224,17 +220,23 @@ function initToggleListeners() {
 }
 
 function initApp() {
-    // startListeningForUpdates();
+    startListeningForUpdates();
+    startListeningForUpdates();
 
-    // const powerButton = document.getElementById("power-btn");
-    // powerButton.addEventListener("click", () => {
-    //     sendPowerOnMessage();
-    // });
-
-    // const powerOffButton = document.getElementById("power-off-btn");
-    // powerOffButton.addEventListener("click", () => {
-    //     sendPowerOffMessage();
-    // });
+    const powerToggle = document.getElementById("powerToggle");
+    if (!powerToggle) {
+        console.error("Power toggle not found in DOM");
+    } else {
+        powerToggle.addEventListener("change", () => {
+            if (powerToggle.checked) {
+                sendPowerOnMessage();
+                console.log("Sensor Power: ON");
+            } else {
+                sendPowerOffMessage();
+                console.log("Sensor Power: OFF");
+            }
+        });
+    }
 
     // const calibrateButton = document.getElementById("calibrate-btn");
     // calibrateButton.addEventListener("click", () => {
@@ -247,91 +249,8 @@ function initApp() {
     // });
 
 
-    if (document.body.classList.contains("statistics-page")) {
-        setupStatisticsPage();
-
-    }
-
-    if (document.body.classList.contains("home-page")) {
-                console.log("Inside the body page")
-        setupHomePage();
-    }
-
-    fetchLastSlouchTemperature();
-
-    // initToggleListeners();
-}
-
-// function populatePowerSessionsTable(powerSessions) {
-//     const powerSessionsTable = document.getElementById("power-sessions-table");
-//     powerSessionsTable.innerHTML = ""; 
-
-//     powerSessions.forEach((session) => {
-//         const row = document.createElement("tr");
-
-//         const powerOnCell = document.createElement("td");
-//         powerOnCell.textContent = session.power_on ? "Yes" : "No";
-
-//         const timestampCell = document.createElement("td");
-//         timestampCell.textContent = new Date(session.timestamp).toLocaleString();
-
-//         row.appendChild(powerOnCell);
-//         row.appendChild(timestampCell);
-
-//         powerSessionsTable.appendChild(row);
-//     });
-// }
-
-// function populateSensorDataTable(sensorData) {
-//     const sensorDataTable = document.getElementById("sensor-data-table");
-//     sensorDataTable.innerHTML = ""; 
-//     console.log(sensorData);
 
 
-//     sensorData.forEach((data) => {
-//         const row = document.createElement("tr");
-
-//         const temperatureCell = document.createElement("td");
-//         temperatureCell.textContent = data.temperature.toFixed(1) + " °C";
-
-//         const temperatureStatusCell = document.createElement("td");
-//         temperatureStatusCell.textContent = data.temperature_status;
-
-//         const humidityCell = document.createElement("td");
-//         humidityCell.textContent = data.humidity.toFixed(1) + " %";
-
-//         const humidityStatusCell = document.createElement("td");
-//         humidityStatusCell.textContent = data.humidity_status;
-
-//         const pitchCell = document.createElement("td");
-//         pitchCell.textContent = data.pitch.toFixed(2);
-
-//         const gravityXCell = document.createElement("td");
-//         gravityXCell.textContent = data.gravity_x.toFixed(2);
-
-//         const gravityYCell = document.createElement("td");
-//         gravityYCell.textContent = data.gravity_y.toFixed(2);
-
-//         const gravityZCell = document.createElement("td");
-//         gravityZCell.textContent = data.gravity_z.toFixed(2);
-
-
-//         const timestampCell = document.createElement("td");
-//         timestampCell.textContent = new Date(data.timestamp).toLocaleString();
-
-//         row.appendChild(temperatureCell);
-//         row.appendChild(temperatureStatusCell);
-//         row.appendChild(humidityCell);
-//         row.appendChild(humidityStatusCell);
-//         row.appendChild(pitchCell);
-//         row.appendChild(gravityXCell);
-//         row.appendChild(gravityYCell);
-//         row.appendChild(gravityZCell);
-//         row.appendChild(timestampCell);
-
-//         sensorDataTable.appendChild(row);
-//     });
-// }
 
 // function fetchAndDisplayStatistics() {
 //     axios
@@ -678,6 +597,56 @@ function renderChart(ctx, data) {
 }
 
 
+document.addEventListener("DOMContentLoaded", initApp);
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.querySelector('#calibrateModal');
+    const overlay = document.querySelector('#modal-overlay');
+
+    const thresholdTable = document.querySelector('#threshold-table');
+    const calibrateBtnHome = document.querySelector('#calibrate-btn');
+
+    if (thresholdTable && calibrateBtnHome) {
+        fetch('/check-threshold')
+            .then(response => response.json())
+            .then(data => {
+                if (data.show_calibrate) {
+                    modal.style.display = 'block';
+                    overlay.style.display = 'block';
+
+                    calibrateBtnHome.style.display = 'block';
+                    thresholdTable.style.display = 'block';
+                } else {
+                    modal.style.display = 'none';
+                    overlay.style.display = 'none';
+                    calibrateBtnHome.style.display = 'none';
+                    thresholdTable.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error fetching threshold status:', error));
+    }
+
+    const openModalBtns = [
+        document.querySelector('#calibrate-btn'),
+        document.querySelector('#calibrateBtn')
+    ].filter(btn => btn !== null);
+
+    openModalBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const isModalVisible = modal.style.display === 'block';
+            modal.style.display = isModalVisible ? 'none' : 'block';
+            overlay.style.display = isModalVisible ? 'none' : 'block';
+
+            sendCalibrationMessage();
+        });
+    });
+
+    overlay.addEventListener('click', () => {
+        modal.style.display = 'none';
+        overlay.style.display = 'none';
+    });
+});
+ 
 function setupStatisticsPage() {
     const datePicker = document.getElementById("datePicker");
     const errorMessage = document.getElementById("errorMessage");

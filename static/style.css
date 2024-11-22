@@ -10,6 +10,7 @@ body {
     box-sizing: border-box; /* Mila: Ensure no overflow */
 }
 
+
 main {
     display: flex;
     flex-direction: column;
@@ -87,10 +88,6 @@ main {
 .greeting {
     font-size: 30px;
     font-weight: 500;
-}
-
-.usageContainer {
-
 }
 
 .usageContainerFlex {
