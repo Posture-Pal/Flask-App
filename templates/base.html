@@ -130,7 +130,7 @@
     {% if request.path == '/statistics' %}
     <script src="{{ url_for('static', filename='js/statistics.js') }}"></script>
     {% endif %}
-  
+
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/service-worker.js')

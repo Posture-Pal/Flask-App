@@ -96,11 +96,9 @@ def google_login():
 
 @app.route("/logout")
 def logout():
-    # Clear the session and display a logout message
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for("index"))
-
 
 @app.route("/home")
 def home():
@@ -111,11 +109,16 @@ def home():
     my_db.add_user_and_login(user, google_client_id, email)
 
     show_calibrate_button = True
-
     user_data = my_db.get_user_by_email(email)
+
+    usage_today = 0
     if user_data:
         user_id = user_data.get("id")
         show_calibrate_button = not my_db.has_threshold_for_user(user_id)
+        usage_today = my_db.calculate_daily_usage(user_id)
+
+    # Get today's reminder count
+    todays_reminders = my_db.count_todays_reminders()
 
     return render_template(
         "home.html",
@@ -123,6 +126,8 @@ def home():
         google_client_id=google_client_id,
         email=email,
         show_calibrate_button=show_calibrate_button,
+        todays_reminders=todays_reminders,
+        usage_today=usage_today
     )
 
 @app.route("/save_sensor_data", methods=["POST"])
@@ -261,7 +266,8 @@ def get_posture_data():
 
     except Exception as e:
         print(f"Error fetching posture data: {e}")
-        return jsonify({"success": False, "message": "An error occurred. Check server logs for details."}), 500
+        return jsonify({"success": False, "message": "An error occurred in get_posture_data route. Check server logs for details."}), 500
+
 @app.route("/statistics", methods=["GET"])
 def statistics():
     try:
