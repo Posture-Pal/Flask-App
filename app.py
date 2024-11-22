@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request
@@ -8,6 +9,8 @@ from dotenv import load_dotenv
 import pymysql
 
 import my_db
+
+from my_db import get_threshold_by_user_id
 
 load_dotenv()
 
@@ -104,10 +107,23 @@ def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
     google_client_id = session.get("google_client_id", "No client_id provided")
-    
+
     my_db.add_user_and_login(user, google_client_id, email)
-    
-    return render_template("home.html", user=user, google_client_id=google_client_id, email=email)
+
+    show_calibrate_button = True
+
+    user_data = my_db.get_user_by_email(email)
+    if user_data:
+        user_id = user_data.get("id")
+        show_calibrate_button = not my_db.has_threshold_for_user(user_id)
+
+    return render_template(
+        "home.html",
+        user=user,
+        google_client_id=google_client_id,
+        email=email,
+        show_calibrate_button=show_calibrate_button,
+    )
 
 @app.route("/save_sensor_data", methods=["POST"])
 def save_sensor_data():
@@ -177,8 +193,75 @@ def save_threshold_data():
                 return jsonify({"message": "Thresholds saved successfully."}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+        
+#Route to get data for statistics page
+@app.route("/get_posture_data", methods=["GET"])
+def get_posture_data():
+    try:
+        # Verify user session
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"success": False, "message": "User not authenticated"}), 401
 
+        # Fetch user by email
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"success": False, "message": "User not found"}), 404
 
+        user_id = user["id"]
+        selected_date = request.args.get("date")
+        if not selected_date:
+            return jsonify({"success": False, "message": "Date not provided"}), 400
+
+        # Parse the selected date
+        try:
+            start_of_day = datetime.strptime(selected_date, "%Y-%m-%d")
+        except ValueError:
+            return jsonify({"success": False, "message": "Invalid date format. Use YYYY-MM-DD."}), 400
+
+        end_of_day = start_of_day + timedelta(days=1)
+
+        # Fetch power sessions for the selected day
+        power_sessions = my_db.PowerSessions.query.filter(
+            my_db.PowerSessions.user_id == user_id,
+            my_db.PowerSessions.timestamp >= start_of_day,
+            my_db.PowerSessions.timestamp < end_of_day
+        ).order_by(my_db.PowerSessions.timestamp.asc()).all()
+
+        # Fetch slouch events for the selected day
+        slouch_events = my_db.SensorData.query.filter(
+            my_db.SensorData.user_id == user_id,
+            my_db.SensorData.timestamp >= start_of_day,
+            my_db.SensorData.timestamp < end_of_day
+        ).all()
+
+        # Process power sessions
+        power_data = [
+            {
+                "power_on": session.power_on,
+                "timestamp": session.timestamp.strftime("%H:%M:%S")
+            }
+            for session in power_sessions
+        ]
+
+        # Process slouch events
+        slouch_data = [
+            {
+                "timestamp": event.timestamp.strftime("%H:%M:%S")
+            }
+            for event in slouch_events
+        ]
+
+        # Return structured response
+        return jsonify({
+            "success": True,
+            "powerData": power_data,
+            "slouchData": slouch_data
+        })
+
+    except Exception as e:
+        print(f"Error fetching posture data: {e}")
+        return jsonify({"success": False, "message": "An error occurred. Check server logs for details."}), 500
 @app.route("/statistics", methods=["GET"])
 def statistics():
     try:
@@ -260,6 +343,8 @@ def settings():
     except Exception as e:
         print(f"Error in settings route: {e}")
         return "An error occurred.", 500
+    
+    
 
 @app.route("/article1")
 def article1():
