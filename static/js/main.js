@@ -224,22 +224,27 @@ function initToggleListeners() {
 }
 
 function initApp() {
-    // startListeningForUpdates();
+    startListeningForUpdates();
 
-    // const powerButton = document.getElementById("power-btn");
-    // powerButton.addEventListener("click", () => {
-    //     sendPowerOnMessage();
-    // });
+    const powerToggle = document.getElementById("powerToggle");
+    if (!powerToggle) {
+        console.error("Power toggle not found in DOM");
+    } else {
+        powerToggle.addEventListener("change", () => {
+            if (powerToggle.checked) {
+                sendPowerOnMessage();
+                console.log("Sensor Power: ON");
+            } else {
+                sendPowerOffMessage();
+                console.log("Sensor Power: OFF");
+            }
+        });
+    }
 
-    // const powerOffButton = document.getElementById("power-off-btn");
-    // powerOffButton.addEventListener("click", () => {
-    //     sendPowerOffMessage();
-    // });
-
-    // const calibrateButton = document.getElementById("calibrate-btn");
-    // calibrateButton.addEventListener("click", () => {
-    //     sendCalibrationMessage();
-    // });
+    const calibrateButton = document.getElementById("calibrate-btn");
+    calibrateButton.addEventListener("click", () => {
+        sendCalibrationMessage();
+    });
 
     const statisticButton = document.getElementById("view-statistics-btn");
     statisticButton.addEventListener("click", () => {
