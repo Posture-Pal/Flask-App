@@ -20,12 +20,34 @@
         <div>You are meeting your posture goal!</div>
     </div> -->
 
-    <div class="chart-container">
-        <canvas id="todayPostureChart"></canvas>
-    </div>
-    
     <div id="errorMessage" style="color: red; display: none;">
         No data available yet for today. Make sure to turn your device on and calibrate!
+    </div>
+
+    <div class="controls">
+                <div class="control">
+            <span>Power</span>
+            <label class="switch">
+                <input type="checkbox" id="powerToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <!-- TODO: Connect vibration toggle to device settings -->
+        <div class="control">
+            <span>Vibration</span>
+            <label class="switch">
+                <input type="checkbox" id="vibrationToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <!-- TODO: Implement sound toggle functionality -->
+        <div class="control">
+            <span>Sound</span>
+            <label class="switch">
+                <input type="checkbox" id="soundToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
     </div>
 
     <div class="usageContainer">
@@ -45,28 +67,12 @@
             </div>
             <div class="usageCard">
                 <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/thermometer.png" alt="angle icon" />
-                <div class="usageSmallText">Temperature of Device</div>
-                <div class="usageBoldText">15°</div> <!-- TODO Replace with actual temperature -->
-            </div>
-            <div class="usageCard">
-                <img class="navicons" src="https://images.vexels.com/media/users/3/240746/isolated/preview/2fb6bd2cc5c9c8772c19c09cfd0b6deb-cold-temperature-icon.png" alt="temp icon" />
-                <div class="temperatureSmallText">Current Temperature</div>
-                <div class="temperatureBoldText">20°</div>
+                <div class="temperatureSmallText">Temperature of Device</div>
+                <div class="temperatureBoldText">15°</div> <!-- TODO Replace with actual temperature -->
             </div>
         </div>
     </div>
-    <a href="{{ url_for('logout') }}">Logout</a>
-
-    <div id="data-container" style="margin-top: 20px;">
-        <h3>Received Data:</h3>
-        <p id="slouch-status">Slouch: --</p>
-        <p id="temperature-status">Temperature Status: --</p>
-        <p id="temperature-value">Temperature: -- °C</p>
-        <p id="humidity-status">Humidity Status: --</p>
-        <p id="humidity-value">Humidity: --%</p>
-        <p id="pitch-value">Pitch: --</p>
-        <p id="gravity-vector">Gravity Vector: --</p>
-    </div>
+    <!-- <a href="{{ url_for('logout') }}">Logout</a> -->
 
     <div>
         <div class="calendar-container">
@@ -113,51 +119,7 @@
     </script>
 
     <div>
-        <label>
-            <input type="checkbox" id="sound-toggle" />
-            Sound Mode
-        </label>
-        <label>
-            <input type="checkbox" id="vibration-toggle" />
-            Vibration Mode
-        </label>
     </div>
-
-    <!-- <div>
-        <button id="view-statistics-btn">Show Statistics</button>
-        <h1>User Statistics</h1>
-
-        <h2>Power Sessions</h2>
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Power On</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody id="power-sessions-table"></tbody>
-        </table>
-
-        <h2>Sensor Data</h2>
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Temperature</th>
-                    <th>Temperature Status</th>
-                    <th>Humidity</th>
-                    <th>Humidity Status</th>
-                    <th>Pitch</th>
-                    <th>Gravity X</th>
-                    <th>Gravity Y</th>
-                    <th>Gravity Z</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody id="sensor-data-table"></tbody>
-        </table>
-    </div>
-
-    <canvas id="lineGraph" width="600" height="400"></canvas> -->
 </div>
 
 {% endblock %}

@@ -9,29 +9,7 @@
     <h2>Device</h2>
     <div class="device-controls">
         <!-- TODO: Integrate backend logic for power toggle -->
-        <div class="control">
-            <span>Power</span>
-            <label class="switch">
-                <input type="checkbox" id="powerToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <!-- TODO: Connect vibration toggle to device settings -->
-        <div class="control">
-            <span>Vibration</span>
-            <label class="switch">
-                <input type="checkbox" id="vibrationToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <!-- TODO: Implement sound toggle functionality -->
-        <div class="control">
-            <span>Sound</span>
-            <label class="switch">
-                <input type="checkbox" id="soundToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
+
         <p>Device Temperature: <span id="deviceTemp">{{ device_temp }}°C</span></p>
 
         <button id="calibrateBtn">Calibrate Device</button>

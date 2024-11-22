@@ -19,11 +19,9 @@ function startListeningForUpdates() {
         message: (event) => {
             console.log("Received message:", event.message);
 
-            // check if the message contains calibration thresholds
             if (event.message.thresholds) {
                 updateThresholdTable(event.message.thresholds);
             } else {
-                // regular slouch data
                 updateDataInHTML(event.message);
             }
         },
@@ -35,6 +33,29 @@ function startListeningForUpdates() {
             }
         },
     });
+}
+
+function updateDataInHTML(data) {
+    if (!data) {
+        console.error("No data received to update.");
+        return;
+    }
+
+    const slouchStatus = document.getElementById("slouchStatusBoldText");
+    if (slouchStatus) {
+        slouchStatus.textContent = `Slouch: ${data.slouch !== undefined ? data.slouch : "N/A"}`;
+    } else {
+        console.warn("Element with ID 'slouch-status' not found.");
+    }
+
+    axios
+        .post("/save_sensor_data", data)
+        .then((response) => {
+            console.log(response.data.message || "Data saved successfully.");
+        })
+        .catch((error) => {
+            console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
+        });
 }
 
 
@@ -73,38 +94,6 @@ function sendPowerOffMessage() {
     });
 }
 
-// display the slouch values with received data
-function updateDataInHTML(data) {
-    if (!data) {
-        console.error("No data received to update.");
-        return;
-    }
-
-    document.getElementById("slouch-status").textContent = `Slouch: ${data.slouch !== undefined ? data.slouch : "N/A"}`;
-    document.getElementById("temperature-status").textContent = `Temperature Status: ${data.temperature_status || "N/A"}`;
-    document.getElementById("temperature-value").textContent = `Temperature: ${typeof data.temperature === "number" ? data.temperature.toFixed(1) : "N/A"
-        } °C`;
-    document.getElementById("humidity-status").textContent = `Humidity Status: ${data.humidity_status || "N/A"}`;
-    document.getElementById("humidity-value").textContent = `Humidity: ${typeof data.humidity === "number" ? data.humidity.toFixed(1) : "N/A"
-        }%`;
-    document.getElementById("pitch-value").textContent = `Pitch: ${typeof data.pitch === "number" ? data.pitch.toFixed(4) : "N/A"
-        }`;
-    document.getElementById("gravity-vector").textContent = `Gravity Vector: ${Array.isArray(data.gravity_vector)
-            ? data.gravity_vector.map((g) => (typeof g === "number" ? g.toFixed(2) : "N/A")).join(", ")
-            : "N/A"
-        }`;
-
-
-    axios
-        .post("/save_sensor_data", data)
-        .then((response) => {
-            console.log(response.data.message || "Data saved successfully.");
-        })
-        .catch((error) => {
-            console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
-        });
-}
-
 //send a "calibration_setup: true" message to PubNub
 function sendCalibrationMessage() {
     const message = { calibration_setup: true };
@@ -120,43 +109,6 @@ function sendCalibrationMessage() {
         }
     });
 }
-
-function updateThresholdTable(data) {
-    const table = document.getElementById("threshold-table");
-    const tableBody = document.getElementById("threshold-values");
-
-    tableBody.innerHTML = "";
-
-    Object.entries(data.thresholds).forEach(([key, value]) => {
-        const row = document.createElement("tr");
-
-        const parameterCell = document.createElement("td");
-        parameterCell.textContent = key;
-
-        const valueCell = document.createElement("td");
-
-        if (Array.isArray(value)) {
-            valueCell.textContent = value.map(v => v.toFixed(2)).join(", ");
-        } else {
-            valueCell.textContent = typeof value === "number" ? value.toFixed(2) : value;
-        }
-
-        row.appendChild(parameterCell);
-        row.appendChild(valueCell);
-        tableBody.appendChild(row);
-    });
-
-    table.style.display = "none";
-    axios
-        .post("/save_threshold_data", data.thresholds)
-        .then((response) => {
-            console.log(response.data.message || "Data saved successfully.");
-        })
-        .catch((error) => {
-            console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
-        });
-}
-
 
 function startListeningForUpdates() {
     console.log("Subscribing to channel:", CHANNEL_NAME);
@@ -186,10 +138,9 @@ function startListeningForUpdates() {
     });
 }
 
-//send a "sound_mode: true/false, vibration_mode: true/false" message to PubNub
 function sendModesStatus() {
-    const soundToggle = document.getElementById("sound-toggle").checked;
-    const vibrationToggle = document.getElementById("vibration-toggle").checked;
+    const soundToggle = document.getElementById("soundToggle").checked;
+    const vibrationToggle = document.getElementById("vibrationToggle").checked;
 
     const message = {
         sound_mode: soundToggle,
@@ -205,184 +156,74 @@ function sendModesStatus() {
             if (status.error) {
                 console.error("Error publishing mode status:", status);
             } else {
-                console.log("Mode status message sent:", response);
+                console.log("Mode status message sent successfully:", response);
             }
         }
     );
 }
 
 function initToggleListeners() {
-    const soundToggle = document.getElementById("sound-toggle");
-    const vibrationToggle = document.getElementById("vibration-toggle");
+    const soundToggle = document.getElementById("soundToggle");
+    const vibrationToggle = document.getElementById("vibrationToggle");
 
     soundToggle.addEventListener("change", sendModesStatus);
     vibrationToggle.addEventListener("change", sendModesStatus);
 }
 
+
 function initApp() {
     startListeningForUpdates();
-    startListeningForUpdates();
-
     const powerToggle = document.getElementById("powerToggle");
-    if (!powerToggle) {
-        console.error("Power toggle not found in DOM");
-    } else {
-        powerToggle.addEventListener("change", () => {
-            if (powerToggle.checked) {
-                sendPowerOnMessage();
-                console.log("Sensor Power: ON");
-            } else {
-                sendPowerOffMessage();
-                console.log("Sensor Power: OFF");
+if (!powerToggle) {
+    console.error("Power toggle not found in DOM");
+} else {
+    powerToggle.addEventListener("change", () => {
+        const powerOn = powerToggle.checked; // Boolean: true (ON) or false (OFF)
+
+        // Publish the message to PubNub
+        const message = { power: powerOn };
+        pubnub.publish(
+            {
+                channel: CHANNEL_NAME,
+                message: message,
+            },
+            (status, response) => {
+                if (status.error) {
+                    console.error("Error publishing message:", status);
+                } else {
+                    console.log(`Power ${powerOn ? "ON" : "OFF"} message sent:`, response);
+                }
             }
-        });
+        );
+
+        // Send the power session data to the backend
+        axios
+            .post("/save_power_session", { power_on: powerOn ? 1 : 0 }) // Convert to 1 or 0
+            .then((response) => {
+                console.log(response.data.message || "Power session saved successfully.");
+            })
+            .catch((error) => {
+                console.error("Error saving power session:", error.response?.data?.error || error.message);
+            });
+    });
+}
+
+
+
+
+    fetchLastSlouchTemperature();
+
+    if (document.body.classList.contains("statistics-page")) {
+        setupStatisticsPage();
+    }
+    if (document.body.classList.contains("home-page")) {
+        setupHomePage();
     }
 
-    // const calibrateButton = document.getElementById("calibrate-btn");
-    // calibrateButton.addEventListener("click", () => {
-    //     sendCalibrationMessage();
-    // });
-
-    // const statisticButton = document.getElementById("view-statistics-btn");
-    // statisticButton.addEventListener("click", () => {
-    //     fetchAndDisplayStatistics();
-    // });
+    initToggleListeners();
+}
 
 
-
-
-
-// function fetchAndDisplayStatistics() {
-//     axios
-//         .get("/get_statistics_data")
-//         .then((response) => {
-//             const { power_sessions, sensor_data } = response.data;
-
-//             populatePowerSessionsTable(power_sessions);
-//             populateSensorDataTable(sensor_data);
-//             createLineGraph(sensor_data, power_sessions);
-
-//             console.log("Statistics data displayed successfully.");
-//         })
-//         .catch((error) => {
-//             console.error("Error fetching statistics data:", error.response?.data?.error || error.message);
-//         });
-// }
-
-// function prepareGraphData(sensorData, powerSessions) {
-//     const timestamps = [];
-//     const postureStates = [];
-//     const powerStates = [];
-
-//     let sensorIndex = 0;
-//     let powerIndex = 0;
-
-//     while (sensorIndex < sensorData.length && powerIndex < powerSessions.length) {
-//         const sensorTimestamp = new Date(sensorData[sensorIndex].timestamp);
-//         const powerTimestamp = new Date(powerSessions[powerIndex].timestamp);
-
-//         if (powerTimestamp < sensorTimestamp) {
-//             powerIndex++;
-//         } else if (sensorTimestamp < powerTimestamp) {
-//             sensorIndex++;
-//         } else {
-//             timestamps.push(sensorTimestamp);
-//             postureStates.push(sensorData[sensorIndex].posture_status === 'good' ? 1 : 0);
-//             powerStates.push(powerSessions[powerIndex].power_status === 'on' ? 1 : 0);
-
-//             sensorIndex++;
-//             powerIndex++;
-//         }
-//     }
-
-//     return {
-//         timestamps,
-//         postureStates,
-//         powerStates,
-//     };
-// }
-
-
-// function createLineGraph(sensorData, powerSessions) {
-//     const graphData = prepareGraphData(sensorData, powerSessions);
-
-//     const ctx = document.getElementById("lineGraph").getContext("2d");
-
-//     const chart = new Chart(ctx, {
-//         type: "line",
-//         data: {
-//             labels: graphData.timestamps,
-//             datasets: [
-//                 {
-//                     label: "Posture",
-//                     data: graphData.postureStates,
-//                     borderColor: "green",
-//                     backgroundColor: "rgba(0, 255, 0, 0.2)",
-//                     fill: true,
-//                     lineTension: 0.1,
-//                     borderWidth: 2,
-//                     pointRadius: 0,
-//                 },
-//                 {
-//                     label: "Slouch",
-//                     data: graphData.postureStates.map((state) => (state === 0 ? 1 : null)), // Slouch
-//                     borderColor: "red",
-//                     backgroundColor: "rgba(255, 0, 0, 0.2)",
-//                     fill: true,
-//                     lineTension: 0.1,
-//                     borderWidth: 2,
-//                     pointRadius: 0,
-//                 },
-//                 {
-//                     label: "Power Status",
-//                     data: graphData.powerStates,
-//                     borderColor: "gray",
-//                     backgroundColor: "rgba(128, 128, 128, 0.2)",
-//                     fill: false,
-//                     borderWidth: 2,
-//                     pointRadius: 0,
-//                 },
-//             ],
-//         },
-//         options: {
-//             scales: {
-//                 x: {
-//                     type: "time",
-//                     time: {
-//                         unit: "minute", 
-//                         tooltipFormat: "ll HH:mm", 
-//                     },
-//                     title: {
-//                         display: true,
-//                         text: "Time",
-//                     },
-//                 },
-//                 y: {
-//                     beginAtZero: false,
-//                     ticks: {
-//                         stepSize: 1,
-//                         min: -1, 
-//                         max: 2,
-//                     },
-//                     title: {
-//                         display: true,
-//                         text: "States",
-//                     },
-//                 },
-//             },
-//             responsive: true,
-//             plugins: {
-//                 legend: {
-//                     position: "top",
-//                 },
-//                 tooltip: {
-//                     mode: "index",
-//                     intersect: false,
-//                 },
-//             },
-//         },
-//     });
-// }
 function populateTemperature(data) {
     const temperatureDiv = document.querySelector(".temperatureBoldText");
     if (temperatureDiv) {
@@ -392,25 +233,6 @@ function populateTemperature(data) {
     }
 }
 
-// function showPushNotification(message) {
-//     if ("Notification" in window) {
-//         if (Notification.permission === "granted") {
-//             new Notification("Temperature Alert", { body: message });
-//         } else if (Notification.permission === "default") {
-//             Notification.requestPermission().then((permission) => {
-//                 if (permission === "granted") {
-//                     new Notification("Temperature Alert", { body: message });
-//                 } else {
-//                     console.log("Notification permission denied.");
-//                 }
-//             });
-//         } else {
-//             console.log("Notifications are blocked. Please enable them in browser settings.");
-//         }
-//     } else {
-//         alert("This browser does not support notifications.");
-//     }
-// }
 
 function showPushNotification(message) {
     console.log("Attempting to show notification:", message); // Debug log
@@ -468,34 +290,25 @@ async function fetchLastSlouchTemperature() {
     }
 }
 
+// DOESN'T WORK
+// document.addEventListener('DOMContentLoaded', function () {
+//     const calibrateBtn = document.getElementById('calibrate-btn');
+//     const thresholdTable = document.getElementById('threshold-table');
 
+//     fetch('/check-threshold')
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.show_calibrate) {
+//                 calibrateBtn.style.display = 'block';
+//                 thresholdTable.style.display = 'block';
+//             } else {
+//                 calibrateBtn.style.display = 'none';
+//                 thresholdTable.style.display = 'none';
+//             }
+//         })
+//         .catch(error => console.error('Error fetching threshold status:', error));
+// });
 
-document.addEventListener("DOMContentLoaded", initApp);
-
-document.addEventListener('DOMContentLoaded', function () {
-    const calibrateBtn = document.getElementById('calibrate-btn');
-    const thresholdTable = document.getElementById('threshold-table');
-
-    fetch('/check-threshold')
-        .then(response => response.json())
-        .then(data => {
-            if (data.show_calibrate) {
-                calibrateBtn.style.display = 'block';
-                thresholdTable.style.display = 'block';
-            } else {
-                calibrateBtn.style.display = 'none';
-                thresholdTable.style.display = 'none';
-            }
-        })
-        .catch(error => console.error('Error fetching threshold status:', error));
-});
-
-document.getElementById("calibrate-btn").addEventListener("click", () => {
-    const modal = document.getElementById("calibrateModal");
-    const overlay = document.getElementById("modal-overlay")
-    modal.style.display = modal.style.display === "none" ? "block" : "none";
-    overlay.style.display = overlay.style.display === "none" ? "block" : "none";
-});
 
 async function fetchPostureData(date) {
     try {
@@ -506,8 +319,6 @@ async function fetchPostureData(date) {
         if (!data.success) {
             throw new Error(data.message || "An error occurred while fetching data.");
         }
-
-        console.log(data, "Inside fetchPostureData")
         return data;
     } catch (error) {
         console.error("Error fetching data:", error);
@@ -526,8 +337,6 @@ function hideErrorMessage(container) {
 
 function renderChart(ctx, data) {
     const { timestamps, greenBars, greyBars, redSpikes } = data;
-    // console.log(data, "Inside renderChart")
-    console.log("happy")
 
     return new Chart(ctx, {
         type: "line",
@@ -606,25 +415,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const thresholdTable = document.querySelector('#threshold-table');
     const calibrateBtnHome = document.querySelector('#calibrate-btn');
 
-    if (thresholdTable && calibrateBtnHome) {
-        fetch('/check-threshold')
-            .then(response => response.json())
-            .then(data => {
-                if (data.show_calibrate) {
-                    modal.style.display = 'block';
-                    overlay.style.display = 'block';
 
-                    calibrateBtnHome.style.display = 'block';
-                    thresholdTable.style.display = 'block';
-                } else {
-                    modal.style.display = 'none';
-                    overlay.style.display = 'none';
-                    calibrateBtnHome.style.display = 'none';
-                    thresholdTable.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error fetching threshold status:', error));
-    }
 
     const openModalBtns = [
         document.querySelector('#calibrate-btn'),
@@ -678,47 +469,11 @@ function setupStatisticsPage() {
 // TODO - This function doesn't work as expected, user need to select the date and then only they will see the data
 
 function setupHomePage() {
-    // const ctx = document.getElementById("postureChartHome").getContext("2d");
-    // const errorMessage = document.getElementById("errorMessageHome");
-    // let postureChart;
-
-    // // Fetch and render data for today
-    // const today = new Date().toISOString().split("T")[0];
-
-    // (async () => {
-    //     try {
-    //         const data = await fetchPostureData(today);
-    //         hideErrorMessage(errorMessage);
-
-    //         const chartData = processChartData(data.powerData, data.slouchData);
-    //         if (postureChart) postureChart.destroy();
-    //         postureChart = renderChart(ctx, chartData);
-    //     } catch (error) {
-    //         showErrorMessage(errorMessage, error.message);
-    //     }
-    // })();
-
     const ctx = document.getElementById("postureChartHome").getContext("2d");
     const errorMessage = document.getElementById("errorMessageHome");
     let postureChart;
 
     const today = new Date().toISOString().split("T")[0];
-    console.log(today)
-
-
-    // (async () => {
-    //     try {
-    //         const data = await fetchPostureData(today);
-    //         hideErrorMessage(errorMessage);
-    //         console.log(data)
-
-    //         const chartData = processChartData(data.powerData, data.slouchData);
-    //         if (postureChart) postureChart.destroy();
-    //         postureChart = renderChart(ctx, chartData);
-    //     } catch (error) {
-    //         showErrorMessage(errorMessage, error.message);
-    //     }
-    // })();
 
     const datePicker = document.getElementById("datePicker");
 
@@ -736,9 +491,7 @@ function setupHomePage() {
             hideErrorMessage(errorMessage);
 
             const chartData = processChartData(data.powerData, data.slouchData);
-            console.log(chartData, "Inside setup home page")
 
-            console.log("About to call renderChart", chartData);
             if (postureChart) postureChart.destroy();
             postureChart = renderChart(ctx, chartData);
         } catch (error) {

@@ -292,3 +292,14 @@ def get_last_slouch_entry(user_id):
     except Exception as e:
         print(f"Error retrieving last slouch entry: {e}")
         return None
+
+def save_power_session(user_id, power_on):
+    try:
+        new_session = PowerSessions(user_id=user_id, power_on=power_on)
+        db.session.add(new_session)
+        db.session.commit()
+        return "Power session saved successfully."
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in save_power_session: {e}")
+        raise Exception(f"Error saving power session: {e}")
