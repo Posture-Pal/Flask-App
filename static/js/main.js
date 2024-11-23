@@ -110,6 +110,36 @@ function sendCalibrationMessage() {
     });
 }
 
+// Testing if button is still working 
+function updateThresholdTable(data) {
+    const table = document.getElementById("threshold-table");
+    const tableBody = document.getElementById("threshold-values");
+    tableBody.innerHTML = "";
+    Object.entries(data.thresholds).forEach(([key, value]) => {
+        const row = document.createElement("tr");
+        const parameterCell = document.createElement("td");
+        parameterCell.textContent = key;
+        const valueCell = document.createElement("td");
+        if (Array.isArray(value)) {
+            valueCell.textContent = value.map(v => v.toFixed(2)).join(", ");
+        } else {
+            valueCell.textContent = typeof value === "number" ? value.toFixed(2) : value;
+        }
+        row.appendChild(parameterCell);
+        row.appendChild(valueCell);
+        tableBody.appendChild(row);
+    });
+    table.style.display = "table";
+        axios
+        .post("/save_threshold_data", data.thresholds)
+        .then((response) => {
+            console.log(response.data.message || "Data saved successfully.");
+        })
+        .catch((error) => {
+            console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
+        });
+}
+
 function startListeningForUpdates() {
     console.log("Subscribing to channel:", CHANNEL_NAME);
 
@@ -174,42 +204,39 @@ function initToggleListeners() {
 function initApp() {
     startListeningForUpdates();
     const powerToggle = document.getElementById("powerToggle");
-if (!powerToggle) {
-    console.error("Power toggle not found in DOM");
-} else {
-    powerToggle.addEventListener("change", () => {
-        const powerOn = powerToggle.checked; // Boolean: true (ON) or false (OFF)
+    if (!powerToggle) {
+        console.error("Power toggle not found in DOM");
+    } else {
+        powerToggle.addEventListener("change", () => {
+            const powerOn = powerToggle.checked; // Boolean: true (ON) or false (OFF)
 
-        // Publish the message to PubNub
-        const message = { power: powerOn };
-        pubnub.publish(
-            {
-                channel: CHANNEL_NAME,
-                message: message,
-            },
-            (status, response) => {
-                if (status.error) {
-                    console.error("Error publishing message:", status);
-                } else {
-                    console.log(`Power ${powerOn ? "ON" : "OFF"} message sent:`, response);
+            // Publish the message to PubNub
+            const message = { power: powerOn };
+            pubnub.publish(
+                {
+                    channel: CHANNEL_NAME,
+                    message: message,
+                },
+                (status, response) => {
+                    if (status.error) {
+                        console.error("Error publishing message:", status);
+                    } else {
+                        console.log(`Power ${powerOn ? "ON" : "OFF"} message sent:`, response);
+                    }
                 }
-            }
-        );
+            );
 
-        // Send the power session data to the backend
-        axios
-            .post("/save_power_session", { power_on: powerOn ? 1 : 0 }) // Convert to 1 or 0
-            .then((response) => {
-                console.log(response.data.message || "Power session saved successfully.");
-            })
-            .catch((error) => {
-                console.error("Error saving power session:", error.response?.data?.error || error.message);
-            });
-    });
-}
-
-
-
+            // Send the power session data to the backend
+            axios
+                .post("/save_power_session", { power_on: powerOn ? 1 : 0 }) // Convert to 1 or 0
+                .then((response) => {
+                    console.log(response.data.message || "Power session saved successfully.");
+                })
+                .catch((error) => {
+                    console.error("Error saving power session:", error.response?.data?.error || error.message);
+                });
+        });
+    }
 
     fetchLastSlouchTemperature();
 
@@ -219,6 +246,11 @@ if (!powerToggle) {
     if (document.body.classList.contains("home-page")) {
         setupHomePage();
     }
+
+    const calibrateButton = document.getElementById("calibrate-btn");
+    calibrateButton.addEventListener("click", () => {
+        sendCalibrationMessage();
+    });
 
     initToggleListeners();
 }
@@ -408,35 +440,35 @@ function renderChart(ctx, data) {
 
 document.addEventListener("DOMContentLoaded", initApp);
 
-document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.querySelector('#calibrateModal');
-    const overlay = document.querySelector('#modal-overlay');
+// document.addEventListener('DOMContentLoaded', function () {
+//     const modal = document.querySelector('#calibrateModal');
+//     const overlay = document.querySelector('#modal-overlay');
 
-    const thresholdTable = document.querySelector('#threshold-table');
-    const calibrateBtnHome = document.querySelector('#calibrate-btn');
+//     const thresholdTable = document.querySelector('#threshold-table');
+//     const calibrateBtnHome = document.querySelector('#calibrate-btn');
 
 
 
-    const openModalBtns = [
-        document.querySelector('#calibrate-btn'),
-        document.querySelector('#calibrateBtn')
-    ].filter(btn => btn !== null);
+//     const openModalBtns = [
+//         document.querySelector('#calibrate-btn'),
+//         document.querySelector('#calibrateBtn')
+//     ].filter(btn => btn !== null);
 
-    openModalBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const isModalVisible = modal.style.display === 'block';
-            modal.style.display = isModalVisible ? 'none' : 'block';
-            overlay.style.display = isModalVisible ? 'none' : 'block';
+//     openModalBtns.forEach(btn => {
+//         btn.addEventListener('click', () => {
+//             const isModalVisible = modal.style.display === 'block';
+//             modal.style.display = isModalVisible ? 'none' : 'block';
+//             overlay.style.display = isModalVisible ? 'none' : 'block';
 
-            sendCalibrationMessage();
-        });
-    });
+//             sendCalibrationMessage();
+//         });
+//     });
 
-    overlay.addEventListener('click', () => {
-        modal.style.display = 'none';
-        overlay.style.display = 'none';
-    });
-});
+//     overlay.addEventListener('click', () => {
+//         modal.style.display = 'none';
+//         overlay.style.display = 'none';
+//     });
+// });
  
 function setupStatisticsPage() {
     const datePicker = document.getElementById("datePicker");

@@ -41,6 +41,9 @@ vibration_mode = True
 
 monitoring_active = False 
 
+calibration_done = False
+
+
 # PubNub Configuration
 pnconfig = PNConfiguration()
 pnconfig.subscribe_key = "sub-c-90478427-a073-49bc-b402-ba4903894284"
@@ -119,10 +122,10 @@ def check_environment_status(temperature, humidity):
 
 
 def monitor_posture():
-    global monitoring_active
+    global monitoring_active, calibration_done
     try:
         while True:
-            if not monitoring_active:
+            if not monitoring_active or not calibration_done:
                 time.sleep(0.5)
                 continue
 
@@ -196,10 +199,13 @@ def handle_pubnub_message(message):
             if message["calibration_setup"]:
                 print("Calibrating posture...")
                 calibrate_posture()
+                global calibration_done
+                calibration_done = True
                 publish_message({"msg": "Calibration complete", "thresholds": thresholds})
             else:
                 print("Using default calibration values...")
                 publish_message({"msg": "Default thresholds in use", "thresholds": thresholds})
+
 
         if "sound_mode" in message and "vibration_mode" in message:
             sound_mode = message["sound_mode"]

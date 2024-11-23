@@ -40,7 +40,6 @@ def check_database_credentials(uri):
     except Exception as e:
         print("⚠️ Error while checking database credentials:", e)
 
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 

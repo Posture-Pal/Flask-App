@@ -24,11 +24,31 @@
         No data available yet for today. Make sure to turn your device on and calibrate!
     </div>
 
+    <!-- Trying to get calibration button working -->
+     <div class="trying-calibration">
+            <div>
+                <!-- Button to trigger calibration -->
+                <button id="calibrate-btn">Calibrate Posture</button>
+                <!-- Table to display threshold values -->
+                <table id="threshold-table" border="1" style="margin-top: 20px; display: none;">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="threshold-values">
+                        <!-- Data will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+     </div>
+
     <div class="controls">
         <div class="control">
             <span>Power</span>
             <label class="switch">
-                <input type="checkbox" id="powerToggle" checked>
+                <input type="checkbox" id="powerToggle">
                 <span class="slider"></span>
             </label>
         </div>
@@ -93,7 +113,7 @@
     {% include '_calibration_modal.html' %}
     {% endif %}
 
-    <script>
+    <!-- <script>
         document.addEventListener("DOMContentLoaded", () => {
             const modalOverlay = document.getElementById("modal-overlay");
             const calibrateModal = document.getElementById("calibrateModal");
@@ -118,7 +138,7 @@
             calibrateModal.style.display = "none";
         });
     });
-    </script>
+    </script> -->
 
     <div>
     </div>
