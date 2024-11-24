@@ -27,7 +27,7 @@ def check_database_credentials(uri):
         password = uri.split(':')[2].split('@')[0]
         
         # check for default or empty password
-        if not password or password in ["root", "admin", "password", "1234", ""]:
+        if not password or password in ["root", "admin", "password", "", ""]:
             print("⚠️ Warning: The database is using a default or no password. Please secure your database!")
         
         # Attempt a database connection to ensure credentials work
@@ -266,7 +266,7 @@ def get_posture_data():
 
     except Exception as e:
         print(f"Error fetching posture data: {e}")
-        return jsonify({"success": False, "message": "An error occurred in get_posture_data route. Check server logs for details."}), 500
+        return jsonify({"success": False, "message": "An error occurred. Check server logs for details."}), 500
 
 @app.route("/statistics", methods=["GET"])
 def statistics():
@@ -296,8 +296,8 @@ def statistics():
 def information():
     return render_template("information.html")
 
-@app.route("/api/latest_temperature", methods=["GET"])
-def latest_temperature():
+@app.route("/last-slouch-temperature", methods=["GET"])
+def last_slouch_temperature():
     try:
         user_email = session.get("email")
         if not user_email:
@@ -308,20 +308,23 @@ def latest_temperature():
             return jsonify({"error": "User not found"}), 404
 
         user_id = user["id"]
-        sensor_data_list = my_db.get_sensor_data_by_user_id(user_id)
 
-        if isinstance(sensor_data_list, list) and sensor_data_list:
-            # Sort sensor data by timestamp (assuming timestamp is a datetime object)
-            latest_entry = max(sensor_data_list, key=lambda x: x["timestamp"])  # Get the most recent entry
-            latest_temperature = latest_entry.get("temperature", "N/A")
-        else:
-            return jsonify({"error": "No sensor data found for the user."}), 404
+        last_slouch_entry = my_db.get_last_slouch_entry(user_id)
 
-        return jsonify({"temperature": latest_temperature}), 200
+        if not last_slouch_entry:
+            return jsonify({"error": "No slouch data available"}), 404
+        
+        print(last_slouch_entry)
+
+        return jsonify({
+            "temperature": last_slouch_entry["temperature"],
+            "temperature_status": last_slouch_entry["temperature_status"],
+        }), 200
 
     except Exception as e:
-        print(f"Error in latest_temperature endpoint: {e}")
         return jsonify({"error": str(e)}), 500
+
+
 
 @app.route("/settings")
 def settings():
@@ -337,14 +340,8 @@ def settings():
             return "User not found.", 404
 
         user_id = user["id"]
-        sensor_data = my_db.get_sensor_data_by_user_id(user_id)
 
-        if isinstance(sensor_data, list) and sensor_data:
-            latest_temperature = sensor_data[-1].get("temperature", "N/A") 
-        else:
-            latest_temperature = "No data available"
-
-        return render_template("settings.html", device_temp=latest_temperature)
+        return render_template("settings.html")
 
     except Exception as e:
         print(f"Error in settings route: {e}")
@@ -367,6 +364,31 @@ def article3():
 @app.route("/article4")
 def article4():
     return render_template("article4.html")
+
+@app.route("/save_power_session", methods=["POST"])
+def save_power_session():
+    if request.method == "POST":
+        try:
+            user_email = session.get("email")
+            if not user_email:
+                return jsonify({"error": "User not authenticated"}), 401
+            
+            user = my_db.get_user_by_email(user_email)
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+            
+            user_id = user["id"]
+            power_data = request.json
+
+            if "power_on" not in power_data:
+                return jsonify({"error": "Missing 'power_on' key in request data"}), 400
+
+            power_on = power_data["power_on"]
+            message = my_db.save_power_session(user_id, power_on)
+            return jsonify({"message": message}), 201
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
