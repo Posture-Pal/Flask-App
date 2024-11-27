@@ -1,3 +1,4 @@
+import os
 import time
 import board
 import adafruit_dht
@@ -46,13 +47,13 @@ calibration_done = False
 
 # PubNub Configuration
 pnconfig = PNConfiguration()
-pnconfig.subscribe_key = "sub-c-90478427-a073-49bc-b402-ba4903894284"
-pnconfig.publish_key = "pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a"
+pnconfig.subscribe_key = os.getenv("PUBNUB_SUBSCRIBE_KEY")
+pnconfig.publish_key = os.getenv("PUBNUB_PUBLISH_KEY")
 pnconfig.ssl = False
 pnconfig.uuid = str(uuid.uuid4())
 pubnub = PubNub(pnconfig)
 
-CHANNEL = "Posture-Pal"
+CHANNEL = os.getenv("PUBNUB_UUID")
 
 def setup_gpio():
     GPIO.setmode(GPIO.BCM)
