@@ -55,11 +55,13 @@ pubnub = PubNub(pnconfig)
 
 CHANNEL = os.getenv("PUBNUB_UUID")
 
+# setting up pins
 def setup_gpio():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(BUZZER_PIN, GPIO.OUT)
     GPIO.setup(VIBRATION_PIN, GPIO.OUT)
 
+# buzzer function
 def beep(repeat):
     for _ in range(repeat):
         for _ in range(60): 
@@ -81,6 +83,7 @@ def turn_on_vibration():
 def turn_off_vibration():
     GPIO.output(VIBRATION_PIN, GPIO.LOW)
 
+# calibration function
 def calibrate_posture():
     print("Calibrating upright posture...")
     pitch = bno.euler[1] if bno.euler else None
@@ -96,12 +99,14 @@ def calibrate_posture():
     # print("Calibration complete. Sending threshold data:")
     # print(json.dumps(thresholds, indent=2))
 
+# check slouch function
 def check_slouch(pitch, gravity_vector):
     pitch_diff = abs(pitch - thresholds["pitch"])
     gravity_diff = sum(abs(g - t) for g, t in zip(gravity_vector, thresholds["gravity"]))
 
     return pitch_diff > 20 or gravity_diff > 0.2
 
+# check temperature function
 def check_environment_status(temperature, humidity):
     # Determine temperature status
     if temperature > thresholds["temp_overheat"]:
@@ -122,6 +127,7 @@ def check_environment_status(temperature, humidity):
     return temperature_status, humidity_status
 
 
+# posture monitoring
 def monitor_posture():
     global monitoring_active, calibration_done
     try:
@@ -172,7 +178,7 @@ def monitor_posture():
     finally:
         GPIO.cleanup()
 
-
+# publish message to pubnub
 def publish_message(message):
     pubnub.publish().channel(CHANNEL).message(message).sync()
     print(f"Published: {message}")
