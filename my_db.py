@@ -4,6 +4,7 @@ from sqlalchemy import and_
 
 db = SQLAlchemy()
 
+# users table
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +27,7 @@ class User(db.Model):
         self.email = email
 
 
-
+# sensor data table
 class SensorData(db.Model):
     __tablename__ = "sensor_data"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -52,6 +53,7 @@ class SensorData(db.Model):
         self.gravity_y = gravity_y
         self.gravity_z = gravity_z
 
+# threshold data table
 class Threshold(db.Model):
     __tablename__ = "threshold"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -83,6 +85,7 @@ class Threshold(db.Model):
             self.gravity_y = gravity[1]
             self.gravity_z = gravity[2]
     
+    # function to update threshold values
     def update_thresholds(self, temp_overheat=None, temp_cold=None, humid_high=None, humid_low=None, pitch=None, gravity=None):
         if temp_overheat is not None:
             self.temp_overheat = temp_overheat
@@ -101,6 +104,7 @@ class Threshold(db.Model):
         db.session.commit()
 
 
+# power sessions table
 class PowerSessions(db.Model):
     __tablename__ = "power_sessions"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -236,7 +240,7 @@ def count_todays_reminders():
         start_of_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
         
-        # Query to count rows between start and end of today
+        # query to count rows between start and end of today
         count = SensorData.query.filter(
             SensorData.timestamp >= start_of_day,
             SensorData.timestamp <= end_of_day
@@ -264,15 +268,15 @@ def calculate_daily_usage(user_id):
         session_start = None
 
         for session in power_sessions:
-            print(f"Session: {session.power_on}, Timestamp: {session.timestamp}")  # Debug
+            print(f"Session: {session.power_on}, Timestamp: {session.timestamp}")
             if session.power_on:
                 session_start = session.timestamp
             elif session_start:  # Power off
                 total_usage += session.timestamp - session_start
                 session_start = None
 
-        print(f"Total usage time in seconds: {total_usage.total_seconds()}")  # Debug
-        return total_usage.total_seconds() / 3600  # Convert to hours
+        print(f"Total usage time in seconds: {total_usage.total_seconds()}") 
+        return total_usage.total_seconds() / 3600  # convert to hours
     except Exception as e:
         print(f"Error calculating daily usage: {e}")
         return 0
@@ -283,7 +287,7 @@ def get_last_slouch_entry(user_id):
         if not slouch_entry:
             return None
 
-        # Return temperature and status
+        # return temperature and status
         return {
             "temperature": slouch_entry.temperature,
             "temperature_status": slouch_entry.temperature_status,
