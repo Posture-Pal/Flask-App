@@ -362,6 +362,11 @@ def article3():
 def article4():
     return render_template("article4.html")
 
+@app.route("/article5")
+def article5():
+    return render_template("article5.html")
+
+
 @app.route("/save_power_session", methods=["POST"])
 def save_power_session():
     if request.method == "POST":

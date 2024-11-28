@@ -86,6 +86,8 @@
                 Info
                 {% elif request.path == '/article4' %}
                 Info
+                {% elif request.path == '/article5' %}
+                Info
                 {% elif request.path == '/settings' %}
                 Settings
                 {% else %}
@@ -110,7 +112,7 @@
                         alt="statistics icon" />
                 </a>
                 <a href="{{ url_for('information') }}">
-                    <img class="navicons" src="{% if request.path == '/information' or request.path == '/article1' or request.path == '/article2' or request.path == '/article3' or request.path == '/article4' %}
+                    <img class="navicons" src="{% if request.path == '/information' or request.path == '/article1' or request.path == '/article2' or request.path == '/article3' or request.path == '/article4' or request.path == '/article5' %}
                         https://img.icons8.com/fluency-systems-filled/50/read.png
                     {% else %}
                         https://img.icons8.com/fluency-systems-regular/50/read.png

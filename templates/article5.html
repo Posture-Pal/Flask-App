@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}PosturePal - Article{% endblock %}
+
+{% block content %}
+<div class="articleBanner">
+    <img src="{{ url_for('static', filename='images/BannerWhich.png') }}" alt="Banner">
+</div>
+<div class="marginContainer">
+    <h1>How Do You Get Into The Correct Posture Position?</h1>
+    <div class="articleContainer">
+        <section>
+            <h2>Step-by-Step Guide to Proper Posture</h2>
+            <p>Maintaining the correct posture is crucial for ensuring your body works efficiently and feels
+                comfortable. Follow these steps to get into a good posture position:</p>
+            <ul>
+                <li><strong>Stand Up Straight:</strong> Start by standing tall without over-stretching. Imagine a string
+                    pulling you upwards from the top of your head.</li>
+                <li><strong>Keep Your Head Aligned:</strong> Your head should be upright, not tilted forward or back.
+                    Look straight ahead, keeping your eyes on the horizon line.</li>
+                <li><strong>Relax Your Shoulders:</strong> Let your shoulders drop naturally while pulling them slightly
+                    back. Avoid hunching or forcing them down.</li>
+                <li><strong>Engage Your Core:</strong> Gently tuck your bottom under and pull your tummy in to engage
+                    your abdominal muscles. This helps stabilize your spine.</li>
+                <li><strong>Relax Your Knees:</strong> Avoid locking your knees back. Keep them slightly bent to
+                    maintain a natural stance.</li>
+                <li><strong>Position Your Arms:</strong> Let your arms hang naturally by your sides, with palms facing
+                    inwards.</li>
+            </ul>
+            <p>Practice these steps regularly until they feel natural. Over time, good posture will become second
+                nature.</p>
+        </section>
+
+        <center>
+            <section>
+                <iframe width="853" height="480" src="https://www.youtube.com/embed/ToXlJxuFLmU"
+                    title="How to stand with good posture" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </section>
+        </center>
+
+        <section>
+            <h2>Adjusting Your Posture While Sitting</h2>
+            <p>Correct sitting posture is just as important as standing. To sit properly:</p>
+            <ul>
+                <li><strong>Choose a Supportive Chair:</strong> Use a chair with good back support. Sit all the way back
+                    so that your lower back is supported.</li>
+                <li><strong>Feet Flat on the Floor:</strong> Keep your feet flat on the ground and your knees at a right
+                    angle. Avoid crossing your legs for extended periods.</li>
+                <li><strong>Align Your Spine:</strong> Sit with your back straight and shoulders relaxed. Avoid
+                    slouching forward or leaning too far back.</li>
+                <li><strong>Position Your Screen:</strong> If working at a desk, ensure your screen is at eye level to
+                    prevent neck strain.</li>
+            </ul>
+            <p>Remember to take regular breaks to stand, stretch, and move around to prevent stiffness.</p>
+        </section>
+
+    </div>
+    <a href="{{ url_for('information') }}" class="btn btn-primary">Back to Info</a>
+</div>
+{% endblock %}
