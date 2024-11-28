@@ -3,5 +3,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(() => {
         splashScreen.classList.add("hidden");
-    }, 3000);
+    }, 2000);
 });
