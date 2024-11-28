@@ -30,7 +30,6 @@ def check_database_credentials(uri):
         if not password or password in ["root", "admin", "password", "", ""]:
             print("⚠️ Warning: The database is using a default or no password. Please secure your database!")
         
-        # Attempt a database connection to ensure credentials work
         connection = pymysql.connect(
             host=uri.split('@')[1].split('/')[0],
             user=user,
@@ -47,16 +46,14 @@ check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])
 
 db.init_app(app)
 
-# Enable insecure transport (HTTP) for local development
-# TODO: Remove or set to it to 0 in production for HTTPS only
+
 if os.getenv("OAUTHLIB_INSECURE_TRANSPORT") == "1":
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-# Google OAuth Configuration
 google_bp = make_google_blueprint(
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
     client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-    redirect_to="google_login",  # TODO: Change the redirect link when moving to cloud
+    redirect_to="google_login", 
     scope=[
         "openid",
         "https://www.googleapis.com/auth/userinfo.profile",
@@ -66,7 +63,7 @@ google_bp = make_google_blueprint(
 app.register_blueprint(google_bp, url_prefix="/login")
 
 @app.route("/")
-# Redirect to home if the user is already logged in
+# redirect to home if the user is already logged in
 def index():
     if "user" in session and session["user"] != "Guest":
         return redirect(url_for("home"))
@@ -74,6 +71,7 @@ def index():
         return render_template("index.html")
 
 
+# google login route
 @app.route("/google_login")
 def google_login():
     if not google.authorized:
@@ -93,13 +91,14 @@ def google_login():
     return redirect(url_for("home"))
 
 
-
+# logout route
 @app.route("/logout")
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for("index"))
 
+# home route
 @app.route("/home")
 def home():
     user = session.get("user", "Guest")
@@ -117,7 +116,7 @@ def home():
         show_calibrate_button = not my_db.has_threshold_for_user(user_id)
         usage_today = my_db.calculate_daily_usage(user_id)
 
-    # Get today's reminder count
+    # get today's reminder count
     todays_reminders = my_db.count_todays_reminders()
 
     return render_template(
@@ -199,16 +198,16 @@ def save_threshold_data():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         
-#Route to get data for statistics page
+#route to get data for statistics page
 @app.route("/get_posture_data", methods=["GET"])
 def get_posture_data():
     try:
-        # Verify user session
+        # verify user session
         user_email = session.get("email")
         if not user_email:
             return jsonify({"success": False, "message": "User not authenticated"}), 401
 
-        # Fetch user by email
+        # fetch user by email
         user = my_db.get_user_by_email(user_email)
         if not user:
             return jsonify({"success": False, "message": "User not found"}), 404
@@ -218,7 +217,6 @@ def get_posture_data():
         if not selected_date:
             return jsonify({"success": False, "message": "Date not provided"}), 400
 
-        # Parse the selected date
         try:
             start_of_day = datetime.strptime(selected_date, "%Y-%m-%d")
         except ValueError:
@@ -226,21 +224,21 @@ def get_posture_data():
 
         end_of_day = start_of_day + timedelta(days=1)
 
-        # Fetch power sessions for the selected day
+        # fetch power sessions for the selected day
         power_sessions = my_db.PowerSessions.query.filter(
             my_db.PowerSessions.user_id == user_id,
             my_db.PowerSessions.timestamp >= start_of_day,
             my_db.PowerSessions.timestamp < end_of_day
         ).order_by(my_db.PowerSessions.timestamp.asc()).all()
 
-        # Fetch slouch events for the selected day
+        # fetch slouch events for the selected day
         slouch_events = my_db.SensorData.query.filter(
             my_db.SensorData.user_id == user_id,
             my_db.SensorData.timestamp >= start_of_day,
             my_db.SensorData.timestamp < end_of_day
         ).all()
 
-        # Process power sessions
+        # process power sessions
         power_data = [
             {
                 "power_on": session.power_on,
@@ -249,7 +247,7 @@ def get_posture_data():
             for session in power_sessions
         ]
 
-        # Process slouch events
+        # process slouch events
         slouch_data = [
             {
                 "timestamp": event.timestamp.strftime("%H:%M:%S")
@@ -257,7 +255,6 @@ def get_posture_data():
             for event in slouch_events
         ]
 
-        # Return structured response
         return jsonify({
             "success": True,
             "powerData": power_data,
