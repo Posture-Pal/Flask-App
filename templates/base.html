@@ -27,19 +27,22 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@^3"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script> -->
-     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- To display line chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- To display line chart -->
 
 
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
     <div class="mainContainer"> <!-- Mila: Main container contains the navigation bar and block content -->
+        <!-- Logo separate from navigation bar to disdplay it higher -->
         <div class="logo">
             <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/PosturePalLogo.png') }}"
                     alt="PosturePal Logo"></a>
         </div>
+        <!-- Navigation bar -->
         <div class="sidenav">
             <a href="{{ url_for('home') }}">
+                <!-- Icon in side nav depends on current page route -->
                 <img class="navicons"
                     src="{% if request.path == '/home' %}https://img.icons8.com/fluency-systems-filled/48/1A1A1A/home.png{% else %}https://img.icons8.com/fluency-systems-regular/50/home--v1.png{% endif %}"
                     alt="home icon" />
@@ -94,6 +97,7 @@
                 {% block content %}
                 {% endblock %}
             </div>
+            <!-- Bottom version of side navigation to display on mobile devices -->
             <div class="bottomnav">
                 <a href="{{ url_for('home') }}">
                     <img class="navicons"
@@ -131,6 +135,7 @@
     <script src="{{ url_for('static', filename='js/statistics.js') }}"></script>
     {% endif %}
 
+    <!-- Service worker required for PWA -->
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/service-worker.js')
