@@ -5,23 +5,56 @@
 {% block body_class %}statistics-page{% endblock %}
 
 {% block content %}
-<div class="marginContainer">
-<h2>Posture Statistics</h2>
+<div class="container">
+    <h2>Posture Statistics</h2>
 
-<!-- Calendar for date selection -->
-<div class="calendar-container">
-    <label for="datePicker">Select a date:</label>
-    <input type="date" id="datePicker">
-</div>
+    <div class="text-center mb-4">
+        <label for="datePicker">Select a date:</label>
+        <input type="date" id="datePicker" class="form-control" style="max-width: 300px; margin: 0 auto;">
+    </div>
 
-<!-- Chart container -->
-<div class="chart-container">
-    <canvas id="postureChart"></canvas>
-</div>
+    <div class="chart-container mb-5" style="width: 60%; margin: 0 auto;">
+        <canvas id="postureChart"></canvas>
+    </div>
 
-<!-- Error message -->
-<div id="errorMessage" style="color: red; display: none;">
-    No data available for the selected date.
+    <!-- Dropdown for Slouch timing Details -->
+    <div class="dropdown">
+        <button
+            class="btn btn-secondary dropdown-toggle"
+            type="button"
+            id="slouchDetailsDropdown"
+            data-bs-toggle="collapse"
+            data-bs-target="#chartDetails"
+            aria-expanded="false"
+            aria-controls="chartDetails"
+        >
+            View Slouch Timings
+        </button>
+        <div id="chartDetails" class="collapse mt-3">
+
+        </div>
+    </div>
+    
+
+    <!-- Statistics Cards -->
+    <div class="row text-center mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Slouch Events</h5>
+                    <p id="slouchCount" class="card-text">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Usage</h5>
+                    <p id="totalUsage" class="card-text">0 hours</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
-</div>

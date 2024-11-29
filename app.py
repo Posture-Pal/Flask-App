@@ -198,16 +198,14 @@ def save_threshold_data():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         
-#route to get data for statistics page
+# #route to get data for statistics page
 @app.route("/get_posture_data", methods=["GET"])
 def get_posture_data():
     try:
-        # verify user session
         user_email = session.get("email")
         if not user_email:
             return jsonify({"success": False, "message": "User not authenticated"}), 401
 
-        # fetch user by email
         user = my_db.get_user_by_email(user_email)
         if not user:
             return jsonify({"success": False, "message": "User not found"}), 404
@@ -217,28 +215,24 @@ def get_posture_data():
         if not selected_date:
             return jsonify({"success": False, "message": "Date not provided"}), 400
 
-        try:
-            start_of_day = datetime.strptime(selected_date, "%Y-%m-%d")
-        except ValueError:
-            return jsonify({"success": False, "message": "Invalid date format. Use YYYY-MM-DD."}), 400
-
+        start_of_day = datetime.strptime(selected_date, "%Y-%m-%d")
         end_of_day = start_of_day + timedelta(days=1)
 
-        # fetch power sessions for the selected day
+        # Fetch power sessions and slouch events
         power_sessions = my_db.PowerSessions.query.filter(
             my_db.PowerSessions.user_id == user_id,
             my_db.PowerSessions.timestamp >= start_of_day,
             my_db.PowerSessions.timestamp < end_of_day
-        ).order_by(my_db.PowerSessions.timestamp.asc()).all()
+        ).all()
 
-        # fetch slouch events for the selected day
         slouch_events = my_db.SensorData.query.filter(
             my_db.SensorData.user_id == user_id,
             my_db.SensorData.timestamp >= start_of_day,
             my_db.SensorData.timestamp < end_of_day
         ).all()
 
-        # process power sessions
+        slouch_data = [{"timestamp": event.timestamp.strftime("%H:%M:%S")} for event in slouch_events]
+
         power_data = [
             {
                 "power_on": session.power_on,
@@ -247,23 +241,14 @@ def get_posture_data():
             for session in power_sessions
         ]
 
-        # process slouch events
-        slouch_data = [
-            {
-                "timestamp": event.timestamp.strftime("%H:%M:%S")
-            }
-            for event in slouch_events
-        ]
-
         return jsonify({
             "success": True,
-            "powerData": power_data,
-            "slouchData": slouch_data
+            "slouchData": slouch_data,
+            "powerData": power_data
         })
-
     except Exception as e:
         print(f"Error fetching posture data: {e}")
-        return jsonify({"success": False, "message": "An error occurred. Check server logs for details."}), 500
+        return jsonify({"success": False, "message": "An error occurred."}), 500
 
 @app.route("/statistics", methods=["GET"])
 def statistics():

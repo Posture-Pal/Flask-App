@@ -281,28 +281,18 @@ footer {
     .logo {
         display: none;
     }
+
+    .chart-container {
+        max-width: 90%; 
+        height: 300px; 
+    }
+
+    #postureChart {
+        height: auto; 
+    }
+
+    .calendar-container {
+        margin-bottom: 15px;
+    }
 }
 
-.calendar-container {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.chart-container {
-    width: 90%;
-    margin: 0 auto;
-    padding: 20px;
-    height: 500px;
-}
-
-#errorMessage {
-    text-align: center;
-    margin-top: 10px;
-    color: red;
-    font-weight: bold;
-}
-
-#postureChart {
-    width: 100%;
-    height: 400px;
-}

@@ -342,21 +342,21 @@ async function fetchLastSlouchTemperature() {
 // });
 
 
-async function fetchPostureData(date) {
-    try {
-        const response = await fetch(`/get_posture_data?date=${date}`);
-        const data = await response.json();
+// async function fetchPostureData(date) {
+//     try {
+//         const response = await fetch(`/get_posture_data?date=${date}`);
+//         const data = await response.json();
         
 
-        if (!data.success) {
-            throw new Error(data.message || "An error occurred while fetching data.");
-        }
-        return data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        throw error;
-    }
-}
+//         if (!data.success) {
+//             throw new Error(data.message || "An error occurred while fetching data.");
+//         }
+//         return data;
+//     } catch (error) {
+//         console.error("Error fetching data:", error);
+//         throw error;
+//     }
+// }
 
 function showErrorMessage(container, message) {
     container.textContent = message;
@@ -365,76 +365,6 @@ function showErrorMessage(container, message) {
 
 function hideErrorMessage(container) {
     container.style.display = "none";
-}
-
-function renderChart(ctx, data) {
-    const { timestamps, greenBars, greyBars, redSpikes } = data;
-
-    return new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: timestamps,
-            datasets: [
-                {
-                    label: "Good Posture",
-                    data: greenBars,
-                    borderColor: "green",
-                    backgroundColor: "green",
-                    borderWidth: 2,
-                    fill: false,
-                    stepped: true,
-                },
-                {
-                    label: "Power Off",
-                    data: greyBars,
-                    borderColor: "gray",
-                    backgroundColor: "gray",
-                    borderWidth: 2,
-                    fill: false,
-                    stepped: true,
-                },
-                {
-                    label: "Bad Posture",
-                    data: redSpikes,
-                    borderColor: "red",
-                    backgroundColor: "red",
-                    borderWidth: 2,
-                    fill: false,
-                    stepped: true,
-                    pointStyle: "circle",
-                    pointRadius: (context) => (context.raw === 1 ? 6 : 0),
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-            },
-            scales: {
-                x: {
-                    title: { display: true, text: "Time" },
-                    ticks: {
-                        autoSkip: true,
-                        maxTicksLimit: 10,
-                    },
-                },
-                y: {
-                    title: { display: true, text: "Posture Status" },
-                    min: -1.5,
-                    max: 1.5,
-                    ticks: {
-                        callback: (value) => {
-                            if (value === 0) return "Good Posture";
-                            if (value === 1) return "Bad Posture";
-                            if (value === -1) return "Power Off";
-                            return "";
-                        },
-                    },
-                },
-            },
-        },
-    });
 }
 
 
@@ -470,33 +400,309 @@ document.addEventListener("DOMContentLoaded", initApp);
 //     });
 // });
  
-function setupStatisticsPage() {
+//Statistics page
+document.addEventListener("DOMContentLoaded", function () {
     const datePicker = document.getElementById("datePicker");
-    const errorMessage = document.getElementById("errorMessage");
+    const slouchCount = document.getElementById("slouchCount");
+    const totalUsage = document.getElementById("totalUsage");
     const ctx = document.getElementById("postureChart").getContext("2d");
     let postureChart;
 
-    datePicker.addEventListener("change", async () => {
-        const selectedDate = datePicker.value;
-        console.log(selectedDate)
-        if (!selectedDate) {
-            showErrorMessage(errorMessage, "Please select a date.");
+    // Initializing the chart with data
+    function initializeChart(data) {
+        if (!data || data.durations.length === 0) {
+            if (postureChart) {
+                postureChart.destroy(); // Destroying the existing chart if it exists
+            }
+            slouchCount.textContent = "0"; 
+            document.getElementById("totalUsage").textContent = "0.00 hours"; 
+            populateSlouchTimings([]); 
+            return;
+        }
+    
+    
+        if (postureChart) postureChart.destroy(); 
+    
+        const image = new Image();
+        image.src = "/static/images/pengu_1.png";
+    
+        const centerImagePlugin = {
+            id: "centerImage",
+            afterDraw(chart) {
+                const ctx = chart.ctx;
+                const chartArea = chart.chartArea;
+                const centerX = (chartArea.left + chartArea.right) / 2;
+                const centerY = (chartArea.top + chartArea.bottom) / 2;
+    
+                const innerRadius = chart.getDatasetMeta(0).data[0].innerRadius;
+                const imageSize = innerRadius * 1.9;
+    
+                if (image.complete) {
+                    ctx.drawImage(image, centerX - imageSize / 2, centerY - imageSize / 2, imageSize, imageSize);
+                } else {
+                    image.onload = function () {
+                        chart.draw();
+                    };
+                }
+            },
+        };
+    
+        postureChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        data: data.durations,
+                        backgroundColor: data.colors,
+                        borderWidth: 0,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: "80%",
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: false,
+                        external: function (context) {
+                            const tooltipModel = context.tooltip;
+                            let tooltipEl = document.getElementById("chartjs-tooltip");
+                            if (!tooltipEl) {
+                                tooltipEl = document.createElement("div");
+                                tooltipEl.id = "chartjs-tooltip";
+                                tooltipEl.className = "chartjs-tooltip";
+                                document.body.appendChild(tooltipEl);
+                            }
+    
+                            if (tooltipModel.opacity === 0) {
+                                tooltipEl.style.opacity = "0";
+                                return;
+                            }
+    
+                            if (tooltipModel.body) {
+                                const title = tooltipModel.title || [];
+                                const body = tooltipModel.body.map((item) => item.lines);
+                                let tooltipContent = `<div><strong>${title.join("<br>")}</strong></div>`;
+                                tooltipContent += `<div>${body.join("<br>")}</div>`;
+                                tooltipEl.innerHTML = tooltipContent;
+                            }
+    
+                            const canvasRect = context.chart.canvas.getBoundingClientRect();
+                            const tooltipX = canvasRect.left + window.scrollX + tooltipModel.caretX;
+                            const tooltipY = canvasRect.top + window.scrollY + tooltipModel.caretY;
+    
+                            tooltipEl.style.opacity = "1";
+                            tooltipEl.style.left = `${tooltipX}px`;
+                            tooltipEl.style.top = `${tooltipY}px`;
+                            tooltipEl.style.position = "absolute";
+                            tooltipEl.style.pointerEvents = "none";
+                            tooltipEl.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+                            tooltipEl.style.border = "1px solid rgba(0, 0, 0, 0.1)";
+                            tooltipEl.style.borderRadius = "5px";
+                            tooltipEl.style.padding = "10px";
+                            tooltipEl.style.boxShadow = "0px 2px 6px rgba(0, 0, 0, 0.1)";
+                            tooltipEl.style.fontFamily = "Arial, sans-serif";
+                            tooltipEl.style.fontSize = "12px";
+                            tooltipEl.style.zIndex = "1000";
+                        },
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.label || "";
+                                const timeRange = label.split(": ")[1];
+                                if (!timeRange) return "";
+                                const times = timeRange.split(" - ");
+                                return times.length === 2 ? `${times[0]} - ${times[1]}` : times[0];
+                            },
+                            title: function (tooltipItems) {
+                                const title = tooltipItems[0].label || "";
+                                return title.split(": ")[0];
+                            },
+                        },
+                    },
+                },
+            },
+            plugins: [centerImagePlugin],
+        });
+    }
+    
+    // Processing power and slouch data into durations, labels and colors
+    function processChartData(powerData, slouchData) {
+        const durations = [];
+        const labels = [];
+        const colors = [];
+
+        powerData.forEach((session, index) => {
+            const sessionStart = new Date(`2024-11-21T${session.timestamp}`);
+            const sessionEnd =
+                index + 1 < powerData.length
+                    ? new Date(`2024-11-21T${powerData[index + 1].timestamp}`)
+                    : null;
+
+            if (!session.power_on) {
+                // Handling power off periods
+                if (!sessionEnd) {
+                    durations.push(0.1); 
+                    labels.push(`Power Off: ${formatTime(sessionStart)}`);
+                } else {
+                    const duration = (sessionEnd - sessionStart) / (1000 * 60 * 60);
+                    durations.push(duration);
+                    labels.push(`Power Off: ${formatTime(sessionStart)} - ${formatTime(sessionEnd)}`);
+                }
+                colors.push("#9B9B9B");
+            } else {
+                // Handling power on and slouch events
+                let lastTime = sessionStart;
+
+                slouchData.forEach((slouch) => {
+                    const slouchTime = new Date(`2024-11-21T${slouch.timestamp}`);
+                    if (slouchTime >= sessionStart && (!sessionEnd || slouchTime <= sessionEnd)) {
+                        const goodDuration = (slouchTime - lastTime) / (1000 * 60 * 60);
+                        if (goodDuration > 0) {
+                            durations.push(goodDuration);
+                            labels.push(`Good Posture: ${formatTime(lastTime)} - ${formatTime(slouchTime)}`);
+                            colors.push("#46C261");
+                        }
+
+                        durations.push(0.1);
+                        labels.push(`Slouch: ${formatTime(slouchTime)}`);
+                        colors.push("#D1582F");
+
+                        lastTime = slouchTime;
+                    }
+                });
+
+                if (sessionEnd) {
+                    const remainingGoodDuration = (sessionEnd - lastTime) / (1000 * 60 * 60);
+                    if (remainingGoodDuration > 0) {
+                        durations.push(remainingGoodDuration);
+                        labels.push(`Good Posture: ${formatTime(lastTime)} - ${formatTime(sessionEnd)}`);
+                        colors.push("#46C261");
+                    }
+                }
+            }
+        });
+
+        return { durations, labels, colors };
+    }
+
+    // Formatting time for display
+    function formatTime(date) {
+        const hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+        const period = hours >= 12 ? "PM" : "AM";
+        const formattedHours = ((hours + 11) % 12) + 1;
+        return `${formattedHours}:${minutes} ${period}`;
+    }
+
+    // Fetching statistics for the selected date
+    async function fetchStatistics(date) {
+        try {
+            const response = await fetch(`/get_posture_data?date=${date}`);
+            const data = await response.json();
+    
+            if (!data.success) {
+                console.error("Error fetching data:", data.message);
+                initializeChart(null); // Passing null or empty data to initializeChart to clear it
+                return;
+            }
+    
+            const chartData = processChartData(data.powerData, data.slouchData);
+    
+            if (!chartData.durations.length) {
+                console.warn("No valid data for the selected date.");
+                initializeChart(null); // Clearing chart if no valid data
+                return;
+            }
+    
+            initializeChart(chartData); // Updating the chart with fetched data
+    
+            slouchCount.textContent = data.slouchData.length; 
+    
+            let totalUsage = 0;
+    
+            for (let i = 0; i < data.powerData.length - 1; i++) {
+                const currentSession = data.powerData[i];
+                const nextSession = data.powerData[i + 1];
+    
+                if (currentSession.power_on && !nextSession.power_on) {
+                    const startTime = new Date(`2024-11-21T${currentSession.timestamp}`);
+                    const endTime = new Date(`2024-11-21T${nextSession.timestamp}`);
+                    totalUsage += (endTime - startTime) / (1000 * 60 * 60); 
+                }
+            }
+    
+            document.getElementById("totalUsage").textContent = `${totalUsage.toFixed(2)} hours`;
+    
+            populateSlouchTimings(data.slouchData); 
+    
+        } catch (error) {
+            console.error("Error fetching statistics:", error);
+            initializeChart(null); 
+        }
+    }
+    
+
+    // Populating slouch timings in a table
+    function populateSlouchTimings(slouchData) {
+        const slouchDetailsContainer = document.getElementById("chartDetails");
+        slouchDetailsContainer.innerHTML = "";
+
+        if (slouchData.length === 0) {
+            slouchDetailsContainer.innerHTML = `<p>No slouch events recorded for the selected date.</p>`;
             return;
         }
 
-        try {
-            const data = await fetchPostureData(selectedDate);
-            hideErrorMessage(errorMessage);
+        const table = document.createElement("table");
+        table.className = "table table-striped table-bordered";
 
-            const chartData = processChartData(data.powerData, data.slouchData);
-            if (postureChart) postureChart.destroy();
-            postureChart = renderChart(ctx, chartData);
-        } catch (error) {
-            showErrorMessage(errorMessage, error.message);
-        }
-    });
-}
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
 
+        const headerSlouchEvent = document.createElement("th");
+        headerSlouchEvent.textContent = "Slouch Event";
+
+        const headerTime = document.createElement("th");
+        headerTime.textContent = "Time";
+
+        headerRow.appendChild(headerSlouchEvent);
+        headerRow.appendChild(headerTime);
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        slouchData.forEach((slouch, index) => {
+            const slouchTime = new Date(`2024-11-21T${slouch.timestamp}`);
+            const formattedTime = formatTime(slouchTime);
+
+            const row = document.createElement("tr");
+
+            const slouchEventCell = document.createElement("td");
+            slouchEventCell.textContent = `Slouch Event ${index + 1}`;
+
+            const timeCell = document.createElement("td");
+            timeCell.textContent = formattedTime;
+
+            row.appendChild(slouchEventCell);
+            row.appendChild(timeCell);
+            tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+        slouchDetailsContainer.appendChild(table);
+    }
+
+    // Handling date selection changes
+    datePicker.addEventListener("change", function () {
+    const selectedDate = datePicker.value;
+    if (selectedDate) {
+        fetchStatistics(selectedDate);
+    }
+});
+});
 
 // TODO - This function doesn't work as expected, user need to select the date and then only they will see the data
 
