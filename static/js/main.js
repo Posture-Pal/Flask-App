@@ -736,107 +736,244 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 });
 
-// TODO - This function doesn't work as expected, user need to select the date and then only they will see the data
+//Home page
+document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById("homePagePostureChart").getContext("2d");
+    let homePagePostureChart;
 
-function setupHomePage() {
-    const ctx = document.getElementById("postureChartHome").getContext("2d");
-    const errorMessage = document.getElementById("errorMessageHome");
-    let postureChart;
+    const noDataMessage = document.getElementById("noDataMessage");
 
-    const today = new Date().toISOString().split("T")[0];
+    // Helper function to fetch today's date
+    function getTodayDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, "0"); 
+        const day = today.getDate().toString().padStart(2, "0"); 
+        return `${year}-${month}-${day}`; 
+    }
 
-    const datePicker = document.getElementById("datePicker");
-
-
-    datePicker.value = today;
-    datePicker.addEventListener("change", async () => {
-        const selectedDate = datePicker.value;
-        if (!selectedDate) {
-            showErrorMessage(errorMessage, "Please select a date.");
-            return;
-        }
-
+    // Fetching statistics for today
+    async function fetchTodayStatistics() {
+        const todayDate = getTodayDate();
         try {
-            const data = await fetchPostureData(selectedDate);
-            hideErrorMessage(errorMessage);
+            const response = await fetch(`/get_posture_data?date=${todayDate}`);
+            const data = await response.json();
+
+            if (!data.success || !data.powerData || !data.slouchData) {
+                console.log("No data available for today.");
+                displayNoDataMessage(true);
+                return;
+            }
 
             const chartData = processChartData(data.powerData, data.slouchData);
+            if (chartData.durations.length === 0) {
+                console.log("No valid data for today.");
+                displayNoDataMessage(true);
+                return;
+            }
 
-            if (postureChart) postureChart.destroy();
-            postureChart = renderChart(ctx, chartData);
+            initializeChart(chartData);
+            displayNoDataMessage(false);
+
         } catch (error) {
-            showErrorMessage(errorMessage, error.message);
+            console.error("Error fetching statistics:", error);
+            displayNoDataMessage(true);
         }
-    });
-}
+    }
 
-
-function processChartData(powerData, slouchData) {
-    const timestamps = [];
-    const greenBars = [];
-    const greyBars = [];
-    const redSpikes = [];
-
-    powerData.forEach((session, index) => {
-        const sessionTime = session.timestamp;
-
-        if (!session.power_on) {
-            if (!timestamps.includes(sessionTime)) {
-                timestamps.push(sessionTime);
-                greyBars.push(-1);
-                greenBars.push(null);
-                redSpikes.push(null);
-            }
-
-            if (
-                index + 1 < powerData.length &&
-                !timestamps.includes(powerData[index + 1].timestamp)
-            ) {
-                timestamps.push(powerData[index + 1].timestamp);
-                greyBars.push(-1);
-                greenBars.push(null);
-                redSpikes.push(null);
-            }
+    // Function to display or hide the "No Data Available" message
+    function displayNoDataMessage(show) {
+        if (show) {
+            noDataMessage.style.display = "block";
+            if (homePagePostureChart) homePagePostureChart.destroy();
         } else {
-            if (!timestamps.includes(sessionTime)) {
-                timestamps.push(sessionTime);
-                greenBars.push(0);
-                greyBars.push(null);
-                redSpikes.push(null);
-            }
+            noDataMessage.style.display = "none";
+        }
+    }
 
-            slouchData.forEach((slouch) => {
-                if (
-                    slouch.timestamp >= sessionTime &&
-                    (index + 1 < powerData.length
-                        ? slouch.timestamp < powerData[index + 1].timestamp
-                        : true)
-                ) {
-                    if (!timestamps.includes(slouch.timestamp)) {
-                        timestamps.push(slouch.timestamp);
-                        greenBars.push(0);
-                        greyBars.push(null);
-                        redSpikes.push(null);
+    // Function to initialize the chart with data
+    function initializeChart(data) {
+        if (homePagePostureChart) {
+            homePagePostureChart.destroy(); 
+        }
 
-                        timestamps.push(slouch.timestamp);
-                        greenBars.push(null);
-                        greyBars.push(null);
-                        redSpikes.push(1);
+        const image = new Image();
+        image.src = "/static/images/pengu_1.png";
+
+        const centerImagePlugin = {
+            id: "centerImage",
+            afterDraw(chart) {
+                const ctx = chart.ctx;
+                const chartArea = chart.chartArea;
+                const centerX = (chartArea.left + chartArea.right) / 2;
+                const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+                const innerRadius = chart.getDatasetMeta(0).data[0].innerRadius;
+                const imageSize = innerRadius * 1.9;
+
+                if (image.complete) {
+                    ctx.drawImage(image, centerX - imageSize / 2, centerY - imageSize / 2, imageSize, imageSize);
+                } else {
+                    image.onload = function () {
+                        chart.draw();
+                    };
+                }
+            },
+        };
+
+        // Initializing the chart 
+        homePagePostureChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        data: data.durations,
+                        backgroundColor: data.colors,
+                        borderWidth: 0,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: "80%",
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: false, // Enable tooltips
+                        external: function (context) {
+                            const tooltipModel = context.tooltip;
+                            let tooltipEl = document.getElementById("chartjs-tooltip");
+                            if (!tooltipEl) {
+                                tooltipEl = document.createElement("div");
+                                tooltipEl.id = "chartjs-tooltip";
+                                tooltipEl.className = "chartjs-tooltip";
+                                document.body.appendChild(tooltipEl);
+                            }
+
+                            if (tooltipModel.opacity === 0) {
+                                tooltipEl.style.opacity = "0";
+                                return;
+                            }
+
+                            if (tooltipModel.body) {
+                                const title = tooltipModel.title || [];
+                                const body = tooltipModel.body.map((item) => item.lines);
+                                let tooltipContent = `<div><strong>${title.join("<br>")}</strong></div>`;
+                                tooltipContent += `<div>${body.join("<br>")}</div>`;
+                                tooltipEl.innerHTML = tooltipContent;
+                            }
+
+                            const canvasRect = context.chart.canvas.getBoundingClientRect();
+                            const tooltipX = canvasRect.left + window.scrollX + tooltipModel.caretX;
+                            const tooltipY = canvasRect.top + window.scrollY + tooltipModel.caretY;
+
+                            tooltipEl.style.opacity = "1";
+                            tooltipEl.style.left = `${tooltipX}px`;
+                            tooltipEl.style.top = `${tooltipY}px`;
+                            tooltipEl.style.position = "absolute";
+                            tooltipEl.style.pointerEvents = "none";
+                            tooltipEl.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+                            tooltipEl.style.border = "1px solid rgba(0, 0, 0, 0.1)";
+                            tooltipEl.style.borderRadius = "5px";
+                            tooltipEl.style.padding = "10px";
+                            tooltipEl.style.boxShadow = "0px 2px 6px rgba(0, 0, 0, 0.1)";
+                            tooltipEl.style.fontFamily = "Arial, sans-serif";
+                            tooltipEl.style.fontSize = "12px";
+                            tooltipEl.style.zIndex = "1000";
+                        },
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.label || "";
+                                const timeRange = label.split(": ")[1];
+                                if (!timeRange) return "";
+                                const times = timeRange.split(" - ");
+                                return times.length === 2 ? `${times[0]} - ${times[1]}` : times[0];
+                            },
+                            title: function (tooltipItems) {
+                                const title = tooltipItems[0].label || "";
+                                return title.split(": ")[0];
+                            },
+                        },
+                    },
+                },
+            },
+            plugins: [centerImagePlugin],
+        });
+    }
+
+    // Processing power and slouch data into durations, labels, and colors
+    function processChartData(powerData, slouchData) {
+        const durations = [];
+        const labels = [];
+        const colors = [];
+
+        powerData.forEach((session, index) => {
+            const sessionStart = new Date(`2024-11-21T${session.timestamp}`);
+            const sessionEnd =
+                index + 1 < powerData.length
+                    ? new Date(`2024-11-21T${powerData[index + 1].timestamp}`)
+                    : null;
+
+            if (!session.power_on) {
+                // Handling power off periods
+                if (!sessionEnd) {
+                    durations.push(0.1);
+                    labels.push(`Power Off: ${formatTime(sessionStart)}`);
+                } else {
+                    const duration = (sessionEnd - sessionStart) / (1000 * 60 * 60);
+                    durations.push(duration);
+                    labels.push(`Power Off: ${formatTime(sessionStart)} - ${formatTime(sessionEnd)}`);
+                }
+                colors.push("#9B9B9B");
+            } else {
+                // Handling power on and slouch events
+                let lastTime = sessionStart;
+
+                slouchData.forEach((slouch) => {
+                    const slouchTime = new Date(`2024-11-21T${slouch.timestamp}`);
+                    if (slouchTime >= sessionStart && (!sessionEnd || slouchTime <= sessionEnd)) {
+                        const goodDuration = (slouchTime - lastTime) / (1000 * 60 * 60);
+                        if (goodDuration > 0) {
+                            durations.push(goodDuration);
+                            labels.push(`Good Posture: ${formatTime(lastTime)} - ${formatTime(slouchTime)}`);
+                            colors.push("#46C261");
+                        }
+
+                        durations.push(0.1);
+                        labels.push(`Slouch: ${formatTime(slouchTime)}`);
+                        colors.push("#D1582F");
+
+                        lastTime = slouchTime;
+                    }
+                });
+
+                if (sessionEnd) {
+                    const remainingGoodDuration = (sessionEnd - lastTime) / (1000 * 60 * 60);
+                    if (remainingGoodDuration > 0) {
+                        durations.push(remainingGoodDuration);
+                        labels.push(`Good Posture: ${formatTime(lastTime)} - ${formatTime(sessionEnd)}`);
+                        colors.push("#46C261");
                     }
                 }
-            });
-
-            if (
-                index + 1 < powerData.length &&
-                !timestamps.includes(powerData[index + 1].timestamp)
-            ) {
-                timestamps.push(powerData[index + 1].timestamp);
-                greenBars.push(0);
-                greyBars.push(null);
-                redSpikes.push(null);
             }
-        }
-    });
+        });
 
-    return { timestamps, greenBars, greyBars, redSpikes };
-}
+        return { durations, labels, colors };
+    }
+
+    // Formatting time for display
+    function formatTime(date) {
+        const hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+        const period = hours >= 12 ? "PM" : "AM";
+        const formattedHours = ((hours + 11) % 12) + 1;
+        return `${formattedHours}:${minutes} ${period}`;
+    }
+
+    // Fetching statistics for today
+    fetchTodayStatistics();
+});
+
+

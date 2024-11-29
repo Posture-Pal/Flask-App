@@ -68,6 +68,14 @@
         </div>
     </div>
 
+    <div id="homePagePostureChartContainer">
+        <canvas id="homePagePostureChart"></canvas>
+        <div id="noDataMessage" style="display: none;">
+            <p>No data available for today.</p>
+            <img src="\static\images\sleeping.png" alt="No Data Available" />
+        </div>
+    </div>
+
     <br>
     <div class="usageContainer">
         <div class="usageContainerFlex">
@@ -94,21 +102,6 @@
     </div>
     <!-- <a href="{{ url_for('logout') }}">Logout</a> -->
     <br><br>
-    <div>
-        <div class="calendar-container">
-            <label for="datePicker">Select a date:</label>
-            <input type="date" id="datePicker">
-        </div>
-
-        <div class="chart-container">
-            <canvas id="postureChartHome"></canvas>
-        </div>
-
-        <div id="errorMessageHome" style="color: red; display: none;">
-            Unable to load posture data for today.
-        </div>
-    </div>
-
     {% if show_calibrate_button %}
     {% include '_calibration_modal.html' %}
     {% endif %}

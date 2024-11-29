@@ -239,6 +239,48 @@ footer {
     z-index: 999;
 }
 
+/* ======================== Home Page Posture Chart ==============================*/
+
+#homePagePostureChartContainer {
+    width: 80%; 
+    max-width: 355px; 
+    height: 300px; 
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; 
+}
+
+#homePagePostureChart {
+    width: 100%;
+    height: 100%; 
+}
+
+/* ======================== No Data Message ==============================*/
+
+#noDataMessage {
+    display: none;
+    padding-right: 450px;
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#noDataMessage p {
+    margin: 0;
+    font-weight: bold;
+    color: #666;
+}
+
+#noDataMessage img {
+    width: 200px;
+    height: auto;
+    margin-top: 15px;
+}
+
+
 /* ===================== Responsiveness ====================== */
 
 .bottomnav {
@@ -293,6 +335,20 @@ footer {
 
     .calendar-container {
         margin-bottom: 15px;
+    }
+
+    #homePagePostureChartContainer {
+        width: 90%; 
+        max-width: 90%; 
+        height: 250px; 
+    }
+
+    #noDataMessage img {
+        width: 130px;
+}
+
+    #homePagePostureChart {
+        height: auto; 
     }
 }
 
