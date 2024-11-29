@@ -40,7 +40,6 @@ def check_database_credentials(uri):
         print("⚠️ Error while checking database credentials:", e)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
-
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])
@@ -418,8 +417,7 @@ def save_power_session():
             return jsonify({"message": message}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-# TODO Access manager: Include an admin page to let user subscribe to posture pal service
-# TODO User: 
+
 
 if __name__ == "__main__":
     app.run(debug=True)

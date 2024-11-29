@@ -4,90 +4,84 @@
 
 {% block content %} <!-- All of the articles inherit from base.html -->
 <div class="articleBanner">
-<img src="{{ url_for('static', filename='images/BannerPosture.png') }}" alt="Banner">
+    <img src="{{ url_for('static', filename='images/BannerPosture.png') }}" alt="Banner">
 </div>
 <div class="marginContainer">
     <h1>Gym Workouts For Posture</h1>
     <div class="articleContainer">
-        <section>
-            <h2>Why Posture Matters</h2>
-            <p>Good posture is essential for maintaining proper body alignment, reducing strain on muscles, and
-                preventing chronic pain. Whether you're sitting at a desk, watching TV, or exercising, paying attention
-                to your posture can lead to improved overall health and comfort.</p>
-            <p>Fortunately, it's never too late to work on your posture. With regular practice, you can strengthen the
-                muscles that support your spine and improve your alignment. Here are some targeted workouts to help you
-                achieve better posture.</p>
-            <p>Check out this article from <a
-                    href="https://www.health.harvard.edu/exercise-and-fitness/is-it-too-late-to-save-your-posture"
-                    target="_blank">Harvard Health</a> for more on the importance of posture and exercises to help you.
-            </p>
-        </section>
+        <div class="flexArticle">
+            <div class="twoColumn">
+                <h2>How Workouts Improve Posture</h2>
+                <p>Workouts play a crucial role in developing and maintaining good posture by strengthening the muscles
+                    that support your spine and improving your alignment. Incorporating exercises that target your core,
+                    back, and shoulders can improve presentation and reduce muscle stiffness.</p>
+                <p>Whether you're sitting, standing, or moving, regular workouts designed for posture can enhance your
+                    overall stability and comfort. With consistent practice, you can improve your posture, reduce
+                    discomfort, and carry yourself with greater confidence.</p>
+            </div>
+            <div class="twoColumn">
+                <img src="{{ url_for('static', filename='images/penguinWorkout.png') }}" alt="Penguin Workout">
+            </div>
+        </div>
 
-        <section>
-            <h2>Shoulder Strengthening Exercises</h2>
-            <p>The building of shoulder strength can greatly enhance your posture by keeping your shoulders back and
-                aligned. Some effective exercises target this area, which includes:</p>
-            <ul>
-                <li><strong>Scapula Squeezes:</strong> Squeeze your shoulder blades together and hold for 30 seconds.
-                    This simple move helps activate the muscles around your shoulders and upper back.</li>
-                <li><strong>Resistance Band Rows:</strong> Using a resistance band, hold it with both hands and pull
-                    your elbows back as if you're rowing. Keep your back straight and squeeze your shoulder blades at
-                    the end of the movement.</li>
-                <li><strong>Shoulder Circles:</strong> Stand with your arms extended out to your sides and make small
-                    circles, gradually increasing the size of the circles. This helps to mobilize the shoulder joints
-                    and improve flexibility.</li>
-            </ul>
-        </section>
+        <h2>Shoulder Strengthening Exercises</h2>
+        <p>The building of shoulder strength can greatly enhance your posture by keeping your shoulders back and
+            aligned. Some effective exercises target this area, which includes:</p>
+        <ul>
+            <li><strong>Scapula Squeezes:</strong> Squeeze your shoulder blades together and hold for 30 seconds.
+                This simple move helps activate the muscles around your shoulders and upper back.</li>
+            <li><strong>Resistance Band Rows:</strong> Using a resistance band, hold it with both hands and pull
+                your elbows back as if you're rowing. Keep your back straight and squeeze your shoulder blades at
+                the end of the movement.</li>
+            <li><strong>Shoulder Circles:</strong> Stand with your arms extended out to your sides and make small
+                circles, gradually increasing the size of the circles. This helps to mobilize the shoulder joints
+                and improve flexibility.</li>
+        </ul>
 
-        <section>
-            <h2>Back Strengthening Exercises</h2>
-            <p>A strong back is vital for supporting your posture. These exercises target the muscles that support your
-                spine and help correct slouching:</p>
-            <ul>
-                <li><strong>Superman Exercise:</strong> Lie face down on the floor with your arms extended in front of
-                    you. Lift both your arms and legs off the ground simultaneously, holding for a few seconds before
-                    lowering. This strengthens the lower back and helps with spinal alignment.</li>
-                <li><strong>Bridges:</strong> Lie on your back with your knees bent and feet flat on the floor. Lift
-                    your hips toward the ceiling, forming a straight line from your shoulders to your knees. This
-                    targets the lower back and glutes, helping to prevent slumping.</li>
-                <li><strong>Bird-Dog:</strong> Start in a tabletop position (hands and knees on the floor). Extend your
-                    right arm forward and your left leg back, keeping your back straight. Hold for a few seconds, then
-                    switch sides. This exercise strengthens the back and core while promoting stability.</li>
-            </ul>
-        </section>
 
-        <section>
-            <h2>Core Strengthening Exercises</h2>
-            <p>Your core muscles play a key role in maintaining proper posture. Strengthening your core can help support
-                your spine and prevent slouching:</p>
-            <ul>
-                <li><strong>Modified Plank:</strong> Hold a plank position on your forearms instead of your hands. Keep
-                    your body straight from head to heels and engage your abdominal muscles. Hold for as long as you can
-                    while keeping your form tight.</li>
-                <li><strong>Dead Bug:</strong> Lie on your back with your arms extended toward the ceiling. Slowly lower
-                    your right arm and left leg to the ground, keeping your lower back pressed into the floor. Return to
-                    the starting position and repeat on the other side. This exercise strengthens the deep core muscles
-                    that support the spine.</li>
-                <li><strong>Abdominal Tightening:</strong> Simply tighten your abdominal muscles by pulling your belly
-                    button towards your spine. Hold for a few seconds, then release. This is a great way to activate
-                    your core throughout the day.</li>
-            </ul>
-        </section>
+        <h2>Back Strengthening Exercises</h2>
+        <p>A strong back is vital for supporting your posture. These exercises target the muscles that support your
+            spine and help correct slouching:</p>
+        <ul>
+            <li><strong>Superman Exercise:</strong> Lie face down on the floor with your arms extended in front of
+                you. Lift both your arms and legs off the ground simultaneously, holding for a few seconds before
+                lowering. This strengthens the lower back and helps with spinal alignment.</li>
+            <li><strong>Bridges:</strong> Lie on your back with your knees bent and feet flat on the floor. Lift
+                your hips toward the ceiling, forming a straight line from your shoulders to your knees. This
+                targets the lower back and glutes, helping to prevent slumping.</li>
+            <li><strong>Bird-Dog:</strong> Start in a tabletop position (hands and knees on the floor). Extend your
+                right arm forward and your left leg back, keeping your back straight. Hold for a few seconds, then
+                switch sides. This exercise strengthens the back and core while promoting stability.</li>
+        </ul>
 
-        <section>
-            <h2>Everyday Tips for Better Posture</h2>
-            <p>In addition to these exercises, there are simple changes you can make in your daily routine to improve
-                your posture:</p>
-            <ul>
-                <li><strong>Sit with support:</strong> When sitting, try placing a rolled towel behind your shoulders.
-                    It will encourage you to sit upright and help keep your posture in check.</li>
-                <li><strong>Take regular breaks:</strong> If you're sitting for long periods, especially at a computer
-                    or watching TV, get up and move around every 30 minutes. This helps reduce muscle fatigue and
-                    prevents poor posture habits.</li>
-                <li><strong>Stand tall:</strong> Practice standing with your weight evenly distributed on both feet,
-                    shoulders relaxed but pulled back, and your head aligned with your spine.</li>
-            </ul>
-        </section>
+        <h2>Core Strengthening Exercises</h2>
+        <p>Your core muscles play a key role in maintaining proper posture. Strengthening your core can help support
+            your spine and prevent slouching:</p>
+        <ul>
+            <li><strong>Modified Plank:</strong> Hold a plank position on your forearms instead of your hands. Keep
+                your body straight from head to heels and engage your abdominal muscles. Hold for as long as you can
+                while keeping your form tight.</li>
+            <li><strong>Dead Bug:</strong> Lie on your back with your arms extended toward the ceiling. Slowly lower
+                your right arm and left leg to the ground, keeping your lower back pressed into the floor. Return to
+                the starting position and repeat on the other side. This exercise strengthens the deep core muscles
+                that support the spine.</li>
+            <li><strong>Abdominal Tightening:</strong> Simply tighten your abdominal muscles by pulling your belly
+                button towards your spine. Hold for a few seconds, then release. This is a great way to activate
+                your core throughout the day.</li>
+        </ul>
+
+        <h2>Everyday Tips for Better Posture</h2>
+        <p>In addition to these exercises, there are simple changes you can make in your daily routine to improve
+            your posture:</p>
+        <ul>
+            <li><strong>Sit with support:</strong> When sitting, try placing a rolled towel behind your shoulders.
+                It will encourage you to sit upright and help keep your posture in check.</li>
+            <li><strong>Take regular breaks:</strong> If you're sitting for long periods, especially at a computer
+                or watching TV, get up and move around every 30 minutes. This helps reduce muscle fatigue and
+                prevents poor posture habits.</li>
+            <li><strong>Stand tall:</strong> Practice standing with your weight evenly distributed on both feet,
+                shoulders relaxed but pulled back, and your head aligned with your spine.</li>
+        </ul>
 
         <footer>
             <p>Source: <a href="https://www.health.harvard.edu/exercise-and-fitness/is-it-too-late-to-save-your-posture"

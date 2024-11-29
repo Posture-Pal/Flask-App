@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (postureChart) postureChart.destroy(); 
     
         const image = new Image();
-        image.src = "/static/images/pengu_1.png";
+        image.src = "/static/images/penguinRing.png";
     
         const centerImagePlugin = {
             id: "centerImage",
@@ -798,7 +798,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const image = new Image();
-        image.src = "/static/images/pengu_1.png";
+        image.src = "/static/images/penguinRing.png";
 
         const centerImagePlugin = {
             id: "centerImage",
@@ -975,5 +975,3 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetching statistics for today
     fetchTodayStatistics();
 });
-
-

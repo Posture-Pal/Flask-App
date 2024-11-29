@@ -139,7 +139,10 @@ main {
 
 .infoCardsContainer{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
     margin-left: 35px;
 }
 
@@ -151,7 +154,7 @@ main {
 .infoCards {
     font-size: 22px;
     font-weight: 400;
-    margin-bottom: 40px;
+    margin: 40px;
 }
 
 .infoCards img {
@@ -177,13 +180,44 @@ main {
     font-size: 20px;
 }
 
-.articleContainer img {
-    
+.articleContainer p {
+    color: #1a4f67;
 }
 
-section {
+.marginContainer h1 {
+    color: #1e3e4f;
+}
+
+.articleContainer h1, 
+.articleContainer h2, 
+.articleContainer h3, 
+.articleContainer h4, 
+.articleContainer h5, 
+.articleContainer h6,
+.articleContainer strong,
+.articleContainer li {
+    color: #1e3e4f;
+}
+
+.articleContainer h2 {
     margin-top: 40px;
 }
+
+.flexArticle {
+    display: flex;
+    gap: 20px;
+}
+
+.twoColumn {
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.twoColumn img {
+    height: 45vh;
+    align-items: right;
+}
+
 ul {
     list-style-type: disc;
     margin-left: 20px;
