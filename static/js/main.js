@@ -110,6 +110,29 @@ function sendCalibrationMessage() {
     });
 }
 
+// document.getElementById("calibrate-btn").addEventListener("click", async () => {
+//     try {
+
+//         const thresholds = {
+//             temp_overheat: 38.0,
+//             temp_cold: 10.0,
+//             humid_high: 85.0,
+//             humid_low: 15.0,
+//             pitch: 15.0,
+//             gravity: [0.1, 0.1, 0.9],
+//         };
+
+//         const response = await axios.post("/save_threshold_data", thresholds);
+//         if (response.status === 200 || response.status === 201) {
+//             console.log(response.data.message);
+//         } else {
+//             console.error("Unexpected response:", response.data);
+//         }
+//     } catch (error) {
+//         console.error("Error saving thresholds:", error.response?.data?.error || error.message);
+//     }
+// });
+
 // Testing if button is still working 
 function updateThresholdTable(data) {
     const table = document.getElementById("threshold-table");

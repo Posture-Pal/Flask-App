@@ -2,16 +2,17 @@
 <div id="modal-overlay" style="display: none;"></div> <!-- Displaying none by default -->
 <div id="calibrateModal" style="display: none;">
     <h3>Calibrate Your Device</h3>
-    <p>Make sure to sit or stand up straight to capture your good posture. If you deviate from this posture you will receive an alert. Don't worry, you can always re-calibrate in settings.</p>
-    <button id="calibrate-btn">Calibrate Posture</button>
+    <p>Make sure to sit or stand up straight to capture your good posture. If you deviate from this posture you will
+        receive an alert. Don't worry, you can always re-calibrate in settings.</p>
+    <!-- <button id="calibrate-btn">Calibrate Posture</button> -->
 
-    <table id="threshold-table" border="0" style="display: block;"> <!-- Table doesn't display anything, just need the values below -->
+    <table id="threshold-table" border="0" style="display: block;">
+        <!-- Table doesn't display anything, just need the values below -->
         <thead>
             <tr>
-                <!-- <th>Parameter</th>
-                <th>Value</th> -->
+                                <th>Value</th>
             </tr>
         </thead>
-    <tbody id="threshold-values"></tbody> <!-- Js takes this table's values to send to PubNub -->
+        <tbody id="threshold-values"></tbody> <!-- Js takes this table's values to send to PubNub -->
     </table>
 </div>
