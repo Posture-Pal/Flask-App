@@ -408,6 +408,38 @@ document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById("postureChart").getContext("2d");
     let postureChart;
 
+    // Fetching the most recent available date from the backend
+    async function getMostRecentDate() {
+        try {
+            const response = await fetch('/get_last_available_data_date');
+            const data = await response.json();
+
+            if (data.success) {
+                return data.lastAvailableDate; 
+            } else {
+                console.error("No data available before today.");
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching the most recent available date:", error);
+            return null;
+        }
+    }
+
+    // Setting default date to the last available date before today
+    async function setDefaultDate() {
+        const mostRecentDate = await getMostRecentDate();
+        if (mostRecentDate) {
+            datePicker.value = mostRecentDate; 
+            fetchStatistics(mostRecentDate); 
+        } else {
+            console.warn("No available data before today.");
+        }
+    }
+
+    setDefaultDate(); 
+
+
     // Initializing the chart with data
     function initializeChart(data) {
         if (!data || data.durations.length === 0) {

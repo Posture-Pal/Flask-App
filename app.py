@@ -249,6 +249,48 @@ def get_posture_data():
     except Exception as e:
         print(f"Error fetching posture data: {e}")
         return jsonify({"success": False, "message": "An error occurred."}), 500
+    
+@app.route("/get_last_available_data_date", methods=["GET"])
+def get_last_available_data_date():
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"success": False, "message": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"success": False, "message": "User not found"}), 404
+
+        user_id = user["id"]
+
+        # Fetching the most recent power session and slouch event timestamps, excluding today's data
+        today = datetime.today().date()
+        yesterday = today - timedelta(days=1)
+
+        last_power_session = my_db.PowerSessions.query.filter(
+            my_db.PowerSessions.user_id == user_id,
+            my_db.PowerSessions.timestamp < datetime.combine(today, datetime.min.time())
+        ).order_by(my_db.PowerSessions.timestamp.desc()).first()
+
+        last_slouch_event = my_db.SensorData.query.filter(
+            my_db.SensorData.user_id == user_id,
+            my_db.SensorData.timestamp < datetime.combine(today, datetime.min.time())
+        ).order_by(my_db.SensorData.timestamp.desc()).first()
+
+        last_timestamp = max(
+            last_power_session.timestamp if last_power_session else datetime.min,
+            last_slouch_event.timestamp if last_slouch_event else datetime.min
+        )
+
+        if last_timestamp == datetime.min:
+            return jsonify({"success": False, "message": "No data available before today."}), 404
+
+        most_recent_date = last_timestamp.strftime("%Y-%m-%d")  # Format as YYYY-MM-DD
+        return jsonify({"success": True, "lastAvailableDate": most_recent_date})
+
+    except Exception as e:
+        print(f"Error fetching last available date: {e}")
+        return jsonify({"success": False, "message": "An error occurred."}), 500
 
 @app.route("/statistics", methods=["GET"])
 def statistics():
