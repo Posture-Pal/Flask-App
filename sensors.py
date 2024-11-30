@@ -85,17 +85,28 @@ def turn_off_vibration():
 
 # calibration function
 def calibrate_posture():
+    global thresholds
     print("Calibrating upright posture...")
     pitch = bno.euler[1] if bno.euler else None
     gravity_vector = bno.gravity
 
-    if pitch is None or gravity_vector is None:
+    temperature = dht_sensor.temperature
+    humidity = dht_sensor.humidity
+    
+    if None in [pitch, gravity_vector, temperature, humidity]:
         print("Failed to calibrate: Sensor data not available!")
         return
 
     thresholds["pitch"] = pitch
     thresholds["gravity"] = gravity_vector
 
+    thresholds["pitch"] = pitch
+    thresholds["gravity"] = gravity_vector
+    thresholds["temp_overheat"] = temperature
+    thresholds["temp_cold"] = temperature
+    thresholds["humid_high"] = humidity
+    thresholds["humid_low"] = humidity
+    
     # print("Calibration complete. Sending threshold data:")
     # print(json.dumps(thresholds, indent=2))
 

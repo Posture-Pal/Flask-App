@@ -8,8 +8,6 @@ const pubnub = new PubNub({
 
 const CHANNEL_NAME = "Posture-Pal";
 
-
-
 function startListeningForUpdates() {
     console.log("Subscribing to channel:", CHANNEL_NAME);
 
@@ -106,8 +104,58 @@ function sendCalibrationMessage() {
             console.error("Error publishing calibration message:", status);
         } else {
             console.log("Calibration message sent:", response);
+            console.log("Waiting for real-time sensor data...");
+            startListeningForUpdates();
         }
     });
+}
+
+function startListeningForUpdates() {
+    console.log("Subscribing to channel:", CHANNEL_NAME);
+
+    pubnub.subscribe({ channels: [CHANNEL_NAME] });
+
+    pubnub.addListener({
+        message: (event) => {
+            console.log("Received message:", event.message);
+
+            // If sensor data is received, update thresholds dynamically
+            if (event.message.calibration_data) {
+                updateThresholdTable(event.message.calibration_data);
+            } else if (event.message.sensor_data) {
+                // If it's regular sensor data, update the UI
+                updateDataInHTML(event.message);
+            }
+        },
+        status: (statusEvent) => {
+            if (statusEvent.category === "PNConnectedCategory") {
+                console.log("Successfully connected to PubNub channel.");
+            } else {
+                console.warn("PubNub connection status:", statusEvent);
+            }
+        },
+    });
+}
+
+
+pubnub.addListener({
+    message: (event) => {
+        console.log("Received message:", event.message);
+
+        if (event.message.type === "calibration") {
+            updateThresholdTable(event.message);
+        } else if (event.message.type === "sensor") {
+            updateDataInHTML(event.message);
+        }
+    },
+});
+
+const calibrateButton = document.getElementById("calibrate-btn");
+if (calibrateButton) {
+    console.log("Calibrate button found!");
+    calibrateButton.addEventListener("click", sendCalibrationMessage);
+} else {
+    console.error("Calibrate button not found!");
 }
 
 // document.getElementById("calibrate-btn").addEventListener("click", async () => {
