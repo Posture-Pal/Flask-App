@@ -10,23 +10,16 @@
         <p>Hello, {{ user }}!</p>
     </div>
 
-    <!-- <div>
-        <button id="power-btn">Turn On Sensor</button>
-        <button id="power-off-btn">Turn Off Sensor</button>
-    </div> -->
-
-    <!-- <div class="postureGoalContainer">
-        <div class="percentPosture">85%</div>
-        <div>You are meeting your posture goal!</div>
-    </div> -->
-
     <div id="errorMessage" style="color: red; display: none;">
         No data available yet for today. Make sure to turn your device on and calibrate!
     </div>
 
     <!-- Trying to get calibration button working -->
-    <div class="trying-calibration" id="calibration-section" style="display: none;">
-        <div>
+    <div class="calibModal" id="calibration-section" style="display: none;">
+        <div class="calibContent">
+            <h4>Calibrate Posture</h4>
+            <p>Get into a comfortable posture to save as your good posture. We will alert you if you slouch too far from this posture. Don't worry, you can always re-calibrate in settings!</p>
+
             <!-- Button to trigger calibration -->
             <button id="calibrate-btn">Calibrate Posture</button>
             <!-- Table to display threshold values -->
@@ -100,38 +93,8 @@
             </div>
         </div>
     </div>
-    <!-- <a href="{{ url_for('logout') }}">Logout</a> -->
     <br><br>
-    <!-- {% if show_calibrate_button %}
-    {% include '_calibration_modal.html' %}
-    {% endif %} -->
 
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const modalOverlay = document.getElementById("modal-overlay");
-            const calibrateModal = document.getElementById("calibrateModal");
-            const closeModalBtn = document.getElementById("close-modal-btn");
-            const showCalibrate = {{ 'true' if show_calibrate_button else 'false' }}
-        }
-        };
-
-        // Ensure elements are found and showCalibrate is true
-        if (showCalibrate && modalOverlay && calibrateModal) {
-            modalOverlay.style.display = "block";
-            calibrateModal.style.display = "block";
-        }
-
-        closeModalBtn?.addEventListener("click", () => {
-            modalOverlay.style.display = "none";
-            calibrateModal.style.display = "none";
-        });
-
-        modalOverlay?.addEventListener("click", () => {
-            modalOverlay.style.display = "none";
-            calibrateModal.style.display = "none";
-        });
-    });
-    </script> -->
     <script src="/static/js/main.js"></script>
 
     <div>
