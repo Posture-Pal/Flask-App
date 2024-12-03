@@ -1,14 +1,15 @@
 from datetime import datetime, timedelta
 import os
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request
+from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request, abort
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
 from flask_dance.contrib.github import make_github_blueprint, github
 from dotenv import load_dotenv
+import json
 import pymysql
-
-import my_db
+import time
+import my_db, pb
 
 from my_db import get_threshold_by_user_id
 
@@ -66,7 +67,7 @@ app.register_blueprint(google_bp, url_prefix="/login")
 # redirect to home if the user is already logged in
 def index():
     if "user" in session and session["user"] != "Guest":
-        return redirect(url_for("home"))
+        return redirect(url_for("protected_area"))
     else:
         return render_template("index.html")
 
@@ -425,6 +426,95 @@ def save_power_session():
             return jsonify({"message": message}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+def login_is_required(function):
+    def wrapper(*args, **kwargs):
+        if "google_id" not in session:
+            return abort(401)  # Authorization required
+        else:
+            return function()
+    return wrapper
+
+@app.route("/protected_area")
+# @login_is_required
+def protected_area():
+    # my_db.add_user_and_login(session['user'], session['google_client_id'])
+    return render_template("protected_area.html", google_client_id = 'google_clientid_for_admin_user', online_users = my_db.get_all_logged_in_users())
+
+@app.route('/grant-<google_client_id>-<read>-<write>', methods=["POST"])
+def grant_access(google_client_id, read, write):
+    if session.get('google_client_id'):
+        if session['google_client_id'] == 'google_clientid_for_admin_user':
+            print(f"Admin granting {session.user}-{read}-{write}")
+            my_db.add_user_permission(google_client_id, read, write)
+            if read=="true" and write=="true":
+                token = pb.grant_read_and_write_access(google_client_id)
+                my_db.add_token(google_client_id, token)
+                access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id}
+                return json.dumps(access_response)
+            elif read=="true" and write=="false":
+                token = pb.grant_read_access(google_client_id)
+                my_db.add_token(google_client_id, token)
+                access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id}
+                return json.dumps(access_response)
+            elif read=="false" and write=="true":
+                token = pb.grant_write_access(google_client_id)
+                my_db.add_token(google_client_id, token)
+                access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id}
+                return json.dumps(access_response)
+            else:
+                access_response={'token':123, 'cipher_key':pb.cipher_key, 'uuid':google_client_id}
+                return json.dumps(access_response)
+        else:
+            print(f"Non admin attempting to grant privileges {session.user}-{read}-{write}")
+            my_db.add_user_permission(google_client_id, read, write)
+            token = my_db.get_token(google_client_id)
+            if token is not None:
+                timestamp, ttl, google_client_id, read, write = pb.parse_token(token)
+                current_time = time.time
+                if(timestamp + (ttl*60)) - current_time > 0:
+                    print("Token is still valid")
+                    access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id} 
+                    return json.dumps(access_response)
+                else:
+                    print("Token refresh needed")
+                    if read and write:
+                        token = pb.grant_read_write_access(google_client_id)
+                        my_db.add_token(google_client_id, token)
+                        access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id} 
+                        return json.dumps(access_response)
+                    elif read:
+                        token = pb.grant_read_access(google_client_id)
+                        my_db.add_token(google_client_id, token)
+                        access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id} 
+                        return json.dumps(access_response)
+                    elif read:
+                        token = pb.gran_write_access(google_client_id)
+                        my_db.add_token(google_client_id, token)
+                        access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id} 
+                        return json.dumps(access_response)
+                    else:
+                        access_response={'token':123, 'cipher_key':pb.cipher_key, 'uuid':google_client_id}
+                        return json.dumps(access_response)
+  
+
+@app.route('/get_user_token', methods=['POST'])
+def get_user_token():
+    user_id = session['google_client_id']
+    token = my_db.get_token(session.google_client_id)
+    if token is not None:
+        token = get_or_refresh_token(token)
+        token_response = {'token':token, 'cipher_key':pb.cipher_key, 'uuid':session.google_client_id}
+    else:
+        token_response = {'token':123, 'cipher_key':pb.cipher_key, 'uuid':session.google_client_id}
+
+def get_or_refresh_token(token):
+    timestamp, ttl, uuid, read, write = pb.parse_token(token)
+    current_time = time.time()
+    if(timestamp+(ttl*60)) - current_time > 0:
+        return token
+    else:
+        return grant_access(uuid, read, write)
 
 
 if __name__ == "__main__":

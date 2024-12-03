@@ -307,3 +307,57 @@ def save_power_session(user_id, power_on):
         db.session.rollback()
         print(f"Error in save_power_session: {e}")
         raise Exception(f"Error saving power session: {e}")
+
+def add_token(user_id, token):
+    row = get_user_row_if_exists(user_id)
+    if row is not False:
+        row.token = token
+        db.session.commit()
+        
+def get_token(user_id):
+    row = get_user_row_if_exists(user_id)
+    if row is not False:
+        return row.token
+    else:
+        print("User with id: " + user_id + " doesn't exist")
+
+def view_all():
+    all_rows = User.query.all()
+    print_results(all_rows)
+
+def print_results(all_rows):
+    for n in range(0, len(all_rows)):
+        print(f"{all_rows[n].id} | {all_rows[n].name} | {all_rows[n].token} | {all_rows[n].login} | {all_rows[n].read_access} | {all_rows[n].write_access}")
+
+def get_all_logged_in_users():
+    rows = User.query.filter_by(login=1).all()
+    print_results(rows)
+    online_users = {"users":[]}
+    for row in rows:
+        if row.read_access == 0 and row.write_access == 0:
+            read = "unchecked"
+            write = "unchecked"
+        elif row.read_access == 1 and row.write_access == 0:
+            read = "checked"
+            write = "unchecked"
+        elif row.read_access == 0 and row.write_access == 1:
+            read = "unchecked"
+            write = "checked"
+        else:
+            read = "checked"
+            write = "checked"
+        online_users["users"].append([row.name, row.google_client_id, read, write])
+    return online_users
+
+def add_user_permission(google_client_id, read, write):
+    row = get_user_row_if_exists(google_client_id)
+    if row is not False:
+        if read=="true":
+            row.read_access=1
+        elif read=="false":
+            row.read_access=0
+        if write=="true":
+            row.write_access=1
+        elif write=="false":
+            row.write_access=0
+        db.session.commit()

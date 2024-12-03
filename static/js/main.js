@@ -8,6 +8,41 @@ const pubnub = new PubNub({
 
 const CHANNEL_NAME = "Posture-Pal";
 
+sendEvent('get_user_token');
+
+function grantAccess(ab)
+{
+    let userId = ab.id.split("-")[2];
+    let readState = document.getElementById("read-user-"+userId).checked;
+    let writeState = document.getElementById("write-user-"+userId).checked;
+    console.log("grant-"+userId+"-"+readState+"-"+writeState);
+    sendEvent("grant-"+userId+"-"+readState+"-"+writeState);
+}
+function sendEvent(value)
+{
+    fetch(value,
+    {
+        method:"POST",
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+        console.log(responseJson);
+        if(responseJson.hasOwnProperty('token'))
+        {
+            pubnub.setToken(responseJson.token);
+            // pubnub.setCipherKey(responseJson.cipher_key);
+            pubnub.setUUID(responseJson.uuid);
+            subscribe();
+        }
+    });
+}
+
+function subscribe()
+{
+    pubnub.subscription.subscribe();
+}
+
+
 function startListeningForUpdates() {
     console.log("Subscribing to channel:", CHANNEL_NAME);
 
