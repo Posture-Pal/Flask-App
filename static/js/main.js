@@ -271,17 +271,19 @@ function initToggleListeners() {
     vibrationToggle.addEventListener("change", sendModesStatus);
 }
 
-function updateCalibrationSectionVisibility(powerOn) {
+function updateCalibrationSectionVisibility(powerOn, thresholdExists) {
     const calibrationSection = document.getElementById("calibration-section");
 
-    // Ensure calibrationSection exists
     if (!calibrationSection) {
         console.error("Calibration section not found in the DOM");
         return;
     }
 
-    // Set display based on power state
-    calibrationSection.style.display = powerOn ? "block" : "none";
+    if (powerOn && !thresholdExists) {
+        calibrationSection.style.display = "block";
+    } else {
+        calibrationSection.style.display = "none";
+    }
 }
 
 function initApp() {
@@ -291,7 +293,7 @@ function initApp() {
     if (!powerToggle) {
         console.error("Power toggle not found in DOM");
     } else {
-        updateCalibrationSectionVisibility(powerToggle.checked);
+        updateCalibrationSectionVisibility(powerToggle.checked, false);
 
         powerToggle.addEventListener("change", () => {
             const powerOn = powerToggle.checked;
@@ -320,7 +322,7 @@ function initApp() {
                     console.error("Error saving power session:", error.response?.data?.error || error.message);
                 });
 
-            updateCalibrationSectionVisibility(powerOn);
+            updateCalibrationSectionVisibility(powerOn, false);
         });
     }
 
@@ -362,9 +364,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .get("/get_power_state")
         .then((response) => {
             const powerOn = response.data.power_on;
+            const thresholdExists = response.data.threshold_exists;
+
             powerToggle.checked = powerOn;
 
-            updateCalibrationSectionVisibility(powerOn);
+            updateCalibrationSectionVisibility(powerOn, thresholdExists);
         })
         .catch((error) => {
             console.error("Error fetching initial power state:", error.response?.data?.error || error.message);

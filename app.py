@@ -441,10 +441,12 @@ def get_power_state():
 
         latest_session = PowerSessions.query.filter_by(user_id=user_id).order_by(PowerSessions.timestamp.desc()).first()
 
-        if not latest_session:
-            return jsonify({"power_on": False, "message": "No power session data available."}), 200
+        threshold_exists = my_db.has_threshold_for_user(user_id)
 
-        return jsonify({"power_on": latest_session.power_on}), 200
+        if not latest_session:
+            return jsonify({"power_on": False, "threshold_exists": threshold_exists, "message": "No power session data available."}), 200
+
+        return jsonify({"power_on": latest_session.power_on, "threshold_exists": threshold_exists}), 200
 
     except Exception as e:
         print(f"Error retrieving power state: {e}")
