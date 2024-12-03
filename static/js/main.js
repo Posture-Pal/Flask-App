@@ -271,17 +271,31 @@ function initToggleListeners() {
     vibrationToggle.addEventListener("change", sendModesStatus);
 }
 
+function updateCalibrationSectionVisibility(powerOn) {
+    const calibrationSection = document.getElementById("calibration-section");
+
+    // Ensure calibrationSection exists
+    if (!calibrationSection) {
+        console.error("Calibration section not found in the DOM");
+        return;
+    }
+
+    // Set display based on power state
+    calibrationSection.style.display = powerOn ? "block" : "none";
+}
 
 function initApp() {
     startListeningForUpdates();
     const powerToggle = document.getElementById("powerToggle");
+
     if (!powerToggle) {
         console.error("Power toggle not found in DOM");
     } else {
-        powerToggle.addEventListener("change", () => {
-            const powerOn = powerToggle.checked; // Boolean: true (ON) or false (OFF)
+        updateCalibrationSectionVisibility(powerToggle.checked);
 
-            // Publish the message to PubNub
+        powerToggle.addEventListener("change", () => {
+            const powerOn = powerToggle.checked;
+
             const message = { power: powerOn };
             pubnub.publish(
                 {
@@ -297,15 +311,16 @@ function initApp() {
                 }
             );
 
-            // Send the power session data to the backend
             axios
-                .post("/save_power_session", { power_on: powerOn ? 1 : 0 }) // Convert to 1 or 0
+                .post("/save_power_session", { power_on: powerOn ? 1 : 0 })
                 .then((response) => {
                     console.log(response.data.message || "Power session saved successfully.");
                 })
                 .catch((error) => {
                     console.error("Error saving power session:", error.response?.data?.error || error.message);
                 });
+
+            updateCalibrationSectionVisibility(powerOn);
         });
     }
 
@@ -319,13 +334,42 @@ function initApp() {
     }
 
     const calibrateButton = document.getElementById("calibrate-btn");
-    calibrateButton.addEventListener("click", () => {
-        sendCalibrationMessage();
-    });
+    if (calibrateButton) {
+        calibrateButton.addEventListener("click", () => {
+            sendCalibrationMessage();
+        });
+    }
 
     initToggleListeners();
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    const powerToggle = document.getElementById("powerToggle");
+
+    if (!powerToggle) {
+        console.error("Power toggle not found in the DOM");
+        return;
+    }
+
+    const calibrationSection = document.getElementById("calibration-section");
+
+    if (!calibrationSection) {
+        console.error("Calibration section not found in the DOM");
+        return;
+    }
+
+    axios
+        .get("/get_power_state")
+        .then((response) => {
+            const powerOn = response.data.power_on;
+            powerToggle.checked = powerOn;
+
+            updateCalibrationSectionVisibility(powerOn);
+        })
+        .catch((error) => {
+            console.error("Error fetching initial power state:", error.response?.data?.error || error.message);
+        });
+});
 
 function populateTemperature(data) {
     const temperatureDiv = document.querySelector(".temperatureBoldText");

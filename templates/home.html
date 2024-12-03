@@ -25,7 +25,7 @@
     </div>
 
     <!-- Trying to get calibration button working -->
-    <div class="trying-calibration">
+    <div class="trying-calibration" id="calibration-section" style="display: none;">
         <div>
             <!-- Button to trigger calibration -->
             <button id="calibrate-btn">Calibrate Posture</button>
@@ -102,9 +102,9 @@
     </div>
     <!-- <a href="{{ url_for('logout') }}">Logout</a> -->
     <br><br>
-    {% if show_calibrate_button %}
+    <!-- {% if show_calibrate_button %}
     {% include '_calibration_modal.html' %}
-    {% endif %}
+    {% endif %} -->
 
     <!-- <script>
         document.addEventListener("DOMContentLoaded", () => {
