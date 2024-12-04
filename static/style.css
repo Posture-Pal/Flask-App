@@ -2,6 +2,7 @@ body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
 *,
@@ -59,11 +60,172 @@ main {
     color: #163F53;
 }
 
+.siteNavbar2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    background-color: white;
+    width: 100%;
+    z-index: 700;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-size: 20px;
+}
+
+.siteNavbar2 a {
+    text-decoration: none;
+    color: #163F53;
+}
+
 .active a {
     background-color: #163F53;
     color: white;
     padding: 10px;
     border-radius: 30px;
+}
+
+.active a:hover {
+    background-color: #376888;
+    transition: 0.3s;
+}
+
+.siteContainer {
+    min-height: 100vh;
+    background-color: #E0F3FF;
+    display: flex;
+    flex-direction: column;
+}
+
+.productContainer {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    overflow: visible;
+    position: relative;
+    max-width: 600px;
+    width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.productContainer:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+}
+
+.productImage {
+    position: absolute;
+    left: -100px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    height: 200px;
+    z-index: 1;
+}
+
+.productImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.productDetails {
+    padding-left: 110px;
+    flex: 1;
+}
+
+.fontCol {
+    color: #16455F;
+}
+
+.colorOptions {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    transition: transform 0.2s ease;
+}
+
+.circle:hover {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+.price {
+    font-size: 30px;
+    color: #43748B;
+}
+
+.productButton {
+    padding: 10px 20px;
+    background-color: #163f53;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: auto;
+    display: inline-block; 
+    margin: 10px 0;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.productButton:hover {
+    background-color: #376888;
+}
+
+
+/* scrolling boxes reference: https://codepen.io/tlattimore/pen/rxzWyY */
+.merchContainer {
+    width: 100%;
+    overflow: hidden;
+    margin: auto;
+    position: relative;
+}
+
+.merchBanner {
+    display: flex;
+    animation: scroll 30s linear infinite;
+}
+
+.merchBanner li {
+    list-style: none;
+}
+
+.merchBanner img {
+    width: auto;
+    height: 500px;
+    margin: 0.5rem;
+    object-fit: cover;
+}
+
+.merchTitle {
+    margin-left: 50px;
+    color: #16455F;
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(-400%);
+    }
 }
 
 .motto {
