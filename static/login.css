@@ -37,12 +37,15 @@ body {
 
 #loginContainer {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 20px;
     opacity: 1;
     transition: opacity 1s ease;
     z-index: 500; /* make sure it's below the splashScreen */
+    background-color: #E0F3FF;
 }
 
 
@@ -73,9 +76,9 @@ body {
 
 
 .dividerLine {
-    width: 120%; 
+    width: 50%; 
     height: 2px;
-    background-color: #e0e0e0;}
+    background-color: #C4D4DC;}
 
 .socialIcons {
     display: flex;
@@ -83,14 +86,31 @@ body {
     width: 120%;
 }
 
-
-.socialIcon {
-    width: 50px;
-    height: 50px;
+.socialIcons a {
+    /* position: fixed;
+    bottom: 0; */
+    text-decoration: none;
     cursor: pointer;
     border-radius: 10px;
     background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    color: black;
+}
+
+.socialIcons a:hover {
+    background-color: #efefef;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+}
+
+.socialIcon {
+    width: 50px;
+    height: 50px;
 }
 
 /* ======================== Flash Message for Logout ======================== */

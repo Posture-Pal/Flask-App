@@ -24,40 +24,68 @@
 
 <body>
     <div id="splashScreen">
-        <img src="{{ url_for('static', filename='images/SplashScreen.png') }}" alt="Splash Screen Image" style="height: 70vh">
+        <img src="{{ url_for('static', filename='images/SplashScreen.png') }}" alt="Splash Screen Image" id="splashImage"
+            style="height: 70vh">
     </div>
 
-    <div id="loginContainer">
-        <!-- Display flash message for logout notification) -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flashMessages">
-            <ul>
-                {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
+    <div class="siteNavbar">
+        <a href="#posturepal">PosturePal</a>
+        <a href="about">Shop Now</a>
+        <a href="about">How To Use</a>
+        <a href="about">About Us</a>
+    </div>
+
+    <div id="mockup">
+        <img src="{{ url_for('static', filename='images/mockup2.png') }}" alt="mockup image"
+            id="floatingMockup">
+    </div>
+
+    <div class="indexContainer">
+        <div id="imageContainer">
+            <img src="https://media.licdn.com/dms/image/v2/D5612AQHCXFbqZ5_1Vg/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1675441617541?e=1738800000&v=beta&t=pWxi44cBUIBfafC5oHr5JSkyg6yNdu9ux8JJPo5_Q34"
+                alt="Posture Image">
         </div>
-        {% endif %}
-        {% endwith %}
 
-        <!-- PosturePal Logo -->
-        <img src="{{ url_for('static', filename='images/login.png') }}" alt="PosturePal Logo" class="posturePalLogo">
+        <div id="loginContainer">
+            <div class="motto">
+                <h1>Feel Better</h1>
+                <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Look Better</h1>
+                <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Be Better</h1>
+            </div>
+            <!-- Display flash message for logout notification) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flashMessages">
+                <ul>
+                    {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% endwith %}
 
-        <button class="loginButton">Login With</button>
+            <!-- PosturePal Logo -->
+            <img src="{{ url_for('static', filename='images/login.png') }}" alt="PosturePal Logo"
+                class="posturePalLogo">
 
-        <div class="dividerLine"></div>
+            <!-- <button class="loginButton">Login With</button> -->
 
-        <!-- Login icons for Facebook, Google, and GitHub -->
-        <div class="socialIcons">
+            <div class="dividerLine"></div>
 
-            <a href="{{ url_for('google.login') }}">
-                <img src="{{ url_for('static', filename='images/google_icon.png') }}" alt="Google Icon"
-                    class="socialIcon">
-            </a>
+            <!-- Login icons for Facebook, Google, and GitHub -->
+            <div class="socialIcons">
+                <a href="{{ url_for('google.login') }}">
+                    <img src="{{ url_for('static', filename='images/google_icon.png') }}" alt="Google Icon"
+                        class="socialIcon">
+                    Continue with Google
+                </a>
 
+            </div>
         </div>
     </div>
+
+
     <script src="{{ url_for('static', filename='splash.js') }}"></script>
 
     <script>
@@ -66,6 +94,14 @@
                 .then(() => console.log("Service Worker Registered"))
                 .catch((error) => console.error("Service Worker Registration Failed:", error));
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const mockupImage = document.getElementById('floatingMockup');
+
+            setTimeout(() => {
+                mockupImage.style.animationDuration = "5s";
+            }, 5000);
+        });
     </script>
 
 </body>
