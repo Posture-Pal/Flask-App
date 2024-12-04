@@ -401,6 +401,17 @@ def article4():
 def article5():
     return render_template("article5.html")
 
+@app.route("/shop")
+def shop():
+    return render_template("shop.html")
+
+@app.route("/howto")
+def howto():
+    return render_template("howto.html")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 @app.route("/save_power_session", methods=["POST"])
 def save_power_session():

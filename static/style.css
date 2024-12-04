@@ -59,6 +59,13 @@ main {
     color: #163F53;
 }
 
+.active a {
+    background-color: #163F53;
+    color: white;
+    padding: 10px;
+    border-radius: 30px;
+}
+
 .motto {
     color: #163f53;
 }

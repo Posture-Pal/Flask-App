@@ -29,10 +29,10 @@
     </div>
 
     <div class="siteNavbar">
-        <a href="#posturepal">PosturePal</a>
-        <a href="about">Shop Now</a>
-        <a href="about">How To Use</a>
-        <a href="about">About Us</a>
+        <div class="active"><a href="{{ url_for('index') }}">PosturePal</a></div>
+        <a href="{{ url_for('shop') }}">Shop Now</a>
+        <a href="{{ url_for('howto') }}">How To Use</a>
+        <a href="{{ url_for('about') }}">About Us</a>
     </div>
 
     <div id="mockup">
@@ -47,6 +47,7 @@
         </div>
 
         <div id="loginContainer">
+            <br>
             <div class="motto">
                 <h1>Feel Better</h1>
                 <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Look Better</h1>
