@@ -1,0 +1,120 @@
+body {
+            font-family: Arial, sans-serif;
+            background-color: #ddf1ff;
+            color: #2b617d;
+            text-align: center;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: #fffdd0;
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 72px;
+            margin-bottom: 25px;
+            color: #2b617d;
+            animation: slideIn 1s ease-out;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #2b617d;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        a {
+            color: #92c3e9;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: white;
+        }
+
+        .btn {
+            background-color: #92c3e9;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            animation: bounce 1s infinite alternate;
+        }
+
+        .btn:hover {
+            background-color: #2b617d;
+        }
+
+        @keyframes fadeIn {
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .image-container {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .image-container img {
+            width: 300px;
+            opacity: 0;
+            animation: fadeInImage 1s ease-in-out forwards;
+        }
+
+        @keyframes fadeInImage {
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0.6;
+            }
+        }

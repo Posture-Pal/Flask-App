@@ -1,5 +1,5 @@
 
-
+// TODO Remove publishKey, subscribeKey, uuid, CHANNEL_NAME from main.js
 const pubnub = new PubNub({
     publishKey: 'pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a',
     subscribeKey: 'sub-c-90478427-a073-49bc-b402-ba4903894284',
@@ -310,13 +310,6 @@ function initApp() {
     }
 
     fetchLastSlouchTemperature();
-
-    if (document.body.classList.contains("statistics-page")) {
-        setupStatisticsPage();
-    }
-    if (document.body.classList.contains("home-page")) {
-        setupHomePage();
-    }
 
     const calibrateButton = document.getElementById("calibrate-btn");
     calibrateButton.addEventListener("click", () => {

@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
 import os
+from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request
+from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request, abort
 from flask_dance.contrib.google import make_google_blueprint, google
-from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
-from flask_dance.contrib.github import make_github_blueprint, github
 from dotenv import load_dotenv
 import pymysql
 
@@ -39,7 +38,7 @@ def check_database_credentials(uri):
     except Exception as e:
         print("⚠️ Error while checking database credentials:", e)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])
@@ -63,7 +62,7 @@ google_bp = make_google_blueprint(
 app.register_blueprint(google_bp, url_prefix="/login")
 
 @app.route("/")
-# redirect to home if the user is already logged in
+# redirect to home if the user is already logged in otherwise don't do anything 
 def index():
     if "user" in session and session["user"] != "Guest":
         return redirect(url_for("home"))
@@ -90,6 +89,13 @@ def google_login():
 
     return redirect(url_for("home"))
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user" not in session or session["user"] == "Guest":
+            return redirect(url_for("not_authorized"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # logout route
 @app.route("/logout")
@@ -100,6 +106,7 @@ def logout():
 
 # home route
 @app.route("/home")
+@login_required
 def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
@@ -301,6 +308,7 @@ def get_last_available_data_date():
         return jsonify({"success": False, "message": "An error occurred."}), 500
 
 @app.route("/statistics", methods=["GET"])
+@login_required
 def statistics():
     try:
         user_email = session.get("email")
@@ -325,6 +333,7 @@ def statistics():
 
 
 @app.route("/information")
+@login_required
 def information():
     return render_template("information.html")
 
@@ -359,6 +368,7 @@ def last_slouch_temperature():
 
 
 @app.route("/settings")
+@login_required
 def settings():
     
     try:
@@ -382,22 +392,27 @@ def settings():
     
 
 @app.route("/article1")
+@login_required
 def article1():
     return render_template("article1.html")
 
 @app.route("/article2")
+@login_required
 def article2():
     return render_template("article2.html")
 
 @app.route("/article3")
+@login_required
 def article3():
     return render_template("article3.html")
 
 @app.route("/article4")
+@login_required
 def article4():
     return render_template("article4.html")
 
 @app.route("/article5")
+@login_required
 def article5():
     return render_template("article5.html")
 
@@ -436,6 +451,10 @@ def save_power_session():
             return jsonify({"message": message}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+@app.route("/not_authorized")
+def not_authorized():
+    return render_template("not_authorized.html"), 403
 
 
 if __name__ == "__main__":
