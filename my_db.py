@@ -10,7 +10,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
     google_client_id = db.Column(db.String(255), unique=True)
-    token = db.Column(db.String(255))
+    token = db.Column(db.String(260))
     login = db.Column(db.Integer)
     read_access = db.Column(db.Integer)     # to change access permissions
     write_access = db.Column(db.Integer)    # to change access permissions

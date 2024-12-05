@@ -1,12 +1,46 @@
-
+let aliveSecond = 0;
+let heartBeatRate = 5000;
 
 const pubnub = new PubNub({
     publishKey: 'pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a',
     subscribeKey: 'sub-c-90478427-a073-49bc-b402-ba4903894284',
-    uuid: "Posture-Pal",
+    uuid: "113667953823888935649",
+    authKey: 'token_not_valid'
+
 });
 
 const CHANNEL_NAME = "Posture-Pal";
+
+function time()
+{
+    let d = new Date();
+    let currentSecond = d.getTime();
+    if(currentSecond - aliveSecond > heartBeatRate + 1000)
+    {
+        console.log("Your connection is DEAD")
+    }
+    else
+    {
+        console.log("Your connection is ALIVE")
+        
+    }
+    setTimeout('time()', 1000);
+}
+
+function keepAlive()
+{
+    fetch('/keep_alive')
+    .then(response=>{
+        if(response.ok){
+            let date = new Date();
+            aliveSecond = date.getTime();
+            return response.json();
+        }
+        throw new Error("Server offline");
+    })
+    .catch(error=>console.log(error));
+    setTimeout('keepAlive()', heartBeatRate);
+}
 
 sendEvent('get_user_token');
 
@@ -25,11 +59,14 @@ function sendEvent(value)
         method:"POST",
     })
     .then(response => response.json())
-    .then(responseJson => {
-        console.log(responseJson);
+        .then(responseJson => {
+        
+        console.log("WHile fetching the toke inside sendEven: ",responseJson);
+    
         if(responseJson.hasOwnProperty('token'))
         {
-            pubnub.setToken(responseJson.token);
+            pbToken = responseJson.token;
+            pubnub.setToken(pbToken);
             // pubnub.setCipherKey(responseJson.cipher_key);
             pubnub.setUUID(responseJson.uuid);
             subscribe();
@@ -39,7 +76,12 @@ function sendEvent(value)
 
 function subscribe()
 {
-    pubnub.subscription.subscribe();
+    console.log("Trying to subscribe with token");
+
+    const channel = pubnub.channel(CHANNEL_NAME);
+    //create a subscription
+    const subscription = channel.subscription();
+    subscription.subscribe();
 }
 
 
@@ -159,6 +201,7 @@ function startListeningForUpdates() {
                 updateThresholdTable(event.message.calibration_data);
             } else if (event.message.sensor_data) {
                 // If it's regular sensor data, update the UI
+             
                 updateDataInHTML(event.message);
             }
         },
@@ -246,33 +289,33 @@ function updateThresholdTable(data) {
         });
 }
 
-function startListeningForUpdates() {
-    console.log("Subscribing to channel:", CHANNEL_NAME);
+// function startListeningForUpdates() {
+//     console.log("Subscribing to channel:", CHANNEL_NAME);
 
-    pubnub.subscribe({ channels: [CHANNEL_NAME] });
+//     pubnub.subscribe({ channels: [CHANNEL_NAME] });
 
-    pubnub.addListener({
-        message: (event) => {
-            console.log("Received message:", event.message);
+//     pubnub.addListener({
+//         message: (event) => {
+//             console.log("Received message:", event.message);
 
-            // check the type of message and call the appropriate function
-            if (event.message.thresholds) {
-                // handle calibration data
-                updateThresholdTable(event.message);
-            } else {
-                // handle regular sensor data
-                updateDataInHTML(event.message);
-            }
-        },
-        status: (statusEvent) => {
-            if (statusEvent.category === "PNConnectedCategory") {
-                console.log("Successfully connected to PubNub channel.");
-            } else {
-                console.warn("PubNub connection status:", statusEvent);
-            }
-        },
-    });
-}
+//             // check the type of message and call the appropriate function
+//             if (event.message.thresholds) {
+//                 // handle calibration data
+//                 updateThresholdTable(event.message);
+//             } else {
+//                 // handle regular sensor data
+//                 updateDataInHTML(event.message);
+//             }
+//         },
+//         status: (statusEvent) => {
+//             if (statusEvent.category === "PNConnectedCategory") {
+//                 console.log("Successfully connected to PubNub channel.");
+//             } else {
+//                 console.warn("PubNub connection status:", statusEvent);
+//             }
+//         },
+//     });
+// }
 
 function sendModesStatus() {
     const soundToggle = document.getElementById("soundToggle").checked;

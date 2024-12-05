@@ -17,6 +17,9 @@ load_dotenv()
 
 db = my_db.db
 
+alive=0
+data={}
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
@@ -71,6 +74,14 @@ def index():
     else:
         return render_template("index.html")
 
+@app.route("/keep_alive")
+def keep_alive():
+    global alive, data
+    alive += 1
+    keep_alive_count = str(alive)
+    data["keep_alive"] = keep_alive_count
+    parsed_json = json.dumps(data)
+    return str(parsed_json)
 
 # google login route
 @app.route("/google_login")
@@ -439,16 +450,17 @@ def login_is_required(function):
 # @login_is_required
 def protected_area():
     # my_db.add_user_and_login(session['user'], session['google_client_id'])
-    return render_template("protected_area.html", google_client_id = 'google_clientid_for_admin_user', online_users = my_db.get_all_logged_in_users())
+    return render_template("protected_area.html", google_client_id = 'adming_google_id', online_users = my_db.get_all_logged_in_users())
 
 @app.route('/grant-<google_client_id>-<read>-<write>', methods=["POST"])
 def grant_access(google_client_id, read, write):
     if session.get('google_client_id'):
-        if session['google_client_id'] == 'google_clientid_for_admin_user':
-            print(f"Admin granting {session.user}-{read}-{write}")
+        if session['google_client_id'] == 'adming_google_id':
+            print(f"Admin granting {session['user']}-{read}-{write}")
             my_db.add_user_permission(google_client_id, read, write)
             if read=="true" and write=="true":
                 token = pb.grant_read_and_write_access(google_client_id)
+                print("printing token for call for grant_read_and_write_access", token)
                 my_db.add_token(google_client_id, token)
                 access_response={'token':token, 'cipher_key':pb.cipher_key, 'uuid':google_client_id}
                 return json.dumps(access_response)
@@ -498,18 +510,46 @@ def grant_access(google_client_id, read, write):
                         return json.dumps(access_response)
   
 
+# @app.route('/get_user_token', methods=['POST'])
+# def get_user_token():
+#     user_id = session['google_client_id']
+#     token = my_db.get_token(user_id)
+#     if token is not None:
+#         token = get_or_refresh_token(token)
+#         token_response = {'token':token, 'cipher_key':pb.cipher_key, 'uuid':session.google_client_id}
+#     else:
+#         token_response = {'token':123, 'cipher_key':pb.cipher_key, 'uuid':session.google_client_id}
+
+#     return json.dumps(token_response)
+
 @app.route('/get_user_token', methods=['POST'])
 def get_user_token():
+    if 'google_client_id' not in session:
+        return jsonify({'error': 'User not authenticated'}), 401
+
     user_id = session['google_client_id']
-    token = my_db.get_token(session.google_client_id)
-    if token is not None:
+    token = my_db.get_token(user_id)
+
+    if token:
         token = get_or_refresh_token(token)
-        token_response = {'token':token, 'cipher_key':pb.cipher_key, 'uuid':session.google_client_id}
     else:
-        token_response = {'token':123, 'cipher_key':pb.cipher_key, 'uuid':session.google_client_id}
+        # Generate a new token if none exists
+        token = grant_access(user_id, read=True, write=True)
+        # my_db.update_token(user_id, token)  # Ensure you have a method to save the new token
+
+    token_response = {
+        'token': token,
+        'cipher_key': pb.cipher_key,
+        'uuid': user_id
+    }
+    print("Pritnting the token resp",token_response)
+    return jsonify(token_response)
 
 def get_or_refresh_token(token):
     timestamp, ttl, uuid, read, write = pb.parse_token(token)
+    print(timestamp)
+    print(ttl)
+    print(uuid)
     current_time = time.time()
     if(timestamp+(ttl*60)) - current_time > 0:
         return token
