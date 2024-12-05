@@ -6,19 +6,17 @@ from flask import Flask, render_template, redirect, url_for, session, flash, jso
 from flask_dance.contrib.google import make_google_blueprint, google
 from dotenv import load_dotenv
 import pymysql
-
 import my_db
 
-from my_db import get_threshold_by_user_id
-
 load_dotenv()
-
 db = my_db.db
-
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
 
-# logic to check for defualt or no password
+
 def check_database_credentials(uri):
     try:
         # parse URI
@@ -38,12 +36,7 @@ def check_database_credentials(uri):
     except Exception as e:
         print("⚠️ Error while checking database credentials:", e)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])
-
-db.init_app(app)
 
 
 if os.getenv("OAUTHLIB_INSECURE_TRANSPORT") == "1":
@@ -62,15 +55,12 @@ google_bp = make_google_blueprint(
 app.register_blueprint(google_bp, url_prefix="/login")
 
 @app.route("/")
-# redirect to home if the user is already logged in otherwise don't do anything 
 def index():
     if "user" in session and session["user"] != "Guest":
         return redirect(url_for("home"))
     else:
         return render_template("index.html")
 
-
-# google login route
 @app.route("/google_login")
 def google_login():
     if not google.authorized:
@@ -97,14 +87,12 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# logout route
 @app.route("/logout")
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for("index"))
 
-# home route
 @app.route("/home")
 @login_required
 def home():
@@ -211,9 +199,6 @@ def save_threshold_data():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
-        
-# #route to get data for statistics page
 @app.route("/get_posture_data", methods=["GET"])
 def get_posture_data():
     try:
@@ -331,7 +316,6 @@ def statistics():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route("/information")
 @login_required
 def information():
@@ -365,12 +349,9 @@ def last_slouch_temperature():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
 @app.route("/settings")
 @login_required
-def settings():
-    
+def settings(): 
     try:
         user_email = session.get("email")
         
@@ -387,9 +368,7 @@ def settings():
 
     except Exception as e:
         print(f"Error in settings route: {e}")
-        return "An error occurred.", 500
-    
-    
+        return "An error occurred.", 500 
 
 @app.route("/article1")
 @login_required
