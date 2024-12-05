@@ -6,7 +6,7 @@ from flask import Flask, render_template, redirect, url_for, session, flash, jso
 from flask_dance.contrib.google import make_google_blueprint, google
 from dotenv import load_dotenv
 import pymysql
-import my_db
+import my_db, pb
 
 load_dotenv()
 db = my_db.db
@@ -72,10 +72,18 @@ def google_login():
         return "Error: Unable to fetch user information from Google."
 
     user_info = response.json()
-    print("User Info:", user_info)
+
     session["user"] = user_info.get("name", "Unknown User")
     session["email"] = user_info.get("email", "No email provided")
     session["google_client_id"] = user_info.get("id")
+
+    my_db.add_user_and_login(user_info.get("name"), user_info.get("id"), user_info.get("email"))
+
+    token = pb.generate_token(user_info.get("id"))
+
+    if token:
+        my_db.update_user_token(user_info.get("id"), token)
+        session["token"] = token 
 
     return redirect(url_for("home"))
 
@@ -100,16 +108,18 @@ def home():
     email = session.get("email", "No email provided")
     google_client_id = session.get("google_client_id", "No client_id provided")
 
-    my_db.add_user_and_login(user, google_client_id, email)
-
     show_calibrate_button = True
     user_data = my_db.get_user_by_email(email)
 
     usage_today = 0
+    token = None
     if user_data:
         user_id = user_data.get("id")
         show_calibrate_button = not my_db.has_threshold_for_user(user_id)
         usage_today = my_db.calculate_daily_usage(user_id)
+        user_record = my_db.get_user_row_if_exists(google_client_id)
+        if user_record:
+            token = user_record.token
 
     # get today's reminder count
     todays_reminders = my_db.count_todays_reminders()
@@ -121,7 +131,8 @@ def home():
         email=email,
         show_calibrate_button=show_calibrate_button,
         todays_reminders=todays_reminders,
-        usage_today=usage_today
+        usage_today=usage_today,
+        token=token,
     )
 
 @app.route("/save_sensor_data", methods=["POST"])
