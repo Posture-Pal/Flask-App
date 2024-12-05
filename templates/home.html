@@ -100,38 +100,7 @@
             </div>
         </div>
     </div>
-    <!-- <a href="{{ url_for('logout') }}">Logout</a> -->
-    <br><br>
-    {% if show_calibrate_button %}
-    {% include '_calibration_modal.html' %}
-    {% endif %}
 
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const modalOverlay = document.getElementById("modal-overlay");
-            const calibrateModal = document.getElementById("calibrateModal");
-            const closeModalBtn = document.getElementById("close-modal-btn");
-            const showCalibrate = {{ 'true' if show_calibrate_button else 'false' }}
-        }
-        };
-
-        // Ensure elements are found and showCalibrate is true
-        if (showCalibrate && modalOverlay && calibrateModal) {
-            modalOverlay.style.display = "block";
-            calibrateModal.style.display = "block";
-        }
-
-        closeModalBtn?.addEventListener("click", () => {
-            modalOverlay.style.display = "none";
-            calibrateModal.style.display = "none";
-        });
-
-        modalOverlay?.addEventListener("click", () => {
-            modalOverlay.style.display = "none";
-            calibrateModal.style.display = "none";
-        });
-    });
-    </script> -->
     <script src="/static/js/main.js"></script>
 
     <div>

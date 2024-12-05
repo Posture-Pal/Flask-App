@@ -806,6 +806,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let homePagePostureChart;
 
     const noDataMessage = document.getElementById("noDataMessage");
+    const homePagePostureChartContainer = document.getElementById("homePagePostureChart");
 
     // Helper function to fetch today's date
     function getTodayDate() {
@@ -848,10 +849,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to display or hide the "No Data Available" message
     function displayNoDataMessage(show) {
         if (show) {
-            noDataMessage.style.display = "block";
+            noDataMessage.style.display = "flex";
+            homePagePostureChartContainer.style.display = "none";
             if (homePagePostureChart) homePagePostureChart.destroy();
         } else {
             noDataMessage.style.display = "none";
+            homePagePostureChartContainer.style.display = "block";
         }
     }
 
@@ -1039,3 +1042,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetching statistics for today
     fetchTodayStatistics();
 });
+
+// only display the disclaimer on information page once
+document.addEventListener("DOMContentLoaded", function () {
+    const disclaimer = document.getElementById("disclaimerAlert");
+
+    if (localStorage.getItem("disclaimerDismissed") !== "true") {
+        disclaimer.classList.remove("hidden");
+    }
+});
+
+function dismissDisclaimer() {
+    localStorage.setItem("disclaimerDismissed", "true");
+}
