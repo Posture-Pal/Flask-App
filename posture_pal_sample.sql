@@ -55,7 +55,7 @@ CREATE TABLE power_sessions (
 );
 
 
--- Sample User Account
+-- Sample User Account (gmail - mihirucd@gmail.com, password - PosturePal@123)
 INSERT INTO users (id, name, google_client_id, token, login, read_access, write_access, email)
 VALUES (1, 'Mihir', '109565775953816462122', NULL, 1, 0, 0, 'mihirucd@gmail.com');
 
