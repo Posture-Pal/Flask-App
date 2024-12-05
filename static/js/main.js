@@ -1049,3 +1049,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetching statistics for today
     fetchTodayStatistics();
 });
+
+// only display the disclaimer on information page once
+document.addEventListener("DOMContentLoaded", function () {
+    const disclaimer = document.getElementById("disclaimerAlert");
+
+    if (localStorage.getItem("disclaimerDismissed") !== "true") {
+        disclaimer.classList.remove("hidden");
+    }
+});
+
+function dismissDisclaimer() {
+    localStorage.setItem("disclaimerDismissed", "true");
+}

@@ -563,10 +563,14 @@ main {
     color: black;
 }
 
+.hidden {
+    display: none;
+}
+
 .infoCards {
     font-size: 22px;
     font-weight: 400;
-    margin: 40px;
+    margin: 20px;
 }
 
 .infoCards img {
