@@ -17,12 +17,39 @@
 </head>
 
 <body>
-    <div class="siteNavbar2">
-        <a href="{{ url_for('index') }}">PosturePal</a>
-        <a href="{{ url_for('shop') }}">Shop Now</a>
-        <a href="{{ url_for('howto') }}">How To Use</a>
-        <div class="active"><a href="{{ url_for('about') }}">About Us</a></div>
-    </div>
+    <div class="siteContainer">
+        <div class="siteNavbar2">
+            <a href="{{ url_for('index') }}">PosturePal</a>
+            <a href="{{ url_for('shop') }}">Shop Now</a>
+            <a href="{{ url_for('howto') }}">How To Use</a>
+            <div class="active"><a href="{{ url_for('about') }}">About Us</a></div>
+        </div>
+        <div class="aboutContainer">
+            <h1>Meet The Team</h1>
+            <div class="team">
+                <div class="team-member">
+                    <img src="https://i.ibb.co/G0WYHLL/image.png" alt="Team Member 1">
+                    <p>Harjappan Singh</p>
+                </div>
+                <div class="team-member">
+                    <img src="https://i.ibb.co/GVCLnR6/image.png" alt="Team Member 2">
+                    <p>Elga Jerusha Henry</p>
+                </div>
+                <div class="team-member">
+                    <img src="https://i.ibb.co/fx7DdST/image.png" alt="Team Member 3">
+                    <p>Mila Murphy</p>
+                </div>
+                <div class="team-member">
+                    <img src="https://i.ibb.co/82pk71H/image.png" alt="Team Member 4">
+                    <p>Meghana Rathnam</p>
+                </div>
+            </div>
+            <br><br>
+            <h1>About PosturePal</h1>
+            <div class="whiteBox">
+                <p>PosturePal is a posture tracking device that sends your real-time posture data to an accompanying app. You can get alerted for when you are slouching and view your daily usage statistics as well as past slouch data. There is flexibility in how you use our app, as you can choose to re-calibrate for if you want to change your posture, toggle between sound and vibration alerts, check the temperature of the device to ensure it's not overheating and various other features. Try it out today!</p>
+            </div>
+        </div>
 </body>
 
 </html>
