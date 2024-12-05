@@ -84,7 +84,7 @@ main {
 .active a {
     background-color: #163F53;
     color: white;
-    padding: 10px;
+    padding: 10px 16px;
     border-radius: 30px;
 }
 
@@ -108,7 +108,7 @@ main {
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
     overflow: visible;
     position: relative;
-    max-width: 600px;
+    max-width: 800px;
     width: 100%;
     margin: 20px auto;
     padding: 20px;
@@ -122,11 +122,11 @@ main {
 
 .productImage {
     position: absolute;
-    left: -100px;
+    left: -90px;
     top: 50%;
     transform: translateY(-50%);
-    width: 200px;
-    height: 200px;
+    width: 400px;
+    height: 400px;
     z-index: 1;
 }
 
@@ -139,7 +139,7 @@ main {
 }
 
 .productDetails {
-    padding-left: 110px;
+    padding-left: 350px;
     flex: 1;
 }
 
@@ -200,7 +200,7 @@ main {
 
 .merchBanner {
     display: flex;
-    animation: scroll 30s linear infinite;
+    animation: scroll 25s linear infinite;
 }
 
 .merchBanner li {
@@ -221,10 +221,10 @@ main {
 
 @keyframes scroll {
     from {
-        transform: translateX(100%);
+        transform: translateX(0);
     }
     to {
-        transform: translateX(-400%);
+        transform: translateX(-347%);
     }
 }
 
@@ -318,6 +318,14 @@ main {
     left: 32px;
 }
 
+.logo a {
+    text-decoration: none;
+    color: #163F53;
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+    font-size: 35px;
+}
+
 .logo img {
     height: 48px;
 }
@@ -396,6 +404,10 @@ main {
 }
 
 .usageBoldText {
+    font-weight: bold;
+}
+
+.temperatureBoldText {
     font-weight: bold;
 }
 
@@ -605,11 +617,11 @@ footer {
     align-items: center;
 }
 
-@media screen and (max-width: 1200px) {
+/* @media screen and (max-width: 1200px) {
     .logo img {
         height: 40px;
     }
-}
+} */
 
 @media screen and (max-width: 800px) {
     .sidenav {

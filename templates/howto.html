@@ -12,16 +12,18 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
         rel="stylesheet">
-        
+
     <title>PosturePal</title>
 </head>
 
 <body>
-    <div class="siteNavbar2">
-        <a href="{{ url_for('index') }}">PosturePal</a>
-        <a href="{{ url_for('shop') }}">Shop Now</a>
-        <div class="active"><a href="{{ url_for('howto') }}">How To Use</a></div>
-        <a href="{{ url_for('about') }}">About Us</a>
+    <div class="siteContainer">
+        <div class="siteNavbar2">
+            <a href="{{ url_for('index') }}">PosturePal</a>
+            <a href="{{ url_for('shop') }}">Shop Now</a>
+            <div class="active"><a href="{{ url_for('howto') }}">How To Use</a></div>
+            <a href="{{ url_for('about') }}">About Us</a>
+    </div>
     </div>
 </body>
 
