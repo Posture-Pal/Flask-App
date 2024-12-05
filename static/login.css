@@ -1,10 +1,4 @@
-/* Reset default styles */
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box; }
+/*
 body {
     font-family: 'Poppins', sans-serif;
     display: flex;
@@ -12,7 +6,7 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #f0f0f0;
-}
+} */
 
 #splashScreen {
     position: fixed;
@@ -40,6 +34,7 @@ body {
 /* ======================== Login Container ======================== */
 
 #loginContainer {
+    height: 100vh;
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -87,7 +82,7 @@ body {
 .socialIcons {
     display: flex;
     justify-content: space-around;
-    width: 120%;
+    width: 100%;
 }
 
 .socialIcons a {

@@ -18,13 +18,19 @@
 
 <body>
     <div class="siteContainer">
-        <div class="siteNavbar2">
-            <a href="{{ url_for('index') }}">PosturePal</a>
-            <a href="{{ url_for('shop') }}">Shop Now</a>
-            <a href="{{ url_for('howto') }}">How To Use</a>
-            <div class="active"><a href="{{ url_for('about') }}">About Us</a></div>
+        <div class="siteNavbar">
+            <div class="hamburger" onclick="toggleNav()">
+                &#9776;
+            </div>
+            <div class="navLinks">
+                <a href="{{ url_for('index') }}">PosturePal</a>
+                <a href="{{ url_for('shop') }}">Shop Now</a>
+                <a href="{{ url_for('howto') }}">How To Use</a>
+                <div class="active"><a href="{{ url_for('about') }}">About Us</a></div>
+            </div>
         </div>
-        <div class="aboutContainer">
+
+        <div class="aboutContainer" style="margin-top: 90px">
             <h1>Meet The Team</h1>
             <div class="team">
                 <div class="team-member">
@@ -50,6 +56,7 @@
                 <p>PosturePal is a posture tracking device that sends your real-time posture data to an accompanying app. You can get alerted for when you are slouching and view your daily usage statistics as well as past slouch data. There is flexibility in how you use our app, as you can choose to re-calibrate for if you want to change your posture, toggle between sound and vibration alerts, check the temperature of the device to ensure it's not overheating and various other features. Try it out today!</p>
             </div>
         </div>
+        <script src="/static/js/nav.js"></script>
 </body>
 
 </html>

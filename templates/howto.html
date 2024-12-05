@@ -18,14 +18,19 @@
 
 <body>
     <div class="siteContainer">
-        <div class="siteNavbar2">
-            <a href="{{ url_for('index') }}">PosturePal</a>
-            <a href="{{ url_for('shop') }}">Shop Now</a>
-            <div class="active"><a href="{{ url_for('howto') }}">How To Use</a></div>
-            <a href="{{ url_for('about') }}">About Us</a>
+        <div class="siteNavbar">
+            <div class="hamburger" onclick="toggleNav()">
+                &#9776;
+            </div>
+            <div class="navLinks">
+                <a href="{{ url_for('index') }}">PosturePal</a>
+                <a href="{{ url_for('shop') }}">Shop Now</a>
+                <div class="active"><a href="{{ url_for('howto') }}">How To Use</a></div>
+                <a href="{{ url_for('about') }}">About Us</a>
+            </div>
         </div>
 
-        <div class="howToBanner">
+        <div class="howToBanner" style="margin-top: 70px">
             <img src="https://i.ibb.co/X8Qx86q/smartmockups-m4alocvh.jpg" alt="how to banner">
             <h1>How To Use PosturePal</h1>
         </div>
@@ -104,6 +109,7 @@
             observer.observe(section);
         });
     </script>
+    <script src="/static/js/nav.js"></script>
 </body>
 
 </html>

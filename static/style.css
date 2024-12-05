@@ -60,25 +60,20 @@ main {
     color: #163F53;
 }
 
-.siteNavbar2 {
+.navLinks {
     display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    left: 0;
-    padding: 20px;
-    background-color: white;
-    width: 100%;
-    z-index: 700;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    font-size: 20px;
+    gap: 80px;
 }
 
-.siteNavbar2 a {
+.navLinks a {
     text-decoration: none;
     color: #163F53;
+}
+
+.hamburger {
+    display: none;
+    font-size: 30px;
+    cursor: pointer;
 }
 
 .active a {
@@ -99,6 +94,8 @@ main {
     display: flex;
     flex-direction: column;
 }
+
+/* ======================== Shop Page ==================================*/
 
 .productContainer {
     display: flex;
@@ -250,6 +247,8 @@ main {
         height: 70vh;
     }
 }
+
+/* ================================ How To Page ==================================*/
 
 .howToBanner {
     width: 100%; 
@@ -418,7 +417,6 @@ main {
     display: flex;
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
 }
 
 #imageContainer {
@@ -427,7 +425,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 #imageContainer img {
@@ -791,10 +789,110 @@ footer {
 
     #noDataMessage img {
         width: 130px;
-}
+    }   
 
     #homePagePostureChart {
         height: auto; 
+    }
+
+    .indexContainer {
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+
+    #loginContainer {
+        order: 1;
+        height: 100vh;
+        width: 100%;
+        margin-top: 30px;
+    }
+
+    #imageContainer {
+        order: 2;
+        height: 100vh;
+        width: 100%;
+        display: none;
+    }
+
+    #imageContainer img {
+        height: 100vh;
+        width: 100%;
+    }
+
+    #floatingMockup {
+        display: none;
+    }
+
+    .siteNavbar {
+        justify-content: flex-start;
+    }
+
+    .navLinks {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 200px;
+    text-align: left;
+    gap: 20px;
+    }
+
+    .navLinks a {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-left: 10px;
+    }
+
+    .hamburger {
+        display: block;
+        margin-right: 20px;
+    }
+
+    .navLinks.show {
+        display: flex;
+    }
+
+    .active a {
+        padding: 5px 10px;
+    }
+
+    .productContainer {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        width: 80%;
+    }
+
+    .productImage {
+        position: static;
+        width: 80%;
+        height: auto;
+        transform: none;
+        margin-bottom: 20px;
+    }
+
+    .productDetails {
+        padding-left: 0;
+        text-align: center;
+    }
+
+    .section-content {
+        flex-direction: column;
+        align-items: center;
+        width: 90%;
+    }
+
+    .section-content img {
+        max-width: 80%;
+        margin-bottom: 20px;
+    }
+
+    .text {
+        max-width: 80%;
     }
 }
 

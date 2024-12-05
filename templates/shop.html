@@ -18,14 +18,19 @@
 
 <body>
     <div class="siteContainer">
-        <div class="siteNavbar2">
-            <a href="{{ url_for('index') }}">PosturePal</a>
-            <div class=active><a href="{{ url_for('shop') }}">Shop Now</a></div>
-            <a href="{{ url_for('howto') }}">How To Use</a>
-            <a href="{{ url_for('about') }}">About Us</a>
+        <div class="siteNavbar">
+            <div class="hamburger" onclick="toggleNav()">
+                &#9776;
+            </div>
+            <div class="navLinks">
+                <a href="{{ url_for('index') }}">PosturePal</a>
+                <div class="active"><a href="{{ url_for('shop') }}">Shop Now</a></div>
+                <a href="{{ url_for('howto') }}">How To Use</a>
+                <a href="{{ url_for('about') }}">About Us</a>
+            </div>
         </div>
 
-        <div class="productContainer">
+        <div class="productContainer" style="margin-top: 100px">
             <div class="productImage">
                 <img src="https://m.media-amazon.com/images/I/613IfYrzvVL.jpg" alt="product image">
             </div>
@@ -66,6 +71,7 @@
 
 
     </div>
+    <script src="/static/js/nav.js"></script>
 </body>
 
 </html>

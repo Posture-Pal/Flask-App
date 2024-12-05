@@ -24,20 +24,24 @@
 
 <body>
     <div id="splashScreen">
-        <img src="{{ url_for('static', filename='images/SplashScreen.png') }}" alt="Splash Screen Image" id="splashImage"
-            style="height: 70vh">
+        <img src="{{ url_for('static', filename='images/SplashScreen.png') }}" alt="Splash Screen Image"
+            id="splashImage" style="height: 70vh">
     </div>
 
     <div class="siteNavbar">
-        <div class="active"><a href="{{ url_for('index') }}">PosturePal</a></div>
-        <a href="{{ url_for('shop') }}">Shop Now</a>
-        <a href="{{ url_for('howto') }}">How To Use</a>
-        <a href="{{ url_for('about') }}">About Us</a>
+        <div class="hamburger" onclick="toggleNav()">
+            &#9776;
+        </div>
+        <div class="navLinks">
+            <div class="active"><a href="{{ url_for('index') }}">PosturePal</a></div>
+            <a href="{{ url_for('shop') }}">Shop Now</a>
+            <a href="{{ url_for('howto') }}">How To Use</a>
+            <a href="{{ url_for('about') }}">About Us</a>
+        </div>
     </div>
 
     <div id="mockup">
-        <img src="{{ url_for('static', filename='images/mockup2.png') }}" alt="mockup image"
-            id="floatingMockup">
+        <img src="{{ url_for('static', filename='images/mockup2.png') }}" alt="mockup image" id="floatingMockup">
     </div>
 
     <div class="indexContainer">
@@ -88,6 +92,7 @@
 
 
     <script src="{{ url_for('static', filename='splash.js') }}"></script>
+    <script src="/static/js/nav.js"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
