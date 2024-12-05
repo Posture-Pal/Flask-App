@@ -6,22 +6,19 @@
 //     }, 2000);
 // });
 
-// splash screen now does not display if already seen
+// splash screen now only displays for new browser sessions
 document.addEventListener("DOMContentLoaded", () => {
     const splashScreen = document.getElementById("splashScreen");
 
-    const hasSeenSplash = localStorage.getItem("hasSeenSplash");
+    const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
 
     if (!hasSeenSplash) {
-        splashScreen.style.display = "flex"; 
-
+        splashScreen.classList.add("show");
         setTimeout(() => {
             splashScreen.classList.add("hidden");
-            splashScreen.style.display = "none"; 
-
-            localStorage.setItem("hasSeenSplash", "true");
-        }, 2000);
+            sessionStorage.setItem("hasSeenSplash", "true");
+        }, 2500);
     } else {
-        splashScreen.style.display = "none";
+        splashScreen.classList.add("hidden");
     }
 });

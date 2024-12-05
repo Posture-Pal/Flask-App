@@ -19,6 +19,8 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #C0DCF2;
+    transform: translateY(0);
+    opacity: 1;
     transition: transform 1s ease, opacity 1s ease;
 }
 
@@ -29,6 +31,7 @@ body {
 #splashScreen.hidden {
     transform: translateY(-100%);
     opacity: 0;
+    transition: transform 1s ease, opacity 1s ease, visibility 0s 1s;
 }
 
 /* ======================== Login Container ======================== */

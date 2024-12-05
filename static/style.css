@@ -229,22 +229,20 @@ main {
 }
 
 #splashImage {
+    will-change: transform;
     height: 30vh;
-    animation: splashResize 4s ease-in-out forwards;
+    animation: splashResize 2.5s ease-in-out forwards;
 }
 
 @keyframes splashResize {
     0% {
-        height: 50vh;
-    }
-    25% {
-        height: 90vh;
+        transform: scale(0.7);
     }
     50% {
-        height: 65vh;
+        transform: scale(1.1);
     }
     100% {
-        height: 70vh;
+        transform: scale(0.9);
     }
 }
 
