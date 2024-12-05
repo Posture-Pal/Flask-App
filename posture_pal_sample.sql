@@ -1,3 +1,7 @@
+-- Sample User Account
+INSERT INTO users (id, name, google_client_id, token, login, read_access, write_access, email)
+VALUES (1, 'John', '103440899543345016347', NULL, 1, 0, 0, 'johnposturepal@gmail.com');
+
 -- Threshold data
 INSERT INTO threshold (user_id, temp_overheat, temp_cold, humid_high, humid_low, pitch, gravity_x, gravity_y, gravity_z) 
 VALUES
