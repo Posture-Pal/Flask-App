@@ -590,6 +590,18 @@ body.dark-mode {
 
 /* =========================== Article Pages ==============================*/
 
+a.btn-primary {
+    font-size: 20px;
+    padding: 12px 18px;
+    background-color: #2B617D;
+    color: #ffffff !important;
+    border: none;
+}
+
+a.btn-primary:hover {
+    background-color: #1e4a60 !important;
+}
+
 /* .articleBanner {
 
 } */
@@ -927,6 +939,27 @@ footer {
     
     .control {
         margin-left: 0;
+    }
+
+    .flexArticle {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .articleContainer {
+        font-size: 18px;
+    }
+
+    .marginContainer h1 {
+        font-size: 24px;
+    }
+
+    .articleContainer h2 {
+        font-size: 20px;
+    }
+
+    ul {
+        margin-left: 15px;
     }
 }
 
