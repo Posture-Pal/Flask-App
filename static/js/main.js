@@ -3,7 +3,8 @@
 const pubnub = new PubNub({
     publishKey: 'pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a',
     subscribeKey: 'sub-c-90478427-a073-49bc-b402-ba4903894284',
-    uuid: "Posture-Pal",
+    uuid: window.userUUID,
+    authKey: window.token
 });
 
 const CHANNEL_NAME = "Posture-Pal";
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", initApp);
 
 // --- PubNub Communication ---
 function subscribeToChannel() {
-    console.log("Subscribing to channel:", CHANNEL_NAME);
+    console.log("Subscribing to channel:", CHANNEL_NAME, "with UUID:", pubnub.getUUID());
     pubnub.subscribe({ channels: [CHANNEL_NAME] });
     pubnub.addListener({
         message: handleIncomingMessage,
