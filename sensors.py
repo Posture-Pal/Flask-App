@@ -49,8 +49,9 @@ calibration_done = False
 pnconfig = PNConfiguration()
 pnconfig.subscribe_key = os.getenv("PUBNUB_SUBSCRIBE_KEY")
 pnconfig.publish_key = os.getenv("PUBNUB_PUBLISH_KEY")
-pnconfig.ssl = False
+pnconfig.ssl = True
 pnconfig.uuid = str(uuid.uuid4())
+pnconfig.secret_key = os.getenv("PUBNUB_SECRET_KEY")  
 pubnub = PubNub(pnconfig)
 
 CHANNEL = os.getenv("PUBNUB_UUID")
