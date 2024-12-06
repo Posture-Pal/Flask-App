@@ -121,14 +121,16 @@ class PowerSessions(db.Model):
 def get_user_row_if_exists(google_client_id):
     return User.query.filter_by(google_client_id=google_client_id).first()
 
-def add_user_and_login(name, google_client_id, email):
+def add_user_and_login(name, google_client_id, email, token=None):
     user = get_user_row_if_exists(google_client_id)
     
     if user:
         user.login = 1
+        if token:
+            user.token = token
         db.session.commit()
     else:
-        new_user = User(name, google_client_id, None, 1, 0, 0, email)
+        new_user = User(name, google_client_id, token, 1, 0, 0, email)
         db.session.add(new_user)
         db.session.commit()
 
@@ -307,3 +309,24 @@ def save_power_session(user_id, power_on):
         db.session.rollback()
         print(f"Error in save_power_session: {e}")
         raise Exception(f"Error saving power session: {e}")
+
+
+def update_user_token(google_client_id, token):
+    user = get_user_row_if_exists(google_client_id)
+    if user:
+        user.token = token
+        db.session.commit()
+    else:
+        print(f"User with Google Client ID {google_client_id} not found.")
+
+def get_user_token(google_client_id):
+    try:
+        user = User.query.filter_by(google_client_id=google_client_id).first()
+        if user:
+            return user.token
+        else:
+            print(f"User with Google Client ID {google_client_id} not found.")
+            return None
+    except Exception as e:
+        print(f"Error in get_user_token: {e}")
+        raise Exception(f"Error fetching user token: {e}")
