@@ -1,12 +1,29 @@
 const TOKEN_TTL_SECONDS = 5 * 60;
 let tokenRefreshTimer = null;
 
+
+const cryptoModule = {
+    encrypt: function (data) {
+        const key = "secret";
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
+        return encrypted;
+    },
+    decrypt: function (data) {
+        const key = "secret";
+        const bytes = CryptoJS.AES.decrypt(data, key);
+        const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        return decrypted;
+    }
+};
+
+
 // TODO Remove publishKey, subscribeKey, uuid, CHANNEL_NAME from main.js
 const pubnub = new PubNub({
     publishKey: 'pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a',
     subscribeKey: 'sub-c-90478427-a073-49bc-b402-ba4903894284',
     uuid: window.userUUID,
-    authKey: window.token
+    authKey: window.token,
+    cryptoModule: cryptoModule
 });
 
 const CHANNEL_NAME = "Posture-Pal";
@@ -34,24 +51,44 @@ function subscribeToChannel() {
 }
 
 function publishMessage(message, callback) {
-    pubnub.publish({ channel: CHANNEL_NAME, message }, (status, response) => {
-        if (status.error) {
-            console.error("Error publishing message:", status);
-        } else {
-            console.log("Message sent successfully:", response);
-        }
-        if (callback) callback(status, response);
-    });
+    try {
+        console.log("Original message:", message);
+
+        const encryptedMessage = cryptoModule.encrypt(message);
+        console.log("Encrypted message:", encryptedMessage);
+
+        pubnub.publish({ channel: CHANNEL_NAME, message: encryptedMessage }, (status, response) => {
+            if (status.error) {
+                console.error("Error publishing message:", status);
+            } else {
+                console.log("Message sent successfully:", response);
+            }
+            if (callback) callback(status, response);
+        });
+    } catch (error) {
+        console.error("Error in publishMessage:", error);
+    }
 }
 
 function handleIncomingMessage(event) {
-    console.log("Received message:", event.message);
-    if (event.message.thresholds) {
-        updateThresholdTable(event.message.thresholds);
-    } else if (event.message.sensor_data) {
-        updateSensorData(event.message.sensor_data);
+    try {
+        console.log("Received encrypted message:", event.message);
+
+        const decryptedMessage = cryptoModule.decrypt(event.message);
+        console.log("Decrypted message:", decryptedMessage);
+
+        if (decryptedMessage.thresholds) {
+            updateThresholdTable(decryptedMessage.thresholds);
+        } else if (decryptedMessage.sensor_data) {
+            updateSensorData(decryptedMessage.sensor_data);
+        } else {
+            console.log("Testing")
+        }
+    } catch (error) {
+        console.error("Error decrypting message:", error);
     }
 }
+
 
 function handlePubNubStatus(statusEvent) {
     if (statusEvent.category === "PNConnectedCategory") {
