@@ -6,19 +6,17 @@ from flask import Flask, render_template, redirect, url_for, session, flash, jso
 from flask_dance.contrib.google import make_google_blueprint, google
 from dotenv import load_dotenv
 import pymysql
-
-import my_db
-
-from my_db import get_threshold_by_user_id
+import my_db, pb
 
 load_dotenv()
-
 db = my_db.db
-
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
 
-# logic to check for defualt or no password
+
 def check_database_credentials(uri):
     try:
         # parse URI
@@ -38,12 +36,7 @@ def check_database_credentials(uri):
     except Exception as e:
         print("⚠️ Error while checking database credentials:", e)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])
-
-db.init_app(app)
 
 
 if os.getenv("OAUTHLIB_INSECURE_TRANSPORT") == "1":
@@ -62,15 +55,12 @@ google_bp = make_google_blueprint(
 app.register_blueprint(google_bp, url_prefix="/login")
 
 @app.route("/")
-# redirect to home if the user is already logged in otherwise don't do anything 
 def index():
     if "user" in session and session["user"] != "Guest":
         return redirect(url_for("home"))
     else:
         return render_template("index.html")
 
-
-# google login route
 @app.route("/google_login")
 def google_login():
     if not google.authorized:
@@ -82,10 +72,18 @@ def google_login():
         return "Error: Unable to fetch user information from Google."
 
     user_info = response.json()
-    print("User Info:", user_info)
+
     session["user"] = user_info.get("name", "Unknown User")
     session["email"] = user_info.get("email", "No email provided")
     session["google_client_id"] = user_info.get("id")
+
+    my_db.add_user_and_login(user_info.get("name"), user_info.get("id"), user_info.get("email"))
+
+    token = pb.generate_token(user_info.get("id"))
+
+    if token:
+        my_db.update_user_token(user_info.get("id"), token)
+        session["token"] = token 
 
     return redirect(url_for("home"))
 
@@ -97,14 +95,12 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# logout route
 @app.route("/logout")
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for("index"))
 
-# home route
 @app.route("/home")
 @login_required
 def home():
@@ -112,16 +108,18 @@ def home():
     email = session.get("email", "No email provided")
     google_client_id = session.get("google_client_id", "No client_id provided")
 
-    my_db.add_user_and_login(user, google_client_id, email)
-
     show_calibrate_button = True
     user_data = my_db.get_user_by_email(email)
 
     usage_today = 0
+    token = None
     if user_data:
         user_id = user_data.get("id")
         show_calibrate_button = not my_db.has_threshold_for_user(user_id)
         usage_today = my_db.calculate_daily_usage(user_id)
+        user_record = my_db.get_user_row_if_exists(google_client_id)
+        if user_record:
+            token = user_record.token
 
     # get today's reminder count
     todays_reminders = my_db.count_todays_reminders()
@@ -133,7 +131,8 @@ def home():
         email=email,
         show_calibrate_button=show_calibrate_button,
         todays_reminders=todays_reminders,
-        usage_today=usage_today
+        usage_today=usage_today,
+        token=token,
     )
 
 @app.route("/save_sensor_data", methods=["POST"])
@@ -211,9 +210,6 @@ def save_threshold_data():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
-        
-# #route to get data for statistics page
 @app.route("/get_posture_data", methods=["GET"])
 def get_posture_data():
     try:
@@ -331,7 +327,6 @@ def statistics():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route("/information")
 @login_required
 def information():
@@ -365,12 +360,9 @@ def last_slouch_temperature():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
 @app.route("/settings")
 @login_required
-def settings():
-    
+def settings(): 
     try:
         user_email = session.get("email")
         
@@ -387,9 +379,7 @@ def settings():
 
     except Exception as e:
         print(f"Error in settings route: {e}")
-        return "An error occurred.", 500
-    
-    
+        return "An error occurred.", 500 
 
 @app.route("/article1")
 @login_required

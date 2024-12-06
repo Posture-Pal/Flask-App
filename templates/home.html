@@ -101,6 +101,15 @@
         </div>
     </div>
 
+     <script>
+        window.userUUID = "{{ session['google_client_id'] }}"; 
+        window.token = "{{ session['token'] }}"; 
+
+        console.log('User UUID:', userUUID);
+        console.log('Token:', token);
+
+    </script>
+
     <script src="/static/js/main.js"></script>
 
     <div>
