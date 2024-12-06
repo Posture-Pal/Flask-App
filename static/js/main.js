@@ -1,3 +1,5 @@
+const TOKEN_TTL_SECONDS = 5 * 60;
+let tokenRefreshTimer = null;
 
 // TODO Remove publishKey, subscribeKey, uuid, CHANNEL_NAME from main.js
 const pubnub = new PubNub({
@@ -16,6 +18,7 @@ function initApp() {
     setupCalibrateButtonListener();
     setupToggleListeners();
     fetchLastSlouchTemperature();
+    initializeTokenManagement();
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
@@ -56,6 +59,43 @@ function handlePubNubStatus(statusEvent) {
     } else {
         console.warn("PubNub connection status:", statusEvent);
     }
+}
+
+// --- Token Management ---
+function initializeTokenManagement() {
+    console.log("Initializing token management...");
+    scheduleTokenRefresh();
+}
+
+function refreshToken() {
+    console.log("Refreshing token...");
+    axios.post('/refresh_user_token')
+        .then(response => {
+            const data = response.data;
+            if (data.success) {
+                console.log("Token refreshed successfully:", data.token);
+
+                pubnub.setAuthKey(data.token);
+
+                scheduleTokenRefresh();
+            } else {
+                console.error("Failed to refresh token:", data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error refreshing token:", error);
+        });
+}
+
+function scheduleTokenRefresh() {
+    if (tokenRefreshTimer) {
+        clearTimeout(tokenRefreshTimer);
+    }
+
+    const refreshTime = (TOKEN_TTL_SECONDS - 10) * 1000;
+    tokenRefreshTimer = setTimeout(refreshToken, refreshTime);
+
+    console.log("Token refresh scheduled in:", refreshTime / 1000, "seconds");
 }
 
 // --- UI Updates ---

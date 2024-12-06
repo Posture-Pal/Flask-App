@@ -318,3 +318,15 @@ def update_user_token(google_client_id, token):
         db.session.commit()
     else:
         print(f"User with Google Client ID {google_client_id} not found.")
+
+def get_user_token(google_client_id):
+    try:
+        user = User.query.filter_by(google_client_id=google_client_id).first()
+        if user:
+            return user.token
+        else:
+            print(f"User with Google Client ID {google_client_id} not found.")
+            return None
+    except Exception as e:
+        print(f"Error in get_user_token: {e}")
+        raise Exception(f"Error fetching user token: {e}")

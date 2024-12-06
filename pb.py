@@ -59,3 +59,15 @@ def parse_token(token, user_id):
     except Exception as e:
         print(f"Error parsing token: {e}")
         return None
+    
+def refresh_token(user_id, ttl=5):
+    try:
+        new_token = generate_token(user_id, ttl=ttl)
+        if new_token:
+            print(f"Token refreshed successfully for user: {user_id}")
+        else:
+            print(f"Failed to refresh token for user: {user_id}")
+        return new_token
+    except Exception as e:
+        print(f"Error in refresh_token: {e}")
+        return None
