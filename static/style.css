@@ -3,6 +3,7 @@ body {
     margin: 0;
     padding: 0;
     height: 100%;
+    transition: background-color 0.3s ease;
 }
 
 *,
@@ -11,11 +12,20 @@ body {
     box-sizing: border-box; /* Mila: Ensure no overflow */
 }
 
+:root {
+    --main-bg-color: #ddf1ff;
+}
+
 main {
     display: flex;
     flex-direction: column;
     flex-grow: 1; /* Mila: Ensure main takes up remaining width apart from the sidebar */
-    background-color: #ddf1ff;
+    background-color: var(--main-bg-color);
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode {
+    --main-bg-color: #35425d;
 }
 
 .blockContent {
