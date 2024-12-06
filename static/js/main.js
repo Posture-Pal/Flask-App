@@ -1,13 +1,34 @@
+const TOKEN_TTL_SECONDS = 5 * 60;
+let tokenRefreshTimer = null;
 
-// TODO Remove publishKey, subscribeKey, uuid, CHANNEL_NAME from main.js
+const publishKey = "pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a";
+const subscribeKey = "sub-c-90478427-a073-49bc-b402-ba4903894284";
+const channelName = "Posture-Pal";
+const secretKey = "topSecret_123";
+
+const cryptoModule = {
+    encrypt: function (data) {
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
+        return encrypted;
+    },
+    decrypt: function (data) {
+        const bytes = CryptoJS.AES.decrypt(data, secretKey);
+        const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        return decrypted;
+    }
+};
+
+
 const pubnub = new PubNub({
-    publishKey: 'pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a',
-    subscribeKey: 'sub-c-90478427-a073-49bc-b402-ba4903894284',
+    publishKey: publishKey,
+    subscribeKey: subscribeKey,
     uuid: window.userUUID,
-    authKey: window.token
+    authKey: window.token,
+    cryptoModule: cryptoModule
 });
 
-const CHANNEL_NAME = "Posture-Pal";
+
+const CHANNEL_NAME = channelName;
 
 // --- Initialization Functions ---
 function initApp() {
@@ -16,6 +37,7 @@ function initApp() {
     setupCalibrateButtonListener();
     setupToggleListeners();
     fetchLastSlouchTemperature();
+    initializeTokenManagement();
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
@@ -31,24 +53,44 @@ function subscribeToChannel() {
 }
 
 function publishMessage(message, callback) {
-    pubnub.publish({ channel: CHANNEL_NAME, message }, (status, response) => {
-        if (status.error) {
-            console.error("Error publishing message:", status);
-        } else {
-            console.log("Message sent successfully:", response);
-        }
-        if (callback) callback(status, response);
-    });
+    try {
+        console.log("Original message:", message);
+
+        const encryptedMessage = cryptoModule.encrypt(message);
+        console.log("Encrypted message:", encryptedMessage);
+
+        pubnub.publish({ channel: CHANNEL_NAME, message: encryptedMessage }, (status, response) => {
+            if (status.error) {
+                console.error("Error publishing message:", status);
+            } else {
+                console.log("Message sent successfully:", response);
+            }
+            if (callback) callback(status, response);
+        });
+    } catch (error) {
+        console.error("Error in publishMessage:", error);
+    }
 }
 
 function handleIncomingMessage(event) {
-    console.log("Received message:", event.message);
-    if (event.message.thresholds) {
-        updateThresholdTable(event.message.thresholds);
-    } else if (event.message.sensor_data) {
-        updateSensorData(event.message.sensor_data);
+    try {
+        console.log("Received encrypted message:", event.message);
+
+        const decryptedMessage = cryptoModule.decrypt(event.message);
+        console.log("Decrypted message:", decryptedMessage);
+
+        if (decryptedMessage.thresholds) {
+            updateThresholdTable(decryptedMessage.thresholds);
+        } else if (decryptedMessage.sensor_data) {
+            updateSensorData(decryptedMessage.sensor_data);
+        } else {
+            console.log("Testing")
+        }
+    } catch (error) {
+        console.error("Error decrypting message:", error);
     }
 }
+
 
 function handlePubNubStatus(statusEvent) {
     if (statusEvent.category === "PNConnectedCategory") {
@@ -56,6 +98,43 @@ function handlePubNubStatus(statusEvent) {
     } else {
         console.warn("PubNub connection status:", statusEvent);
     }
+}
+
+// --- Token Management ---
+function initializeTokenManagement() {
+    console.log("Initializing token management...");
+    scheduleTokenRefresh();
+}
+
+function refreshToken() {
+    console.log("Refreshing token...");
+    axios.post('/refresh_user_token')
+        .then(response => {
+            const data = response.data;
+            if (data.success) {
+                console.log("Token refreshed successfully:", data.token);
+
+                pubnub.setAuthKey(data.token);
+
+                scheduleTokenRefresh();
+            } else {
+                console.error("Failed to refresh token:", data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error refreshing token:", error);
+        });
+}
+
+function scheduleTokenRefresh() {
+    if (tokenRefreshTimer) {
+        clearTimeout(tokenRefreshTimer);
+    }
+
+    const refreshTime = (TOKEN_TTL_SECONDS - 10) * 1000;
+    tokenRefreshTimer = setTimeout(refreshToken, refreshTime);
+
+    console.log("Token refresh scheduled in:", refreshTime / 1000, "seconds");
 }
 
 // --- UI Updates ---

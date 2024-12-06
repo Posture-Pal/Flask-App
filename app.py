@@ -446,6 +446,27 @@ def save_power_session():
 def not_authorized():
     return render_template("not_authorized.html"), 403
 
+@app.route("/refresh_user_token", methods=["POST"])
+def refresh_user_token():
+    try:
+        user_uuid = session.get("google_client_id")
+        if not user_uuid:
+            return jsonify({"error": "User not logged in"}), 401
+
+        new_token = pb.refresh_token(user_uuid, ttl=5)
+
+        if not new_token:
+            return jsonify({"error": "Failed to refresh token"}), 500
+
+        my_db.update_user_token(user_uuid, new_token)
+
+        session["token"] = new_token
+
+        return jsonify({"success": True, "token": new_token}), 200
+    except Exception as e:
+        print(f"Error in refresh_token_endpoint: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
