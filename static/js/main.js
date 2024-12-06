@@ -1,32 +1,34 @@
 const TOKEN_TTL_SECONDS = 5 * 60;
 let tokenRefreshTimer = null;
 
+const publishKey = "pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a";
+const subscribeKey = "sub-c-90478427-a073-49bc-b402-ba4903894284";
+const channelName = "Posture-Pal";
+const secretKey = "topSecret_123";
 
 const cryptoModule = {
     encrypt: function (data) {
-        const key = "secret";
-        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
         return encrypted;
     },
     decrypt: function (data) {
-        const key = "secret";
-        const bytes = CryptoJS.AES.decrypt(data, key);
+        const bytes = CryptoJS.AES.decrypt(data, secretKey);
         const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         return decrypted;
     }
 };
 
 
-// TODO Remove publishKey, subscribeKey, uuid, CHANNEL_NAME from main.js
 const pubnub = new PubNub({
-    publishKey: 'pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a',
-    subscribeKey: 'sub-c-90478427-a073-49bc-b402-ba4903894284',
+    publishKey: publishKey,
+    subscribeKey: subscribeKey,
     uuid: window.userUUID,
     authKey: window.token,
     cryptoModule: cryptoModule
 });
 
-const CHANNEL_NAME = "Posture-Pal";
+
+const CHANNEL_NAME = channelName;
 
 // --- Initialization Functions ---
 function initApp() {
