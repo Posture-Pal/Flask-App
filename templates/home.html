@@ -88,12 +88,20 @@
             <div class="usageCard">
                 <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/thermometer.png"
                     alt="angle icon" />
-                <div class="temperatureSmallText">Temperature of Device</div>
+                <div class="usageSmallText">Temperature of Device</div>
                 <div class="temperatureBoldText">15°</div>
             </div>
         </div>
     </div>
-    <br><br>
+
+     <script>
+        window.userUUID = "{{ session['google_client_id'] }}"; 
+        window.token = "{{ session['token'] }}"; 
+
+        console.log('User UUID:', userUUID);
+        console.log('Token:', token);
+
+    </script>
 
     <script src="/static/js/main.js"></script>
 

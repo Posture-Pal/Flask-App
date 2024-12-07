@@ -1,25 +1,24 @@
 from datetime import datetime, timedelta
 import os
+from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request
+from flask import Flask, render_template, redirect, url_for, session, flash, jsonify, request, abort
 from flask_dance.contrib.google import make_google_blueprint, google
-from flask_dance.contrib.facebook import make_facebook_blueprint, facebook
-from flask_dance.contrib.github import make_github_blueprint, github
 from dotenv import load_dotenv
 import pymysql
-
-import my_db
+import my_db, pb
 
 from my_db import PowerSessions
 
 load_dotenv()
-
 db = my_db.db
-
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
 
-# logic to check for defualt or no password
+
 def check_database_credentials(uri):
     try:
         # parse URI
@@ -39,12 +38,7 @@ def check_database_credentials(uri):
     except Exception as e:
         print("⚠️ Error while checking database credentials:", e)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:@127.0.0.1/posture_pal'
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 check_database_credentials(app.config["SQLALCHEMY_DATABASE_URI"])
-
-db.init_app(app)
 
 
 if os.getenv("OAUTHLIB_INSECURE_TRANSPORT") == "1":
@@ -63,15 +57,12 @@ google_bp = make_google_blueprint(
 app.register_blueprint(google_bp, url_prefix="/login")
 
 @app.route("/")
-# redirect to home if the user is already logged in
 def index():
     if "user" in session and session["user"] != "Guest":
         return redirect(url_for("home"))
     else:
         return render_template("index.html")
 
-
-# google login route
 @app.route("/google_login")
 def google_login():
     if not google.authorized:
@@ -83,38 +74,54 @@ def google_login():
         return "Error: Unable to fetch user information from Google."
 
     user_info = response.json()
-    print("User Info:", user_info)
+
     session["user"] = user_info.get("name", "Unknown User")
     session["email"] = user_info.get("email", "No email provided")
     session["google_client_id"] = user_info.get("id")
 
+    my_db.add_user_and_login(user_info.get("name"), user_info.get("id"), user_info.get("email"))
+
+    token = pb.generate_token(user_info.get("id"))
+
+    if token:
+        my_db.update_user_token(user_info.get("id"), token)
+        session["token"] = token 
+
     return redirect(url_for("home"))
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user" not in session or session["user"] == "Guest":
+            return redirect(url_for("not_authorized"))
+        return f(*args, **kwargs)
+    return decorated_function
 
-# logout route
 @app.route("/logout")
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for("index"))
 
-# home route
 @app.route("/home")
+@login_required
 def home():
     user = session.get("user", "Guest")
     email = session.get("email", "No email provided")
     google_client_id = session.get("google_client_id", "No client_id provided")
 
-    my_db.add_user_and_login(user, google_client_id, email)
-
     show_calibrate_button = True
     user_data = my_db.get_user_by_email(email)
 
     usage_today = 0
+    token = None
     if user_data:
         user_id = user_data.get("id")
         show_calibrate_button = not my_db.has_threshold_for_user(user_id)
         usage_today = my_db.calculate_daily_usage(user_id)
+        user_record = my_db.get_user_row_if_exists(google_client_id)
+        if user_record:
+            token = user_record.token
 
     # get today's reminder count
     todays_reminders = my_db.count_todays_reminders()
@@ -126,7 +133,8 @@ def home():
         email=email,
         show_calibrate_button=show_calibrate_button,
         todays_reminders=todays_reminders,
-        usage_today=usage_today
+        usage_today=usage_today,
+        token=token,
     )
 
 @app.route("/save_sensor_data", methods=["POST"])
@@ -204,9 +212,6 @@ def save_threshold_data():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-
-        
-# #route to get data for statistics page
 @app.route("/get_posture_data", methods=["GET"])
 def get_posture_data():
     try:
@@ -301,6 +306,7 @@ def get_last_available_data_date():
         return jsonify({"success": False, "message": "An error occurred."}), 500
 
 @app.route("/statistics", methods=["GET"])
+@login_required
 def statistics():
     try:
         user_email = session.get("email")
@@ -323,8 +329,8 @@ def statistics():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route("/information")
+@login_required
 def information():
     return render_template("information.html")
 
@@ -356,11 +362,9 @@ def last_slouch_temperature():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
 @app.route("/settings")
-def settings():
-    
+@login_required
+def settings(): 
     try:
         user_email = session.get("email")
         
@@ -377,30 +381,44 @@ def settings():
 
     except Exception as e:
         print(f"Error in settings route: {e}")
-        return "An error occurred.", 500
-    
-    
+        return "An error occurred.", 500 
 
 @app.route("/article1")
+@login_required
 def article1():
     return render_template("article1.html")
 
 @app.route("/article2")
+@login_required
 def article2():
     return render_template("article2.html")
 
 @app.route("/article3")
+@login_required
 def article3():
     return render_template("article3.html")
 
 @app.route("/article4")
+@login_required
 def article4():
     return render_template("article4.html")
 
 @app.route("/article5")
+@login_required
 def article5():
     return render_template("article5.html")
 
+@app.route("/shop")
+def shop():
+    return render_template("shop.html")
+
+@app.route("/howto")
+def howto():
+    return render_template("howto.html")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 @app.route("/save_power_session", methods=["POST"])
 def save_power_session():
@@ -425,6 +443,31 @@ def save_power_session():
             return jsonify({"message": message}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+@app.route("/not_authorized")
+def not_authorized():
+    return render_template("not_authorized.html"), 403
+
+@app.route("/refresh_user_token", methods=["POST"])
+def refresh_user_token():
+    try:
+        user_uuid = session.get("google_client_id")
+        if not user_uuid:
+            return jsonify({"error": "User not logged in"}), 401
+
+        new_token = pb.refresh_token(user_uuid, ttl=5)
+
+        if not new_token:
+            return jsonify({"error": "Failed to refresh token"}), 500
+
+        my_db.update_user_token(user_uuid, new_token)
+
+        session["token"] = new_token
+
+        return jsonify({"success": True, "token": new_token}), 200
+    except Exception as e:
+        print(f"Error in refresh_token_endpoint: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route("/get_power_state", methods=["GET"])
 def get_power_state():

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+
+    <title>PosturePal</title>
+</head>
+
+<body>
+    <div class="siteContainer">
+        <div class="siteNavbar">
+            <div class="hamburger" onclick="toggleNav()">
+                &#9776;
+            </div>
+            <div class="navLinks">
+                <a href="{{ url_for('index') }}">PosturePal</a>
+                <a href="{{ url_for('shop') }}">Shop Now</a>
+                <div class="active"><a href="{{ url_for('howto') }}">How To Use</a></div>
+                <a href="{{ url_for('about') }}">About Us</a>
+            </div>
+        </div>
+
+        <div class="howToBanner" style="margin-top: 70px">
+            <img src="https://i.ibb.co/X8Qx86q/smartmockups-m4alocvh.jpg" alt="how to banner">
+            <h1>How To Use PosturePal</h1>
+        </div>
+
+        <div class="progress-bar">
+            <div class="step" id="step-1">1</div>
+            <div class="step" id="step-2">2</div>
+            <div class="step" id="step-3">3</div>
+            <div class="step" id="step-4">4</div>
+        </div>
+
+        <div class="section" id="section-1">
+            <div class="section-content">
+                <img src="https://m.media-amazon.com/images/I/613IfYrzvVL.jpg" alt="step 1 image">
+                <div class="text">
+                    <h2>Step 1: Get Your Device</h2>
+                    <p>First things first. You Will need a PosturePal Pack to track your posture and receieve useful
+                        insights on the app. You can get your pack <a href="shop">here</a>. Once you receive your Pack
+                        in the mail, unbox it and ensure it is connected to a power source such as a power bank.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="section-2">
+            <div class="section-content">
+                <div class="text">
+                    <h2>Step 2: Create Your Free Account</h2>
+                    <p>Navigate to <a href="/">PosturePal</a> and download the site as a PWA to always have it as a
+                        mobile app. Alternatively, you can use PosturePal as a website. Whichever works for you! Login
+                        with Google for your convenience and you will be welcomed into our app.</p>
+                </div>
+                <img src="https://i.ibb.co/SXLBz0z/image.png" alt="step 2 image">
+            </div>
+        </div>
+        <div class="section" id="section-3">
+            <div class="section-content">
+                <img src="https://res.cloudinary.com/uprightpose/image/upload/q_auto,f_auto/v1590488041/HowItWorks-Steps_ahhtot.png"
+                    alt="step 3 image">
+                <div class="text">
+                    <h2>Step 3: Wear Your Device</h2>
+                    <p>If it is your first time using the app you will be prompted to calibrate your posture. Wear the device on your back and follow the instructions on screen. Get into your ideal posture and press continue. The device will alert you if you slouch too far from this posture.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section" id="section-4">
+            <div class="section-content">
+                <div class="text">
+                    <h2>Step 4: Complete!</h2>
+                    <p>You have completed the setup process. You can now continue to monitor your posture progress using the dashboard on the home page and view your past data on the statistics page. Make sure to toggle your preferred alert method in the settings. Feel better, look better, be better!</p>
+                </div>
+                <img src="http://127.0.0.1:5000/static/images/mockup2.png" alt="step 4 image">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('.section');
+        const steps = document.querySelectorAll('.step');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const stepId = entry.target.id.replace('section-', 'step-');
+                const step = document.getElementById(stepId);
+
+                if (entry.isIntersecting) {
+                    step.classList.add('activeStep');
+                } else {
+                    step.classList.remove('activeStep');
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+    <script src="/static/js/nav.js"></script>
+</body>
+
+</html>

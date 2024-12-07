@@ -4,9 +4,9 @@
 
 {% block content %}
 <div class="marginContainer">
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div id="disclaimerAlert" class="alert alert-warning alert-dismissible fade show hidden" role="alert">
         <strong>Disclaimer:</strong> This app is not intended for medical purposes. It is solely for improving the presentation of your posture.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="dismissDisclaimer()"></button>
     </div>
     <div class="informationContainer">
         <div class="infoCardsContainer">

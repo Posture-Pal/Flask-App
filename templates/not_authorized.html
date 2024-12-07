@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Forbidden</title>
+    <link rel="stylesheet" href="/static/css/not_authorized.css">
+</head>
+<body>
+    <div class="image-container">
+        <img src="/static/images/penguinMatter.png" alt="Background Image" />
+    </div>
+    <div class="container">
+        <h1>403 - Forbidden</h1>
+        <p>You are not authorized to view this page.</p>
+        <p>Please <a href="{{ url_for('index') }}">log in</a> to continue.</p>
+        <a href="{{ url_for('index') }}" class="btn">Go to Login</a>
+    </div>
+</body>
+</html>

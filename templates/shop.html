@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+
+    <title>PosturePal</title>
+</head>
+
+<body>
+    <div class="siteContainer">
+        <div class="siteNavbar">
+            <div class="hamburger" onclick="toggleNav()">
+                &#9776;
+            </div>
+            <div class="navLinks">
+                <a href="{{ url_for('index') }}">PosturePal</a>
+                <div class="active"><a href="{{ url_for('shop') }}">Shop Now</a></div>
+                <a href="{{ url_for('howto') }}">How To Use</a>
+                <a href="{{ url_for('about') }}">About Us</a>
+            </div>
+        </div>
+
+        <div class="productContainer" style="margin-top: 100px">
+            <div class="productImage">
+                <img src="https://m.media-amazon.com/images/I/613IfYrzvVL.jpg" alt="product image">
+            </div>
+            <div class="productDetails">
+                <h1 class="fontCol">PosturePal Pack</h1>
+                <div class="price">€49.99</div>
+                <h3 class="fontCol">Colours</h3>
+                <div class="colorOptions">
+                    <div class="circle" style="background-color: black;"></div>
+                    <div class="circle" style="background-color: white;"></div>
+                    <div class="circle" style="background-color: rgb(157, 208, 255);"></div>
+                </div>
+                <p>Your personal posture tracking device compatibale with the PosturePal app. Alerts with sound and
+                    vibration. Ensuring you are more in tune with your posture to boost your mood and radiate
+                    confidence.</p>
+                <div class="productButton">Coming Soon</div>
+            </div>
+        </div>
+
+        <h1 class="merchTitle">Merch Line Dropping in 2025</h1>
+        <div class="merchContainer">
+            <ul class="merchBanner">
+                <li><img src="https://i.ibb.co/nmbHKB9/Tote-Bags-Mockup-Falling.png" alt="tote bags"></li>
+                <li><img src="https://i.ibb.co/CV2f1QK/Men-Hoodie-Mockup-Front-View.png" alt="hoodie"></li>
+                <li><img src="https://i.ibb.co/jwrXnXv/smartmockups-m4ain5ls.jpg" alt="mug"></li>
+                <li><img src="https://i.ibb.co/L9J04bb/smartmockups-m4ail8f9.jpg" alt="sweater model"></li>
+                <li><img src="https://i.ibb.co/C5QCtxp/smartmockups-m4aitghv.jpg" alt="bottle"></li>
+                <li><img src="https://i.ibb.co/whp4sYX/smartmockups-m4aivv88.jpg" alt="candle"></li>
+                <li><img src="https://i.ibb.co/DLZTFN5/smartmockups-m4aii08o.jpg" alt="phone case"></li>
+                <li><img src="https://i.ibb.co/86vdb4V/smartmockups-m4aioygq.jpg" alt="tote bag on chair"></li>
+                <li><img src="https://i.ibb.co/WfkbDk7/smartmockups-m4aiu5vf.jpg" alt="pillow"></li>
+                <li><img src="https://i.ibb.co/nmbHKB9/Tote-Bags-Mockup-Falling.png" alt="tote bags"></li>
+                <li><img src="https://i.ibb.co/CV2f1QK/Men-Hoodie-Mockup-Front-View.png" alt="hoodie"></li>
+                <li><img src="https://i.ibb.co/jwrXnXv/smartmockups-m4ain5ls.jpg" alt="mug"></li>
+                <li><img src="https://i.ibb.co/L9J04bb/smartmockups-m4ail8f9.jpg" alt="sweater model"></li>
+            </ul>
+        </div>
+
+
+    </div>
+    <script src="/static/js/nav.js"></script>
+</body>
+
+</html>
