@@ -7,7 +7,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from dotenv import load_dotenv
 import pymysql
 
-import my_db
+import my_db, pb
 
 from my_db import PowerSessions
 
