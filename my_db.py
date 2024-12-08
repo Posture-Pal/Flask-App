@@ -310,7 +310,6 @@ def save_power_session(user_id, power_on):
         print(f"Error in save_power_session: {e}")
         raise Exception(f"Error saving power session: {e}")
 
-
 def update_user_token(google_client_id, token):
     user = get_user_row_if_exists(google_client_id)
     if user:

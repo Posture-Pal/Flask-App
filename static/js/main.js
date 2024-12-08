@@ -173,6 +173,31 @@ function updateThresholdTable(thresholds) {
     sendDataToBackend("/save_threshold_data", thresholds);
 }
 
+function initToggleListeners() {
+    const soundToggle = document.getElementById("soundToggle");
+    const vibrationToggle = document.getElementById("vibrationToggle");
+
+    soundToggle.addEventListener("change", sendModesStatus);
+    vibrationToggle.addEventListener("change", sendModesStatus);
+}
+
+function updateCalibrationSectionVisibility(powerOn, thresholdExists) {
+    const calibrationSection = document.getElementById("calibration-section");
+
+    if (!calibrationSection) {
+        console.error("Calibration section not found in the DOM");
+        return;
+    }
+
+    if (powerOn && !thresholdExists) {
+        calibrationSection.style.display = "block";
+    } else {
+        calibrationSection.style.display = "none";
+    }
+}
+
+function initApp() {
+    startListeningForUpdates();
 function formatThresholdValue(value) {
     return Array.isArray(value) ? value.map(v => v.toFixed(2)).join(", ") : value.toFixed(2);
 }
@@ -180,6 +205,7 @@ function formatThresholdValue(value) {
 // --- Event Listeners ---
 function setupPowerToggleListener() {
     const powerToggle = document.getElementById("powerToggle");
+
     if (!powerToggle) {
         console.error("Power toggle not found.");
         return;

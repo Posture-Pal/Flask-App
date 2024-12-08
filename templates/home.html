@@ -10,23 +10,16 @@
         <p>Hello, {{ user }}!</p>
     </div>
 
-    <!-- <div>
-        <button id="power-btn">Turn On Sensor</button>
-        <button id="power-off-btn">Turn Off Sensor</button>
-    </div> -->
-
-    <!-- <div class="postureGoalContainer">
-        <div class="percentPosture">85%</div>
-        <div>You are meeting your posture goal!</div>
-    </div> -->
-
     <div id="errorMessage" style="color: red; display: none;">
         No data available yet for today. Make sure to turn your device on and calibrate!
     </div>
 
     <!-- Trying to get calibration button working -->
-    <div class="trying-calibration">
-        <div>
+    <div class="calibModal" id="calibration-section" style="display: none;">
+        <div class="calibContent">
+            <h4>Calibrate Posture</h4>
+            <p>Get into a comfortable posture to save as your good posture. We will alert you if you slouch too far from this posture. Don't worry, you can always re-calibrate in settings!</p>
+
             <!-- Button to trigger calibration -->
             <button id="calibrate-btn">Calibrate Posture</button>
             <!-- Table to display threshold values -->

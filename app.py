@@ -6,7 +6,10 @@ from flask import Flask, render_template, redirect, url_for, session, flash, jso
 from flask_dance.contrib.google import make_google_blueprint, google
 from dotenv import load_dotenv
 import pymysql
-import my_db, pb
+
+import my_db
+
+from my_db import PowerSessions
 
 load_dotenv()
 db = my_db.db
@@ -442,6 +445,31 @@ def save_power_session():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
+@app.route("/get_power_state", methods=["GET"])
+def get_power_state():
+    try:
+        user_email = session.get("email")
+        if not user_email:
+            return jsonify({"error": "User not authenticated"}), 401
+
+        user = my_db.get_user_by_email(user_email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user_id = user["id"]
+
+        latest_session = PowerSessions.query.filter_by(user_id=user_id).order_by(PowerSessions.timestamp.desc()).first()
+
+        threshold_exists = my_db.has_threshold_for_user(user_id)
+
+        if not latest_session:
+            return jsonify({"power_on": False, "threshold_exists": threshold_exists, "message": "No power session data available."}), 200
+
+        return jsonify({"power_on": latest_session.power_on, "threshold_exists": threshold_exists}), 200
+
+    except Exception as e:
+        print(f"Error retrieving power state: {e}")
+        return jsonify({"error": str(e)}), 500
 @app.route("/not_authorized")
 def not_authorized():
     return render_template("not_authorized.html"), 403
