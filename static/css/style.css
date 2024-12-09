@@ -28,6 +28,22 @@ body.dark-mode {
     --main-bg-color: #35425d;
 }
 
+body.dark-mode .usageContainer {
+    color: black;
+}
+
+body.dark-mode .informationContainer a {
+    color: white;
+}
+
+body.dark-mode .articleContainer * {
+    color: white;
+}
+
+body.dark-mode .marginContainer h1 {
+    color: white;
+}
+
 .blockContent {
     /* padding: 20px; */
     width: 100%;
