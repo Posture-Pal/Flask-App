@@ -4,19 +4,32 @@ let tokenRefreshTimer = null;
 const publishKey = "pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a";
 const subscribeKey = "sub-c-90478427-a073-49bc-b402-ba4903894284";
 const channelName = "Posture-Pal";
-const secretKey = "topSecret_123";
+const secretKey = "topSecret1234567topSecret1234567";
 
-const cryptoModule = {
-    encrypt: function (data) {
-        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
-        return encrypted;
-    },
-    decrypt: function (data) {
-        const bytes = CryptoJS.AES.decrypt(data, secretKey);
-        const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        return decrypted;
-    }
-};
+
+// const cryptoModule = {
+//     encrypt: function (data) {
+//         const iv = CryptoJS.lib.WordArray.random(16); // Random 16-byte IV
+//         const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), CryptoJS.enc.Utf8.parse(secretKey), {
+//             iv: iv,
+//             mode: CryptoJS.mode.CBC,
+//             padding: CryptoJS.pad.Pkcs7
+//         });
+//         const ivAndCiphertext = iv.concat(encrypted.ciphertext); // Prepend IV to ciphertext
+//         return CryptoJS.enc.Base64.stringify(ivAndCiphertext); // Encode in Base64
+//     },
+//     decrypt: function (data) {
+//         const encryptedBytes = CryptoJS.enc.Base64.parse(data); // Decode Base64
+//         const iv = CryptoJS.lib.WordArray.create(encryptedBytes.words.slice(0, 4)); // Extract IV (16 bytes)
+//         const ciphertext = CryptoJS.lib.WordArray.create(encryptedBytes.words.slice(4)); // Extract ciphertext
+//         const decrypted = CryptoJS.AES.decrypt({ ciphertext: ciphertext }, CryptoJS.enc.Utf8.parse(secretKey), {
+//             iv: iv,
+//             mode: CryptoJS.mode.CBC,
+//             padding: CryptoJS.pad.Pkcs7
+//         });
+//         return JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+//     }
+// };
 
 
 const pubnub = new PubNub({
@@ -24,7 +37,7 @@ const pubnub = new PubNub({
     subscribeKey: subscribeKey,
     uuid: window.userUUID,
     authKey: window.token,
-    cryptoModule: cryptoModule
+    // cryptoModule: cryptoModule
 });
 
 
@@ -56,10 +69,10 @@ function publishMessage(message, callback) {
     try {
         console.log("Original message:", message);
 
-        const encryptedMessage = cryptoModule.encrypt(message);
-        console.log("Encrypted message:", encryptedMessage);
+        // const encryptedMessage = cryptoModule.encrypt(message);
+        // console.log("Encrypted message:", encryptedMessage);
 
-        pubnub.publish({ channel: CHANNEL_NAME, message: encryptedMessage }, (status, response) => {
+        pubnub.publish({ channel: CHANNEL_NAME, message: message }, (status, response) => {
             if (status.error) {
                 console.error("Error publishing message:", status);
             } else {
@@ -76,13 +89,14 @@ function handleIncomingMessage(event) {
     try {
         console.log("Received encrypted message:", event.message);
 
-        const decryptedMessage = cryptoModule.decrypt(event.message);
-        console.log("Decrypted message:", decryptedMessage);
+        msg = event.message
+        // const decryptedMessage = cryptoModule.decrypt(event.message);
+        // console.log("Decrypted message:", decryptedMessage);
 
-        if (decryptedMessage.thresholds) {
-            updateThresholdTable(decryptedMessage.thresholds);
-        } else if (decryptedMessage.sensor_data) {
-            updateSensorData(decryptedMessage.sensor_data);
+        if (msg.thresholds) {
+            updateThresholdTable(msg.thresholds);
+        } else if (msg.sensor_data) {
+            updateSensorData(msg.sensor_data);
         } else {
             console.log("Testing")
         }
