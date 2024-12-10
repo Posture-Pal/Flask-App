@@ -204,17 +204,17 @@ function setupPowerToggleListener() {
         return;
     }
 
-    // fetch the state on page reload
-    fetch("/get_power_state")
-        .then(response => response.json())
-        .then(data => {
-            if (data.hasOwnProperty("power_on")) {
-                powerToggle.checked = data.power_on;
-            } else {
-                console.error("Invalid response from get_power_state:", data);
-            }
-        })
-        .catch(err => console.error("Error fetching power state:", err));
+    // // fetch the state on page reload
+    // fetch("/get_power_state")
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         if (data.hasOwnProperty("power_on")) {
+    //             powerToggle.checked = data.power_on;
+    //         } else {
+    //             console.error("Invalid response from get_power_state:", data);
+    //         }
+    //     })
+    //     .catch(err => console.error("Error fetching power state:", err));
 
     powerToggle.addEventListener("change", () => {
         const powerOn = powerToggle.checked;
