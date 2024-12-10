@@ -162,6 +162,7 @@ def save_sensor_data():
 
 @app.route("/save_threshold_data", methods=["POST"])
 def save_threshold_data():
+    print("Save threshold data in app.py ")
     if request.method == "POST":
         threshold_data = request.json  # Data from PubNub
         try:
@@ -174,33 +175,35 @@ def save_threshold_data():
                 return jsonify({"error": "User not found"}), 404
 
             user_id = user["id"]
-            print("Threshold data received:", threshold_data)
+            print("Threshold data received outside if block:", threshold_data)
 
-            # Check if real-time calibration data is available
-            if threshold_data.get("calibration_data"):
-                # Assuming calibration data contains the real-time values
-                calibration_data = threshold_data["calibration_data"]
+
+            if threshold_data:
+                print("printing the threshold_data data inside if block for threshold data", threshold_data)
+                # calibration_data = threshold_data["calibration_data"]
+                # print("printing the calibration data inside if block for threshold data",calibration_data)
                 existing_threshold = my_db.Threshold.query.filter_by(user_id=user_id).first()
 
                 if existing_threshold:
                     existing_threshold.update_thresholds(
-                        temp_overheat=calibration_data.get("temp_overheat"),
-                        temp_cold=calibration_data.get("temp_cold"),
-                        humid_high=calibration_data.get("humid_high"),
-                        humid_low=calibration_data.get("humid_low"),
-                        pitch=calibration_data.get("pitch"),
-                        gravity=calibration_data.get("gravity")
+                        temp_overheat=threshold_data.get("temp_overheat"),
+                        temp_cold=threshold_data.get("temp_cold"),
+                        humid_high=threshold_data.get("humid_high"),
+                        humid_low=threshold_data.get("humid_low"),
+                        pitch=threshold_data.get("pitch"),
+                        gravity=threshold_data.get("gravity")
                     )
                     return jsonify({"message": "Thresholds updated successfully."}), 200
                 else:
+                    print("Saving data for a user with no threshold")
                     new_threshold = my_db.Threshold(
                         user_id=user_id,
-                        temp_overheat=calibration_data.get("temp_overheat", 37.5),
-                        temp_cold=calibration_data.get("temp_cold", 15.0),
-                        humid_high=calibration_data.get("humid_high", 80.0),
-                        humid_low=calibration_data.get("humid_low", 20.0),
-                        pitch=calibration_data.get("pitch", 0.0),
-                        gravity=calibration_data.get("gravity", [0.0, 0.0, 1.0])
+                        temp_overheat=threshold_data.get("temp_overheat", 37.5),
+                        temp_cold=threshold_data.get("temp_cold", 15.0),
+                        humid_high=threshold_data.get("humid_high", 80.0),
+                        humid_low=threshold_data.get("humid_low", 20.0),
+                        pitch=threshold_data.get("pitch", 0.0),
+                        gravity=threshold_data.get("gravity", [0.0, 0.0, 1.0])
                     )
                     db.session.add(new_threshold)
                     db.session.commit()
@@ -209,6 +212,40 @@ def save_threshold_data():
                 return jsonify({"error": "No calibration data received."}), 400
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+        #     # Check if real-time calibration data is available
+        #     if threshold_data.get("calibration_data"):
+        #         # Assuming calibration data contains the real-time values
+        #         calibration_data = threshold_data["calibration_data"]
+        #         existing_threshold = my_db.Threshold.query.filter_by(user_id=user_id).first()
+
+        #         if existing_threshold:
+        #             existing_threshold.update_thresholds(
+        #                 temp_overheat=calibration_data.get("temp_overheat"),
+        #                 temp_cold=calibration_data.get("temp_cold"),
+        #                 humid_high=calibration_data.get("humid_high"),
+        #                 humid_low=calibration_data.get("humid_low"),
+        #                 pitch=calibration_data.get("pitch"),
+        #                 gravity=calibration_data.get("gravity")
+        #             )
+        #             return jsonify({"message": "Thresholds updated successfully."}), 200
+        #         else:
+        #             new_threshold = my_db.Threshold(
+        #                 user_id=user_id,
+        #                 temp_overheat=calibration_data.get("temp_overheat", 37.5),
+        #                 temp_cold=calibration_data.get("temp_cold", 15.0),
+        #                 humid_high=calibration_data.get("humid_high", 80.0),
+        #                 humid_low=calibration_data.get("humid_low", 20.0),
+        #                 pitch=calibration_data.get("pitch", 0.0),
+        #                 gravity=calibration_data.get("gravity", [0.0, 0.0, 1.0])
+        #             )
+        #             db.session.add(new_threshold)
+        #             db.session.commit()
+        #             return jsonify({"message": "Thresholds saved successfully."}), 201
+        #     else:
+        #         return jsonify({"error": "No calibration data received."}), 400
+        # except Exception as e:
+            # return jsonify({"error": str(e)}), 500
 
 @app.route("/get_posture_data", methods=["GET"])
 def get_posture_data():

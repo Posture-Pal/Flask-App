@@ -98,7 +98,8 @@ function handleIncomingMessage(event) {
         } else if (msg.sensor_data) {
             updateSensorData(msg.sensor_data);
         } else {
-            console.log("Testing")
+            console.log("Some other this was sent")
+            console.log
         }
     } catch (error) {
         console.error("Error decrypting message:", error);
@@ -163,7 +164,9 @@ function updateSensorData(data) {
         slouchStatus.textContent = `Slouch: ${data.slouch ?? "N/A"}`;
     } else {
         console.warn("Slouch status element not found.");
-    }
+    } 
+
+    console.log("Loggin data in updateSensorData method",data)
 
     sendDataToBackend("/save_sensor_data", data);
 }
@@ -183,6 +186,7 @@ function updateThresholdTable(thresholds) {
         tableBody.appendChild(row);
     });
     table.style.display = "table";
+
 
     sendDataToBackend("/save_threshold_data", thresholds);
 }
