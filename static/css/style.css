@@ -440,6 +440,7 @@ body.dark-mode .marginContainer h1 {
     display: flex;
     width: 100vw;
     height: 100vh;
+    background-color: #E0F3FF;
 }
 
 #imageContainer {
@@ -978,4 +979,3 @@ footer {
         margin-left: 15px;
     }
 }
-

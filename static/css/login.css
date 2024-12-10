@@ -49,7 +49,7 @@ body {
     z-index: 500; /* make sure it's below the splashScreen */
     background-color: #E0F3FF;
 }
-
+w
 
 #loginContainer.visible {
     opacity: 1;
@@ -84,7 +84,7 @@ body {
 
 .socialIcons {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     width: 100%;
 }
 
@@ -122,7 +122,9 @@ body {
     border-radius: 5px;
     background-color: #f8d7da; 
     color: #721c24;
-    text-align: center;}
+    text-align: center;
+    word-wrap: break-word;
+}
 
 .flashMessages li {
     list-style-type: none;
