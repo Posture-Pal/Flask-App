@@ -48,6 +48,7 @@ function initApp() {
     subscribeToChannel();
     setupPowerToggleListener();
     setupCalibrateButtonListener();
+    calibrateModalButton();
     setupToggleListeners();
     fetchLastSlouchTemperature();
     initializeTokenManagement();
@@ -234,6 +235,23 @@ function sendModeStatus() {
     const soundMode = document.getElementById("soundToggle").checked;
     const vibrationMode = document.getElementById("vibrationToggle").checked;
     publishMessage({ sound_mode: soundMode, vibration_mode: vibrationMode });
+}
+
+function calibrateModalButton() {
+    const calibrateButtonModal = document.getElementById("calibrate-modal-btn");
+    const modalOverlay = document.getElementById("modal-overlay");
+    const calibrateModal = document.getElementById("calibrateModal");
+
+    calibrateButtonModal.addEventListener("click", () => {
+
+        modalOverlay.style.display = "block";
+        calibrateModal.style.display = "block";
+    });
+
+    modalOverlay.addEventListener("click", () => {
+        modalOverlay.style.display = "none";
+        calibrateModal.style.display = "none";
+    });
 }
 
 // --- Backend Communication ---
