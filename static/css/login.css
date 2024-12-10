@@ -48,21 +48,22 @@ body {
     transition: opacity 1s ease;
     z-index: 500; /* make sure it's below the splashScreen */
     background-color: #E0F3FF;
+    flex-wrap: no-wrap;
 }
-w
+
 
 #loginContainer.visible {
     opacity: 1;
 }
 
 .posturePalLogo {
-    width: 250px;
+    width: 30%;
     height: auto;
     margin-bottom: 20px;
 }
 
 
-.loginButton {
+/* .loginButton {
     width: 200px;
     padding: 10px;
     border: none;
@@ -74,13 +75,15 @@ w
     font-weight: 500;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+} */
 
 
 .dividerLine {
     width: 50%; 
     height: 2px;
-    background-color: #C4D4DC;}
+    background-color: #C4D4DC;
+    position: relative;
+}
 
 .socialIcons {
     display: flex;
@@ -89,8 +92,8 @@ w
 }
 
 .socialIcons a {
-    /* position: fixed;
-    bottom: 0; */
+    position: relative;
+    bottom: 0;
     text-decoration: none;
     cursor: pointer;
     border-radius: 10px;
