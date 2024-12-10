@@ -204,6 +204,18 @@ function setupPowerToggleListener() {
         return;
     }
 
+    // fetch the state on page reload
+    fetch("/get_power_state")
+        .then(response => response.json())
+        .then(data => {
+            if (data.hasOwnProperty("power_on")) {
+                powerToggle.checked = data.power_on;
+            } else {
+                console.error("Invalid response from get_power_state:", data);
+            }
+        })
+        .catch(err => console.error("Error fetching power state:", err));
+
     powerToggle.addEventListener("change", () => {
         const powerOn = powerToggle.checked;
         publishMessage({ power: powerOn }, () => {
@@ -241,16 +253,26 @@ function calibrateModalButton() {
     const calibrateButtonModal = document.getElementById("calibrate-modal-btn");
     const modalOverlay = document.getElementById("modal-overlay");
     const calibrateModal = document.getElementById("calibrateModal");
+    const calibTable = document.getElementById("threshold-table");
+    const calibratBtn = document.getElementById("calibrate-btn")
 
     calibrateButtonModal.addEventListener("click", () => {
 
         modalOverlay.style.display = "block";
         calibrateModal.style.display = "block";
+        calibTable.style.display = "none;"
     });
 
     modalOverlay.addEventListener("click", () => {
         modalOverlay.style.display = "none";
         calibrateModal.style.display = "none";
+        calibTable.style.display = "none";
+    });
+
+    calibratBtn.addEventListener("click", () => {
+        modalOverlay.style.display = "none";
+        calibrateModal.style.display = "none";
+        calibTable.style.display = "none";
     });
 }
 

@@ -62,6 +62,10 @@ body.dark-mode .marginContainer h1 {
     margin-left: 40px;
 }
 
+#thresholdTable {
+    display: none;
+}
+
 /* ======================== Login/Index Page (rest in login.css) ==================================*/
 
 .siteNavbar {

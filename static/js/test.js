@@ -150,34 +150,34 @@ if (calibrateButton) {
 }
 
 // Testing if button is still working 
-function updateThresholdTable(data) {
-    const table = document.getElementById("threshold-table");
-    const tableBody = document.getElementById("threshold-values");
-    tableBody.innerHTML = "";
-    Object.entries(data.thresholds).forEach(([key, value]) => {
-        const row = document.createElement("tr");
-        const parameterCell = document.createElement("td");
-        parameterCell.textContent = key;
-        const valueCell = document.createElement("td");
-        if (Array.isArray(value)) {
-            valueCell.textContent = value.map(v => v.toFixed(2)).join(", ");
-        } else {
-            valueCell.textContent = typeof value === "number" ? value.toFixed(2) : value;
-        }
-        row.appendChild(parameterCell);
-        row.appendChild(valueCell);
-        tableBody.appendChild(row);
-    });
-    table.style.display = "table";
-        axios
-        .post("/save_threshold_data", data.thresholds)
-        .then((response) => {
-            console.log(response.data.message || "Data saved successfully.");
-        })
-        .catch((error) => {
-            console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
-        });
-}
+// function updateThresholdTable(data) {
+//     const table = document.getElementById("threshold-table");
+//     const tableBody = document.getElementById("threshold-values");
+//     tableBody.innerHTML = "";
+//     Object.entries(data.thresholds).forEach(([key, value]) => {
+//         const row = document.createElement("tr");
+//         const parameterCell = document.createElement("td");
+//         parameterCell.textContent = key;
+//         const valueCell = document.createElement("td");
+//         if (Array.isArray(value)) {
+//             valueCell.textContent = value.map(v => v.toFixed(2)).join(", ");
+//         } else {
+//             valueCell.textContent = typeof value === "number" ? value.toFixed(2) : value;
+//         }
+//         row.appendChild(parameterCell);
+//         row.appendChild(valueCell);
+//         tableBody.appendChild(row);
+//     });
+//     table.style.display = "table";
+//         axios
+//         .post("/save_threshold_data", data.thresholds)
+//         .then((response) => {
+//             console.log(response.data.message || "Data saved successfully.");
+//         })
+//         .catch((error) => {
+//             console.error("Error in sending data to backend:", error.response?.data?.error || error.message);
+//         });
+// }
 
 function startListeningForUpdates() {
     console.log("Subscribing to channel:", CHANNEL_NAME);
