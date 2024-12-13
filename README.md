@@ -6,6 +6,10 @@ Welcome to **Posture Pal**, a Progressive Web App (PWA) designed to help student
 Check out the live website: [Posture Pal](https://posturepal.live/)
 
 ![Screenshot 2024-12-11 224706](https://github.com/user-attachments/assets/443c9241-d298-4f05-8b59-c921726cb55c)
+![Screenshot 2024-12-13 203043](https://github.com/user-attachments/assets/c6b8cd2e-b47e-48d9-b3ed-ef58f921f33e)
+![Screenshot 2024-12-13 203111](https://github.com/user-attachments/assets/f4b2fed0-f4b2-4a49-934c-125bb9859821)
+![Screenshot 2024-12-13 203200](https://github.com/user-attachments/assets/f30743e1-66a2-4c4b-a475-edf28354847b)
+![Screenshot 2024-12-13 203215](https://github.com/user-attachments/assets/d456f008-7301-43d5-a02d-bd2a80305537)
 
 ---
 
