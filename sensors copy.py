@@ -5,11 +5,14 @@ import adafruit_dht
 import adafruit_bno055
 import json
 import RPi.GPIO as GPIO  
+import uuid
+import threading
+import base64
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
 from pubnub.callbacks import SubscribeCallback 
-import uuid
-import threading
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 # Initialize sensors
 dht_sensor = adafruit_dht.DHT22(board.D4)
@@ -47,14 +50,35 @@ calibration_done = False
 
 # PubNub Configuration
 pnconfig = PNConfiguration()
-pnconfig.subscribe_key = os.getenv("PUBNUB_SUBSCRIBE_KEY")
-pnconfig.publish_key = os.getenv("PUBNUB_PUBLISH_KEY")
+pnconfig.subscribe_key ="sub-c-90478427-a073-49bc-b402-ba4903894284"
+pnconfig.publish_key = "pub-c-ef699d1a-d6bd-415f-bb21-a5942c7afc1a"
 pnconfig.ssl = True
 pnconfig.uuid = str(uuid.uuid4())
-pnconfig.secret_key = os.getenv("PUBNUB_SECRET_KEY")  
+pnconfig.secret_key = "sec-c-MjVhNWM4MmItMWM1Yy00N2Y1LWIwMzItNTA1MzUzNDQ5NzFi"
 pubnub = PubNub(pnconfig)
+CHANNEL = "Posture-Pal"
 
-CHANNEL = os.getenv("PUBNUB_UUID")
+# CIPHER_KEY = "topSecret1234567topSecret1234567"  # Same key as in JavaScript
+# BLOCK_SIZE = 16 
+
+
+def encrypt(message):
+    iv = os.urandom(16)
+    cipher = AES.new(CIPHER_KEY.encode('utf-8'), AES.MODE_CBC, iv)
+    encrypted = cipher.encrypt(pad(message.encode('utf-8'), 16))
+    return base64.b64encode(iv + encrypted).decode()
+
+def decrypt(encrypted_message):
+    try:
+        encrypted_bytes = base64.b64decode(encrypted_message)
+        iv = encrypted_bytes[:16]  # Extract the first 16 bytes as the IV
+        ciphertext = encrypted_bytes[16:]  # The rest is the ciphertext
+        cipher = AES.new(CIPHER_KEY.encode('utf-8'), AES.MODE_CBC, iv)
+        decrypted = unpad(cipher.decrypt(ciphertext), BLOCK_SIZE)
+        return decrypted.decode('utf-8')
+    except Exception as e:
+        print(f"Decryption failed: {e}")
+        raise
 
 # setting up pins
 def setup_gpio():
@@ -192,8 +216,9 @@ def monitor_posture():
 
 # publish message to pubnub
 def publish_message(message):
+    # encrypted_msg = encrypt(message)
     pubnub.publish().channel(CHANNEL).message(message).sync()
-    print(f"Published: {message}")
+    print(f"Published: {message}, - {message}")
 
 def handle_pubnub_message(message):
     global sound_mode, vibration_mode, monitoring_active
@@ -242,8 +267,17 @@ def handle_pubnub_message(message):
 class PostureListener(SubscribeCallback):
     def message(self, pubnub, message):
         global monitoring_active
-        print(f"Received message: {message.message}")
-        monitoring_active = handle_pubnub_message(message.message)
+        try:
+            # Extract the actual message payload
+            # encrypted_message = str(message.message)  # Extract the encrypted message
+            # decrypted_msg = decrypt(encrypted_message)  # Decrypt it
+            # parsed_message = json.loads(decrypted_msg)
+            print(f"Decrypted message: {message.message}")
+            
+            # Process the decrypted message
+            monitoring_active = handle_pubnub_message(eval(parsed_message))  # Convert to dictionary if needed
+        except Exception as e:
+            print(f"Error decrypting or processing message: {e}")
 
 
 def start_pubnub_listener():

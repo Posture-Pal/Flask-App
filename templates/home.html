@@ -28,21 +28,35 @@
     <div class="trying-calibration">
         <div>
             <!-- Button to trigger calibration -->
-            <button id="calibrate-btn">Calibrate Posture</button>
+            <!-- <button id="calibrate-btn">Calibrate Posture</button> -->
             <!-- Table to display threshold values -->
-            <table id="threshold-table" border="1" style="margin-top: 20px; display: none;">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody id="threshold-values">
-                    <!-- Data will be populated dynamically -->
-                </tbody>
-            </table>
+            
         </div>
     </div>
+
+    <button id="calibrate-modal-btn">Calibrate Device</button>
+    <br>
+
+<div id="modal-overlay" style="display: none;"></div> <!-- Displaying none by default -->
+    <div id="calibrateModal" style="display: none;">
+        <h3>Calibrating Your Device</h3>
+        <p>Make sure to sit or stand up straight to capture your good posture. If you deviate from this posture you will
+            receive an alert. Don't worry, you can always re-calibrate again.</p>
+        <button id="calibrate-btn">Calibrate Posture</button>
+        <table id="threshold-table" border="1" style="display: none;">
+            <!-- <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                </tr>
+            </thead> -->
+            <tbody id="threshold-values" style="display: none;">
+                <!-- Data will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <br><br>
 
     <div class="controls">
         <div class="control">
@@ -83,7 +97,7 @@
                 <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/clock--v1.png"
                     alt="clock icon" />
                 <div class="usageSmallText">Usage Today</div>
-                <div class="usageBoldText">{{ usage_today | int }} Hours</div>
+                <div class="usageBoldText">{{ '%.2f' % usage_today }} Hours</div>
             </div>
             <div class="usageCard">
                 <img class="navicons"
@@ -95,43 +109,21 @@
             <div class="usageCard">
                 <img class="navicons" src="https://img.icons8.com/fluency-systems-regular/50/2b617d/thermometer.png"
                     alt="angle icon" />
-                <div class="temperatureSmallText">Temperature of Device</div>
+                <div class="usageSmallText">Temperature of Device</div>
                 <div class="temperatureBoldText">15°</div>
             </div>
         </div>
     </div>
-    <!-- <a href="{{ url_for('logout') }}">Logout</a> -->
-    <br><br>
-    {% if show_calibrate_button %}
-    {% include '_calibration_modal.html' %}
-    {% endif %}
 
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const modalOverlay = document.getElementById("modal-overlay");
-            const calibrateModal = document.getElementById("calibrateModal");
-            const closeModalBtn = document.getElementById("close-modal-btn");
-            const showCalibrate = {{ 'true' if show_calibrate_button else 'false' }}
-        }
-        };
+     <script>
+        window.userUUID = "{{ session['google_client_id'] }}"; 
+        window.token = "{{ session['token'] }}"; 
 
-        // Ensure elements are found and showCalibrate is true
-        if (showCalibrate && modalOverlay && calibrateModal) {
-            modalOverlay.style.display = "block";
-            calibrateModal.style.display = "block";
-        }
+        console.log('User UUID:', userUUID);
+        console.log('Token:', token);
 
-        closeModalBtn?.addEventListener("click", () => {
-            modalOverlay.style.display = "none";
-            calibrateModal.style.display = "none";
-        });
+    </script>
 
-        modalOverlay?.addEventListener("click", () => {
-            modalOverlay.style.display = "none";
-            calibrateModal.style.display = "none";
-        });
-    });
-    </script> -->
     <script src="/static/js/main.js"></script>
 
     <div>

@@ -1,0 +1,987 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    transition: background-color 0.3s ease;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box; /* Mila: Ensure no overflow */
+}
+
+:root {
+    --main-bg-color: #ddf1ff;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Mila: Ensure main takes up remaining width apart from the sidebar */
+    background-color: var(--main-bg-color);
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode {
+    --main-bg-color: #35425d;
+}
+
+body.dark-mode .usageContainer {
+    color: black;
+}
+
+body.dark-mode .informationContainer a {
+    color: white;
+}
+
+body.dark-mode .articleContainer * {
+    color: white;
+}
+
+body.dark-mode .marginContainer h1 {
+    color: white;
+}
+
+.blockContent {
+    /* padding: 20px; */
+    width: 100%;
+}
+
+.marginContainer {
+    padding: 20px;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+}
+
+.control {
+    margin-left: 40px;
+}
+
+#thresholdTable {
+    display: none;
+}
+
+/* ======================== Login/Index Page (rest in login.css) ==================================*/
+
+.siteNavbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    background-color: white;
+    width: 100%;
+    z-index: 700;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-size: 20px;
+}
+
+.siteNavbar a {
+    text-decoration: none;
+    color: #163F53;
+}
+
+.navLinks {
+    display: flex;
+    gap: 80px;
+}
+
+.navLinks a {
+    text-decoration: none;
+    color: #163F53;
+}
+
+.hamburger {
+    display: none;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.active a {
+    background-color: #163F53;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 30px;
+}
+
+.active a:hover {
+    background-color: #376888;
+    transition: 0.3s;
+}
+
+.siteContainer {
+    min-height: 100vh;
+    background-color: #E0F3FF;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ======================== Shop Page ==================================*/
+
+.productContainer {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    overflow: visible;
+    position: relative;
+    max-width: 800px;
+    width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.productContainer:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+}
+
+.productImage {
+    position: absolute;
+    left: -90px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px;
+    height: 400px;
+    z-index: 1;
+}
+
+.productImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.productDetails {
+    padding-left: 350px;
+    flex: 1;
+}
+
+.fontCol {
+    color: #16455F;
+}
+
+.colorOptions {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    transition: transform 0.2s ease;
+}
+
+.circle:hover {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+.price {
+    font-size: 30px;
+    color: #43748B;
+}
+
+.productButton {
+    padding: 10px 20px;
+    background-color: #163f53;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: auto;
+    display: inline-block; 
+    margin: 10px 0;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.productButton:hover {
+    background-color: #376888;
+}
+
+/* scrolling boxes reference: https://codepen.io/tlattimore/pen/rxzWyY */
+.merchContainer {
+    width: 100%;
+    overflow: hidden;
+    margin: auto;
+    position: relative;
+}
+
+.merchBanner {
+    display: flex;
+    animation: scroll 25s linear infinite;
+}
+
+.merchBanner li {
+    list-style: none;
+}
+
+.merchBanner img {
+    width: auto;
+    height: 500px;
+    margin: 0.5rem;
+    object-fit: cover;
+}
+
+.merchTitle {
+    margin-left: 50px;
+    color: #16455F;
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-347%);
+    }
+}
+
+.motto {
+    color: #163f53;
+    text-align: center;
+    font-size: 1rem;
+}
+
+#splashImage {
+    will-change: transform;
+    height: 30vh;
+    animation: splashResize 2.5s ease-in-out forwards;
+}
+
+@keyframes splashResize {
+    0% {
+        transform: scale(0.7);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(0.9);
+    }
+}
+
+/* ================================ How To Page ==================================*/
+
+.howToBanner {
+    width: 100%; 
+    height: 350px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.howToBanner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+}
+
+.howToBanner h1 {
+    font-size: 40px;
+    position: absolute;
+    color: white;
+    bottom: 10px;
+    left: 30px;
+}
+
+.section {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#section-1 { background-color:white;}
+#section-2 { background-color:rgb(247, 247, 247);}
+#section-3 { background-color:white;}
+#section-4 { background-color:rgb(247, 247, 247);}
+
+.section-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    width: 70%;
+}
+
+.section-content img {
+    max-width: 50%;
+    height: auto;
+    border-radius: 20px;
+}
+
+.text {
+    max-width: 45%;
+}
+
+.text a {
+    text-decoration: none;
+    color: rgb(51, 115, 255);
+}
+
+.progress-bar {
+    position: fixed;
+    top: 20%;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    background-color: grey;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 30px;
+}
+
+.activeStep {
+    background-color: #43748B;
+}
+
+.aboutContainer {
+    text-align: center;
+    padding: 20px;
+}
+
+.aboutContainer h1 {
+    color: #163F53;
+}
+
+.team {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.team-member {
+    text-align: center;
+    flex: 1 1 calc(25% - 20px);
+    max-width: 200px;
+}
+
+.team-member img {
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.team-member p {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.whiteBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    height: auto;
+    background-color: white;
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+#mockup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 600;
+}
+
+#mockup img {
+    height: 80vh;
+}
+
+#floatingMockup {
+    position: relative;
+    animation: floatUpDown 4s ease-in-out infinite;
+}
+
+@keyframes floatUpDown {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.indexContainer {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: #E0F3FF;
+}
+
+#imageContainer {
+    flex: 1;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* overflow: hidden; */
+}
+
+#imageContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ======================== Base Page (that other pages extend layouts from) ==================================*/
+
+.mainContainer {
+    display: flex;
+    width: 100%;
+}
+
+.logo {
+    position: fixed;
+    z-index: 1;
+    top: 40px;
+    left: 32px;
+}
+
+.logo a {
+    text-decoration: none;
+    color: #163F53;
+    font-weight: bold;
+    font-family: "Poppins", sans-serif;
+    font-size: 35px;
+}
+
+.logo img {
+    height: 48px;
+}
+
+.sidenav {
+    height: 100vh;
+    position: sticky;
+    left: 0;
+    top: 0;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+    padding-right: 10vw;
+    font-size: 20px;
+}
+
+.sidenav a {
+    text-decoration: none;
+    color: black;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.navicons {
+    height: 35px;
+    width: 35px;
+}
+
+.PageBanner {
+    padding: 20px;
+    width: 100%;
+    background-color: #2B617D;
+    font-weight: 600; /* Mila: Semi-bold*/
+    color: white;
+    font-size: 30px;
+}
+
+/* ======================== Home Page ==================================*/
+
+.greeting {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.usageContainer {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.usageContainerFlex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.usageCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.percentPosture {
+    font-size: 30px;
+    color: #46C261;
+}
+
+.usageSmallText{
+    font-size: 12px;
+}
+
+.usageBoldText {
+    font-weight: bold;
+}
+
+.temperatureBoldText {
+    font-weight: bold;
+}
+
+/* =========================== Info Page ==============================*/
+
+.informationContainer{
+    width: 100%;
+}
+
+.infoCardsContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-left: 35px;
+}
+
+.infoCardsContainer a {
+    text-decoration: none;
+    color: black;
+}
+
+.hidden {
+    display: none;
+}
+
+.infoCards {
+    font-size: 22px;
+    font-weight: 400;
+    margin: 20px;
+}
+
+.infoCards img {
+    height: 200px;
+    border-radius: 25px;
+}
+
+/* =========================== Article Pages ==============================*/
+
+a.btn-primary {
+    font-size: 20px;
+    padding: 12px 18px;
+    background-color: #2B617D;
+    color: #ffffff !important;
+    border: none;
+}
+
+a.btn-primary:hover {
+    background-color: #1e4a60 !important;
+}
+
+/* .articleBanner {
+
+} */
+
+.articleBanner img {
+    width: 100%;
+    height: 300px;
+    max-height: 200px;
+    object-fit: cover;
+}
+
+.articleContainer {
+    margin: 20px;
+    font-size: 20px;
+}
+
+.articleContainer p {
+    color: #1a4f67;
+}
+
+.marginContainer h1 {
+    color: #1e3e4f;
+}
+
+.articleContainer h1, 
+.articleContainer h2, 
+.articleContainer h3, 
+.articleContainer h4, 
+.articleContainer h5, 
+.articleContainer h6,
+.articleContainer strong,
+.articleContainer li {
+    color: #1e3e4f;
+}
+
+.articleContainer h2 {
+    margin-top: 40px;
+}
+
+.flexArticle {
+    display: flex;
+    gap: 20px;
+}
+
+.twoColumn {
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.twoColumn img {
+    height: 45vh;
+    align-items: right;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+footer {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 20px;
+    color: #777;
+}
+
+/* ===================== Modal ====================== */
+
+#calibrateModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#calibrate-btn {
+    background-color: #2B617D;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#calibrate-btn:hover {
+    background-color: #19455b;
+}
+
+#modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* ======================== Home Page Posture Chart ==============================*/
+
+#homePagePostureChartContainer {
+    width: 80%; 
+    max-width: 355px; 
+    height: 300px; 
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; 
+}
+
+#homePagePostureChart {
+    width: 100%;
+    height: 100%;
+    display: none; /* centered the penguin as no data showed blank canvas */
+}
+
+/* ======================== No Data Message ==============================*/
+
+#noDataMessage {
+    display: none; /* Keeps it hidden initially */
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+    display: flex; /* Flexbox for alignment */
+    flex-direction: column; /* Stack content vertically */
+    align-items: center; /* Horizontally center content */
+    justify-content: center; /* Vertically center content, if needed */
+    padding: 20px; /* Optional, for spacing around content */
+}
+
+#noDataMessage p {
+    margin: 0;
+    font-weight: bold;
+    color: #666;
+}
+
+#noDataMessage img {
+    width: 200px;
+    height: auto;
+    margin-top: 15px;
+}
+
+
+/* ===================== Responsiveness ====================== */
+
+.bottomnav {
+    display: none;
+    height: 50px;
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+    text-decoration: none;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 20px;
+}
+
+.bottomnav a {
+    text-decoration: none;
+    color: black;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+/* @media screen and (max-width: 1200px) {
+    .logo img {
+        height: 40px;
+    }
+} */
+
+@media screen and (max-width: 800px) {
+    .sidenav {
+        display: none;
+    }
+
+    .bottomnav {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .chart-container {
+        max-width: 90%; 
+        height: 300px; 
+    }
+
+    #postureChart {
+        height: auto; 
+    }
+
+    .calendar-container {
+        margin-bottom: 15px;
+    }
+
+    #homePagePostureChartContainer {
+        width: 90%; 
+        max-width: 90%; 
+        height: 250px; 
+    }
+
+    #noDataMessage img {
+        width: 130px;
+    }   
+
+    #homePagePostureChart {
+        height: auto; 
+    }
+
+    .indexContainer {
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+
+    #loginContainer {
+        order: 1;
+        height: 100vh;
+        width: 100%;
+        margin-top: 30px;
+    }
+
+    #imageContainer {
+        order: 2;
+        height: 100vh;
+        width: 100%;
+        display: none;
+    }
+
+    #imageContainer img {
+        height: 100vh;
+        width: 100%;
+    }
+
+    #floatingMockup {
+        display: none;
+    }
+
+    .siteNavbar {
+        justify-content: flex-start;
+    }
+
+    .navLinks {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 200px;
+    text-align: left;
+    gap: 20px;
+    }
+
+    .navLinks a {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-left: 10px;
+    }
+
+    .hamburger {
+        display: block;
+        margin-right: 20px;
+    }
+
+    .navLinks.show {
+        display: flex;
+    }
+
+    .active a {
+        padding: 5px 10px;
+    }
+
+    .productContainer {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        width: 80%;
+    }
+
+    .productImage {
+        position: static;
+        width: 80%;
+        height: auto;
+        transform: none;
+        margin-bottom: 20px;
+    }
+
+    .productDetails {
+        padding-left: 0;
+        text-align: center;
+    }
+
+    .section-content {
+        flex-direction: column;
+        align-items: center;
+        width: 90%;
+    }
+
+    .section-content img {
+        max-width: 80%;
+        margin-bottom: 20px;
+    }
+
+    .text {
+        max-width: 80%;
+    }
+
+    .usageContainerFlex {
+        flex-wrap: wrap;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
+    
+    .control {
+        margin-left: 0;
+    }
+
+    .flexArticle {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .articleContainer {
+        font-size: 18px;
+    }
+
+    .marginContainer h1 {
+        font-size: 24px;
+    }
+
+    .articleContainer h2 {
+        font-size: 20px;
+    }
+
+    ul {
+        margin-left: 15px;
+    }
+}
